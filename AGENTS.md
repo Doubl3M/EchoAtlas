@@ -97,31 +97,20 @@ Implementation waits.
 
 # Architectural Layers
 
-Application
+Dependencies follow this canonical model:
 
-↓
+```
+music      → knowledge, shared
+knowledge  → shared
+world      → knowledge, engine, shared
+render     → world, engine, shared
+ui         → render, shared
+app        → music, knowledge, world, render, ui, engine, shared
+engine     → shared
+shared     → nothing
+```
 
-Engine
-
-↓
-
-Knowledge Graph
-
-↓
-
-World
-
-↓
-
-Renderer
-
-↓
-
-UI
-
-Dependencies may only point downward.
-
-Never upward.
+No inverse or circular dependency is allowed.
 
 ---
 
@@ -136,7 +125,7 @@ The Engine manipulates:
 - weights
 - geometry
 - terrain
-- rendering
+- rendering primitives
 
 Music belongs to the Interpreter.
 
@@ -222,21 +211,22 @@ Barrel exports only at module level.
 
 # Folder Structure
 
+```
 src/
-
-app/
-
-engine/
-
-music/
-
-render/
-
-ui/
-
-shared/
-
-tests/
+├── app/
+├── music/
+├── knowledge/
+├── world/
+├── render/
+├── ui/
+├── engine/
+│   ├── core/
+│   ├── math/
+│   ├── terrain/
+│   ├── camera/
+│   └── interaction/
+└── shared/
+```
 
 No additional root folders without justification.
 
@@ -250,15 +240,17 @@ math
 
 terrain
 
-world
-
-render
+camera
 
 interaction
 
 Each module owns its API.
 
 Internal implementation remains private.
+
+There is no application renderer inside the Engine.
+
+Application rendering belongs exclusively to `src/render/`.
 
 ---
 

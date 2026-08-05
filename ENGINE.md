@@ -16,7 +16,8 @@ EchoAtlas is not Music Atlas.
 
 EchoAtlas is an engine.
 
-Its purpose is to transform structured knowledge into a coherent, persistent and explorable world.
+Its purpose is to provide the generic mechanisms used to produce and explore a coherent,
+persistent world.
 
 Music Atlas is simply the first interpretation of this engine.
 
@@ -26,7 +27,7 @@ Music Atlas is simply the first interpretation of this engine.
 
 EchoAtlas is a deterministic world generation engine.
 
-Its mission is to convert meaning into geography.
+Its mission is to support deterministic world generation and exploration.
 
 It does not understand music.
 
@@ -34,7 +35,7 @@ It does not understand books.
 
 It does not understand movies.
 
-It only understands relationships.
+It understands only generic structures and mechanisms.
 
 Everything else is interpretation.
 
@@ -48,7 +49,9 @@ It only knows how data is connected.
 
 The interpretation layer gives meaning.
 
-The Engine gives shape.
+The World decides geography.
+
+The Engine provides the generic mechanisms required to produce and explore it.
 
 ---
 
@@ -379,12 +382,14 @@ Math
 
 Terrain
 
-World
-
-Render
+Camera
 
 Interaction
 ```
+
+World and Render are application-level modules outside the Engine.
+
+There is no application renderer inside `engine/`.
 
 Modules communicate only through public contracts.
 

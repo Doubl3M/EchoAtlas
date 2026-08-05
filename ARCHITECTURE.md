@@ -17,27 +17,22 @@ EchoAtlas is divided into independent layers.
 
 Each layer solves exactly one problem.
 
-A layer may depend only on lower layers.
-
-A lower layer never depends on a higher one.
+A module may depend only on the modules explicitly allowed below.
 
 ```
-Application
-      │
-      ▼
-Knowledge
-      │
-      ▼
-World
-      │
-      ▼
-Engine
-      │
-      ▼
-Math
+music      → knowledge, shared
+knowledge  → shared
+world      → knowledge, engine, shared
+render     → world, engine, shared
+ui         → render, shared
+app        → music, knowledge, world, render, ui, engine, shared
+engine     → shared
+shared     → nothing
 ```
 
-Rendering is a service of the Engine.
+No inverse or circular dependency is allowed.
+
+Rendering is an application module built on the Engine primitives.
 
 It never owns the world.
 
@@ -206,9 +201,7 @@ Generic simulation engine.
 
 Contains:
 
-camera
-
-renderer
+camera primitives
 
 terrain
 
@@ -220,15 +213,47 @@ selection
 
 viewport
 
-render loop
+exploration mechanisms
 
 The Engine has no knowledge of music.
+
+The World decides geography.
+
+The Engine provides the generic mechanisms required to produce and explore it.
+
+---
+
+## Render
+
+Reads the World and uses Engine primitives.
+
+It never modifies the World.
+
+Application rendering exists only in `src/render/`.
+
+There is no application renderer in `engine/`.
+
+---
+
+## UI
+
+Manages the interface.
+
+It contains no musical or geographic logic.
+
+---
+
+## Shared
+
+Contains domain-independent contracts shared by modules.
+
+It depends on no other module.
 
 ---
 
 ## Math
 
-Lowest layer.
+Lowest Engine module.
 
 Contains only deterministic algorithms.
 
@@ -258,34 +283,19 @@ No project logic.
 
 ```
 src/
-
     app/
-
     music/
-
     knowledge/
-
     world/
-
-    engine/
-
-        core/
-
-        math/
-
-        terrain/
-
-        render/
-
-        interaction/
-
+    render/
     ui/
-
+    engine/
+        core/
+        math/
+        terrain/
+        camera/
+        interaction/
     shared/
-
-tests/
-
-docs/
 ```
 
 Folders are permanent.
@@ -296,61 +306,22 @@ Adding a new root folder requires architectural justification.
 
 # Dependency Rules
 
-Allowed
+Allowed imports
 
 ```
-Application
-
-↓
-
-Music
-
-↓
-
-Knowledge
-
-↓
-
-World
-
-↓
-
-Engine
-
-↓
-
-Math
+music      → knowledge, shared
+knowledge  → shared
+world      → knowledge, engine, shared
+render     → world, engine, shared
+ui         → render, shared
+app        → music, knowledge, world, render, ui, engine, shared
+engine     → shared
+shared     → nothing
 ```
 
-Forbidden
+All imports not listed above are forbidden.
 
-```
-Math
-
-↓
-
-World
-```
-
-Forbidden
-
-```
-Renderer
-
-↓
-
-Music
-```
-
-Forbidden
-
-```
-Terrain
-
-↓
-
-Album
-```
+Inverse and circular dependencies are forbidden.
 
 Every dependency violating this rule is considered an architectural defect.
 

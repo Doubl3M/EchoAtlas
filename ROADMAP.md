@@ -70,9 +70,37 @@ Frozen except corrections.
 
 ---
 
+# Official Technical Order
+
+Until the first navigable map, development follows this order:
+
+```
+Foundation
+↓
+Math Engine
+↓
+Terrain Engine
+↓
+Knowledge Graph
+↓
+World Engine
+↓
+Camera
+↓
+Renderer
+↓
+Music Interpreter
+↓
+JSON Import
+↓
+First Navigable Map
+```
+
+---
+
 # Phase 1
 
-## Engine Foundation
+## Foundation
 
 Objective
 
@@ -85,9 +113,6 @@ Deliverables
 - Engine modules
 - TypeScript configuration
 - Testing infrastructure
-- Rendering bootstrap
-- Deterministic random generator
-- Mathematical foundations
 
 Exit Criteria
 
@@ -97,11 +122,33 @@ Tests execute.
 
 Architecture is stable.
 
-No music support yet.
+No world generation or music support yet.
 
 ---
 
 # Phase 2
+
+## Math Engine
+
+Objective
+
+Create the deterministic mathematical foundations.
+
+Deliverables
+
+- Deterministic random generator
+- Interpolation
+- Geometry
+- Vectors
+- Matrices
+
+Exit Criteria
+
+Mathematical foundations are deterministic and tested.
+
+---
+
+# Phase 3
 
 ## Terrain Engine
 
@@ -127,61 +174,9 @@ A complete world is generated from a seed.
 
 ---
 
-# Phase 3
-
-## World Engine
-
-Objective
-
-Transform terrain into geography.
-
-Deliverables
-
-- Provinces
-- Cities
-- Routes
-- Bridges
-- Forests
-- Ruins
-- Ports
-- Landmarks
-
-Exit Criteria
-
-The world becomes explorable.
-
-Still contains no musical information.
-
----
-
 # Phase 4
 
-## Rendering Engine
-
-Objective
-
-Display the world interactively.
-
-Deliverables
-
-- Camera
-- Zoom
-- Pan
-- Selection
-- Layers
-- Labels
-- LOD
-- Picking
-
-Exit Criteria
-
-Large worlds remain fluid.
-
----
-
-# Phase 5
-
-## Knowledge Engine
+## Knowledge Graph
 
 Objective
 
@@ -202,7 +197,77 @@ The graph exists independently of the renderer.
 
 ---
 
+# Phase 5
+
+## World Engine
+
+Objective
+
+Transform the Knowledge Graph and terrain into geography.
+
+Deliverables
+
+- Provinces
+- Cities
+- Routes
+- Bridges
+- Forests
+- Ruins
+- Ports
+- Landmarks
+
+Exit Criteria
+
+The world becomes explorable.
+
+Still contains no musical information.
+
+---
+
 # Phase 6
+
+## Camera
+
+Objective
+
+Make generated worlds navigable.
+
+Deliverables
+
+- Camera
+- Zoom
+- Pan
+- Selection
+
+Exit Criteria
+
+The camera can navigate a World without modifying it.
+
+---
+
+# Phase 7
+
+## Renderer
+
+Objective
+
+Display the World using Engine primitives.
+
+Deliverables
+
+- Rendering bootstrap
+- Layers
+- Labels
+- LOD
+- Picking
+
+Exit Criteria
+
+Large worlds remain fluid.
+
+---
+
+# Phase 8
 
 ## Music Interpreter
 
@@ -212,8 +277,6 @@ Translate musical data into semantics.
 
 Deliverables
 
-- JSON parser
-- Validation
 - Metrics
 - Listening history
 - Artist relationships
@@ -226,13 +289,33 @@ A Knowledge Graph can be produced.
 
 ---
 
-# Phase 7
+# Phase 9
 
-## Geographic Interpretation
+## JSON Import
 
 Objective
 
-Convert semantics into geography.
+Import and validate musical data.
+
+Deliverables
+
+- JSON parser
+- Validation
+- Normalization
+
+Exit Criteria
+
+Validated JSON can be passed to the Music Interpreter.
+
+---
+
+# Phase 10
+
+## First Navigable Map
+
+Objective
+
+Connect the complete pipeline into an explorable application.
 
 Examples
 
@@ -272,20 +355,6 @@ Abandon
 
 Ruin
 
-Exit Criteria
-
-A complete atlas can be generated.
-
----
-
-# Phase 8
-
-## User Experience
-
-Objective
-
-Create an explorable application.
-
 Deliverables
 
 - Search
@@ -295,9 +364,13 @@ Deliverables
 - Time navigation
 - Layer controls
 
+Exit Criteria
+
+A complete atlas can be generated and navigated.
+
 ---
 
-# Phase 9
+# Phase 11
 
 ## Optimization
 
@@ -315,7 +388,7 @@ Deliverables
 
 ---
 
-# Phase 10
+# Phase 12
 
 ## Version 1.0
 
