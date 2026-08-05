@@ -1,5 +1,24 @@
 # AGENTS.md
 
+# Entry Point
+
+If you are an AI coding agent working on EchoAtlas,
+read the following documents in this exact order:
+
+1. README.md
+
+2. AGENTS.md
+
+3. ARCHITECTURE.md
+
+4. ENGINE.md
+
+5. CODE_STYLE.md
+
+6. ROADMAP.md
+
+Do not start implementing before understanding these documents.
+
 > EchoAtlas Development Contract
 >
 > This document defines the permanent rules that every coding agent, contributor or AI assistant must follow.
