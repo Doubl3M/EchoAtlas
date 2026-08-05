@@ -12,7 +12,9 @@ The project follows Semantic Versioning.
 
 ## Added
 
-Nothing yet.
+- TypeScript and Vite application foundation.
+- Deterministic application and engine service lifecycle.
+- Unit testing, linting, formatting and build infrastructure.
 
 ## Changed
 
