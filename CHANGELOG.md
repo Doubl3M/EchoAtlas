@@ -14,6 +14,7 @@ The project follows Semantic Versioning.
 
 - TypeScript and Vite application foundation.
 - Deterministic application and engine service lifecycle.
+- Deterministic seeds, hashing, random streams, interpolation and two-dimensional value noise.
 - Unit testing, linting, formatting and build infrastructure.
 
 ## Changed
