@@ -17,6 +17,7 @@ The project follows Semantic Versioning.
 - Deterministic seeds, hashing, random streams, interpolation and two-dimensional value noise.
 - Deterministic multi-octave terrain height-field generation.
 - Immutable, deterministic semantic knowledge graph snapshots with strict stable identities.
+- Deterministic, bounded geographic world generation from semantic graphs and terrain.
 - Unit testing, linting, formatting and build infrastructure.
 
 ## Changed
