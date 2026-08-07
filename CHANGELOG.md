@@ -18,6 +18,7 @@ The project follows Semantic Versioning.
 - Deterministic multi-octave terrain height-field generation.
 - Immutable, deterministic semantic knowledge graph snapshots with strict stable identities.
 - Deterministic, bounded geographic world generation from semantic graphs and terrain.
+- Browser-independent deterministic 2D camera transformations with atomic state updates.
 - Unit testing, linting, formatting and build infrastructure.
 
 ## Changed
