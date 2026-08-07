@@ -19,6 +19,7 @@ The project follows Semantic Versioning.
 - Immutable, deterministic semantic knowledge graph snapshots with strict stable identities.
 - Deterministic, bounded geographic world generation from semantic graphs and terrain.
 - Browser-independent deterministic 2D camera transformations with atomic state updates.
+- Layered Canvas 2D rendering with an injectable seventies-inspired visual theme.
 - Unit testing, linting, formatting and build infrastructure.
 
 ## Changed
