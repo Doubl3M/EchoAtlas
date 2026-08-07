@@ -85,6 +85,48 @@ describe("MusicInterpreter", () => {
         ]);
     });
 
+    it("keeps descriptive and JSON V1 attributes out of generic Knowledge nodes", () => {
+        const entities = [
+            new MusicEntity({
+                id: "artist",
+                kind: "artist",
+                name: "Artiste",
+                country: "FR",
+                formed: 2001,
+                tags: ["Électronique"],
+            }),
+            new MusicEntity({
+                id: "album",
+                kind: "album",
+                title: "Album",
+                year: 2020,
+                duration: 120,
+            }),
+            new MusicEntity({
+                id: "track",
+                kind: "track",
+                title: "Track",
+                duration: 60,
+                trackNumber: 1,
+            }),
+        ];
+        const graph = new MusicInterpreter().interpret(new MusicCatalog(entities));
+
+        expect(entities[0]).toMatchObject({
+            name: "Artiste",
+            country: "FR",
+            formed: 2001,
+            tags: ["Électronique"],
+        });
+        expect(entities[1]).toMatchObject({ title: "Album", year: 2020, duration: 120 });
+        expect(entities[2]).toMatchObject({ title: "Track", duration: 60, trackNumber: 1 });
+        expect(graph.getNodes()).toEqual([
+            { id: "music:album:album", kind: "music:album", weight: 1 },
+            { id: "music:artist:artist", kind: "music:artist", weight: 1 },
+            { id: "music:track:track", kind: "music:track", weight: 1 },
+        ]);
+    });
+
     it("freezes the complete reference mapping and canonical order", () => {
         const graph = new MusicInterpreter().interpret(referenceCatalog());
 
