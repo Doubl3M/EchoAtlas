@@ -56,6 +56,54 @@ Chaque objet possède un identifiant unique.
 
 ---
 
+# Imported Music Document
+
+L'import JSON produit une enveloppe documentaire immuable.
+
+```text
+ImportedMusicDocument
+│
+├── metadata
+└── catalog: MusicCatalog
+```
+
+`metadata` décrit le document importé et conserve notamment sa version et sa seed éventuelle.
+
+`MusicCatalog` contient uniquement le domaine musical structurel :
+
+- artistes ;
+- albums ;
+- morceaux ;
+- labels ;
+- playlists ;
+- relations musicales.
+
+Les métadonnées du document ne deviennent ni des entités musicales, ni des nœuds du Knowledge
+Graph.
+
+Les événements d'écoute appartiendront à un futur modèle d'historique distinct. Les paramètres
+applicatifs n'appartiennent pas au catalogue musical.
+
+## Identités musicales
+
+L'identité d'une entité musicale est formée de son kind et de son identifiant canonique.
+
+```text
+(kind, canonical ID)
+```
+
+Deux catégories peuvent donc employer le même identifiant sans collision.
+
+Une playlist est une entité musicale identifiée et nommée. Son contenu est représenté uniquement
+par des relations explicites.
+
+Une collaboration est une relation musicale. Elle n'est pas une entité implicite.
+
+Le format JSON V1 n'importe ni genre ni compilation. Ces concepts restent disponibles dans le
+modèle Music pour de futures versions.
+
+---
+
 # World
 
 Le World représente l'intégralité de l'Atlas.

@@ -60,20 +60,26 @@ describe("DeterministicRandom", () => {
 
     it("keeps generated values inside their requested bounds", () => {
         const random = new DeterministicRandom(1234);
+        let floatsAreNormalized = true;
+        let integersAreIntegral = true;
+        let integersAreBounded = true;
+        let rangedValuesAreBounded = true;
 
         for (let index = 0; index < 2_000; index += 1) {
             const float = random.nextFloat();
             const integer = random.nextInt(-10, 13);
             const ranged = random.nextRange(-2.5, 7.25);
 
-            expect(float).toBeGreaterThanOrEqual(0);
-            expect(float).toBeLessThan(1);
-            expect(Number.isInteger(integer)).toBe(true);
-            expect(integer).toBeGreaterThanOrEqual(-10);
-            expect(integer).toBeLessThan(13);
-            expect(ranged).toBeGreaterThanOrEqual(-2.5);
-            expect(ranged).toBeLessThan(7.25);
+            floatsAreNormalized &&= float >= 0 && float < 1;
+            integersAreIntegral &&= Number.isInteger(integer);
+            integersAreBounded &&= integer >= -10 && integer < 13;
+            rangedValuesAreBounded &&= ranged >= -2.5 && ranged < 7.25;
         }
+
+        expect(floatsAreNormalized).toBe(true);
+        expect(integersAreIntegral).toBe(true);
+        expect(integersAreBounded).toBe(true);
+        expect(rangedValuesAreBounded).toBe(true);
     });
 
     it("supports exact probability boundaries", () => {

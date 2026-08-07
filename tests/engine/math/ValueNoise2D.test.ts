@@ -55,14 +55,19 @@ describe("ValueNoise2D", () => {
 
     it("always returns normalized values", () => {
         const noise = new ValueNoise2D(999);
+        let minimum = 1;
+        let maximum = 0;
 
         for (let x = -10; x <= 10; x += 0.25) {
             for (let y = -10; y <= 10; y += 0.25) {
                 const value = noise.sample(x, y);
-                expect(value).toBeGreaterThanOrEqual(0);
-                expect(value).toBeLessThanOrEqual(1);
+                minimum = Math.min(minimum, value);
+                maximum = Math.max(maximum, value);
             }
         }
+
+        expect(minimum).toBeGreaterThanOrEqual(0);
+        expect(maximum).toBeLessThanOrEqual(1);
     });
 
     it("rejects invalid coordinates", () => {
