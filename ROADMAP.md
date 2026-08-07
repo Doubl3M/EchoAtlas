@@ -39,8 +39,18 @@ Never the opposite.
 | Phase | Status |
 |---------|--------|
 | Phase 0 — Editorial Foundation | ✅ Complete |
-| Phase 1 — Engine Foundation | 🔄 In Progress |
-| Phase 2+ | ⏳ Planned |
+| Phase 1 — Engine Foundation | ✅ Complete |
+| Phase 2 — Math Engine | ✅ Complete |
+| Phase 3 — Terrain Engine | ✅ Complete |
+| Phase 4 — Knowledge Graph | ✅ Complete |
+| Phase 5 — World Engine | ✅ Complete |
+| Phase 6 — Camera | ✅ Complete |
+| Phase 7 — Renderer | ✅ Complete |
+| Phase 8 — Music Interpreter | ✅ Complete |
+| Phase 9 — JSON Import | ✅ Complete |
+| Phase 10 — First Navigable Map | ▶️ Next |
+| Phase 11 — Optimization | ⏳ Planned |
+| Phase 12 — Version 1.0 | ⏳ Planned |
 
 ---
 
