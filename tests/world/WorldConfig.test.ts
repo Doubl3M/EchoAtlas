@@ -1,0 +1,87 @@
+import { describe, expect, it } from "vitest";
+
+import { TerrainConfig } from "../../src/engine/terrain";
+import { WorldConfig, type WorldConfigOptions } from "../../src/world";
+
+function terrain(width = 8, height = 6): TerrainConfig {
+    return new TerrainConfig({
+        width,
+        height,
+        baseFrequency: 0.1,
+        octaves: 3,
+        persistence: 0.5,
+        lacunarity: 2,
+        offsetX: -2,
+        offsetY: 3,
+    });
+}
+
+function options(overrides: Partial<WorldConfigOptions> = {}): WorldConfigOptions {
+    return {
+        width: 8,
+        height: 6,
+        placementIterations: 12,
+        attractionStrength: 0.04,
+        repulsionStrength: 0.3,
+        terrain: terrain(),
+        ...overrides,
+    };
+}
+
+describe("WorldConfig", () => {
+    it("creates an immutable configuration", () => {
+        const config = new WorldConfig(options());
+
+        expect(config).toEqual(options());
+        expect(Object.isFrozen(config)).toBe(true);
+    });
+
+    it.each([0, -1, 1.5, Number.NaN, Number.POSITIVE_INFINITY])(
+        "rejects the invalid width %s",
+        (width) => {
+            expect(() => new WorldConfig(options({ width }))).toThrow(RangeError);
+        }
+    );
+
+    it.each([0, -1, 1.5, Number.NaN, Number.NEGATIVE_INFINITY])(
+        "rejects the invalid height %s",
+        (height) => {
+            expect(() => new WorldConfig(options({ height }))).toThrow(RangeError);
+        }
+    );
+
+    it.each([-1, 1.5, 1_001, Number.NaN, Number.POSITIVE_INFINITY])(
+        "rejects the invalid iteration count %s",
+        (placementIterations) => {
+            expect(() => new WorldConfig(options({ placementIterations }))).toThrow(RangeError);
+        }
+    );
+
+    it.each([-1, 1.1, Number.NaN, Number.POSITIVE_INFINITY])(
+        "rejects the invalid attraction strength %s",
+        (attractionStrength) => {
+            expect(() => new WorldConfig(options({ attractionStrength }))).toThrow(RangeError);
+        }
+    );
+
+    it.each([-1, 1.1, Number.NaN, Number.NEGATIVE_INFINITY])(
+        "rejects the invalid repulsion strength %s",
+        (repulsionStrength) => {
+            expect(() => new WorldConfig(options({ repulsionStrength }))).toThrow(RangeError);
+        }
+    );
+
+    it("accepts the documented boundary values", () => {
+        expect(
+            new WorldConfig(
+                options({ placementIterations: 0, attractionStrength: 0, repulsionStrength: 1 })
+            )
+        ).toBeInstanceOf(WorldConfig);
+    });
+
+    it("requires terrain dimensions to match the world", () => {
+        expect(() => new WorldConfig(options({ terrain: terrain(7, 6) }))).toThrow(
+            "Terrain dimensions must match the world dimensions."
+        );
+    });
+});
