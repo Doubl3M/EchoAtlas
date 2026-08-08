@@ -33,8 +33,8 @@ Le tableau `Current Status` de `ROADMAP.md` indique actuellement :
 | Phase 7 — Renderer | Complete |
 | Phase 8 — Music Interpreter | Complete |
 | Phase 9 — JSON Import | Complete |
-| Phase 10 — First Navigable Map | Next |
-| Phase 11 — Optimization | Planned |
+| Phase 10 — First Navigable Map | Complete |
+| Phase 11 — Optimization | Next |
 | Phase 12 — Version 1.0 | Planned |
 
 ---
@@ -84,46 +84,57 @@ Après cette étape, la roadmap canonique prévoit Optimization puis Version 1.0
 | Renderer Foundation | Renderer Canvas par couches et thème 70's injectable |
 | Music Interpreter | Domaine musical typé et traduction déterministe vers le Knowledge Graph |
 | JSON Import V1 | Parsing, validation stricte et enveloppe d'import immutable vers MusicCatalog |
+| First Navigable Map | Pipeline JSON complet, carte Canvas, labels Music, pan, zoom et resize navigateur opérationnels |
 
 Ces lignes décrivent les fondations effectivement livrées. Elles ne modifient pas les objectifs,
 livrables complets ou critères de sortie définis pour chaque phase dans `ROADMAP.md`.
 
 ## Prochain
 
-### Phase 10 — First Navigable Map
-
-La prochaine étape canonique consiste à connecter le pipeline existant dans une application
-explorable :
-
-```text
-JSON V1
-↓
-ImportedMusicDocument
-↓
-MusicCatalog
-↓
-KnowledgeGraph
-↓
-GeographicWorld
-↓
-Renderer
-```
-
-Les livrables canoniques restent ceux de `ROADMAP.md` : recherche, filtres, tooltips, statistiques,
-navigation temporelle et contrôle des couches. Ce document ne fixe ni leur conception détaillée ni
-leur ordre interne.
-
-## Futur
-
 ### Phase 11 — Optimization
 
-Préparer les grandes bibliothèques par l'indexation spatiale, le chargement par chunks,
-l'optimisation mémoire et rendu, et le caching, conformément à `ROADMAP.md`.
+La prochaine étape canonique consiste à préparer les grandes bibliothèques, conformément au
+périmètre défini dans `ROADMAP.md` :
+
+```text
+Spatial indexing
+Chunk loading
+Memory optimization
+Rendering optimization
+Caching
+```
+
+Ce document ne fixe ni leur conception détaillée ni leur ordre interne.
+
+## Futur
 
 ### Phase 12 — Version 1.0
 
 Atteindre les exigences canoniques : importer la musique, générer un atlas, sauvegarder et recharger
 un projet, puis explorer le monde généré.
+
+**V1 Critical**
+
+- navigation temporelle ;
+- modèle de Listening History distinct, composé conceptuellement de Listening Events.
+
+La navigation temporelle doit permettre d'explorer l'évolution de l'atlas musical. La capacité à
+donner une raison structurante de revenir consulter son atlas est une hypothèse produit à valider,
+pas un effet de rétention démontré.
+
+`MusicCatalog` reste structurel. Le Listening History reste temporel et séparé des User Journey
+Analytics. La reconstruction temporelle dépend uniquement d'entrées explicites et déterministes,
+sans notion implicite de « maintenant » dans les couches génériques.
+
+**V1 Required**
+
+- recherche ;
+- filtres ;
+- informations contextuelles et tooltips ;
+- statistiques ;
+- contrôle des couches.
+
+Ces exigences fonctionnelles appartiennent à Version 1.0 et ne font pas partie de Phase 11.
 
 ---
 

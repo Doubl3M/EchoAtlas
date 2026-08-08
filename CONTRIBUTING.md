@@ -215,6 +215,10 @@ Especially:
 
 Every deterministic algorithm must produce identical results for identical input.
 
+Use `npm run test:run` for the Vitest suite and `npm run test:e2e` for the separate local
+Chrome/Puppeteer browser smoke test. Puppeteer is development tooling, not an application
+dependency.
+
 ---
 
 # Determinism
