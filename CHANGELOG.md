@@ -23,6 +23,8 @@ The project follows Semantic Versioning.
 - Deterministic translation of structured musical catalogs into semantic knowledge graphs.
 - Typed immutable Music attributes required by the canonical JSON V1 schema.
 - Strict immutable JSON V1 import into typed Music documents and catalogs.
+- First navigable map wiring JSON import, Music interpretation, deterministic World generation,
+  human-readable labels, pointer pan, cursor-centered wheel zoom and browser resize.
 - Unit testing, linting, formatting and build infrastructure.
 
 ## Changed

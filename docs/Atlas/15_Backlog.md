@@ -42,7 +42,8 @@ livraison. L'ordre des catégories et des entrées n'exprime aucun classement.
 ## Chevauchement des labels
 
 - **Constat / besoin :** des mondes plus denses nécessiteront une stratégie lisible pour les labels
-  qui se chevauchent.
+  qui se chevauchent, ainsi qu'une éventuelle gestion des labels proches des limites du monde ou
+  du viewport.
 - **Contraintes :** conserver les identités sémantiques et ne pas modifier la géographie pour
   résoudre un problème d'affichage.
 - **Statut :** besoin futur.

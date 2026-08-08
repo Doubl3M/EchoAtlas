@@ -28,4 +28,8 @@ describe("SeventiesTheme", () => {
             { maximum: 1, color: "#74452f" },
         ]);
     });
+
+    it("shows labels only from its selected detail threshold", () => {
+        expect(new SeventiesTheme().label.minZoom).toBe(12);
+    });
 });

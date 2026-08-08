@@ -19,6 +19,8 @@ export interface LocationVisualStyle {
 
 export interface LabelVisualStyle {
     readonly enabled: boolean;
+    /** Labels are rendered at this zoom and above. */
+    readonly minZoom: number;
     readonly color: string;
     readonly font: string;
     readonly offsetX: number;
