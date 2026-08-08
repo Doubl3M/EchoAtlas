@@ -7,8 +7,11 @@ describe("SeventiesTheme", () => {
         const theme = new SeventiesTheme();
 
         expect(Object.isFrozen(theme)).toBe(true);
+        expect(Object.isFrozen(theme.backgroundTexture)).toBe(true);
         expect(Object.isFrozen(theme.terrainBands)).toBe(true);
         expect(theme.terrainBands.every((band) => Object.isFrozen(band))).toBe(true);
+        expect(Object.isFrozen(theme.terrain)).toBe(true);
+        expect(Object.isFrozen(theme.terrain.contour)).toBe(true);
         expect(Object.isFrozen(theme.connection)).toBe(true);
         expect(Object.isFrozen(theme.location)).toBe(true);
         expect(Object.isFrozen(theme.label)).toBe(true);
@@ -21,15 +24,19 @@ describe("SeventiesTheme", () => {
         const theme = new SeventiesTheme();
 
         expect(theme.terrainBands).toEqual([
-            { maximum: 0.2, color: "#315f5b" },
-            { maximum: 0.4, color: "#6f7b45" },
-            { maximum: 0.6, color: "#a49a55" },
-            { maximum: 0.8, color: "#c67a3d" },
-            { maximum: 1, color: "#74452f" },
+            { maximum: 0.12, color: "#456f70" },
+            { maximum: 0.24, color: "#5f8580" },
+            { maximum: 0.36, color: "#879276" },
+            { maximum: 0.48, color: "#a3a06d" },
+            { maximum: 0.6, color: "#b9a36a" },
+            { maximum: 0.7, color: "#c99558" },
+            { maximum: 0.8, color: "#bd7849" },
+            { maximum: 0.9, color: "#925a3d" },
+            { maximum: 1, color: "#684536" },
         ]);
     });
 
     it("shows labels only from its selected detail threshold", () => {
-        expect(new SeventiesTheme().label.minZoom).toBe(12);
+        expect(new SeventiesTheme().label.minZoom).toBe(0);
     });
 });

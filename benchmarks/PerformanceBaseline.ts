@@ -135,7 +135,7 @@ function measureProfile(
     const importer = new MusicJsonImporter();
     const interpreter = new MusicInterpreter();
     const generator = new WorldGenerator();
-    const labels: LabelProvider = (id) => id;
+    const labels: LabelProvider = (id) => ({ text: id, priority: 0, minZoom: 0 });
     const labelsRenderer = new CanvasRenderer(new SeventiesTheme(), labels);
     const noLabelsRenderer = new CanvasRenderer(
         createLabelsDisabledTheme(new SeventiesTheme()),

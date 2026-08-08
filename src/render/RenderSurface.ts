@@ -14,6 +14,18 @@ export interface RenderSurface {
         opacity: number
     ): void;
 
+    strokeQuadraticCurve(
+        startX: number,
+        startY: number,
+        controlX: number,
+        controlY: number,
+        endX: number,
+        endY: number,
+        color: string,
+        width: number,
+        opacity: number
+    ): void;
+
     fillCircle(
         x: number,
         y: number,
@@ -23,5 +35,21 @@ export interface RenderSurface {
         strokeWidth: number
     ): void;
 
-    fillText(text: string, x: number, y: number, color: string, font: string): void;
+    fillText(
+        text: string,
+        x: number,
+        y: number,
+        color: string,
+        font: string,
+        haloColor: string,
+        haloWidth: number
+    ): void;
+
+    measureText(text: string, font: string): RenderTextMetrics;
+}
+
+export interface RenderTextMetrics {
+    readonly width: number;
+    readonly ascent: number;
+    readonly descent: number;
 }

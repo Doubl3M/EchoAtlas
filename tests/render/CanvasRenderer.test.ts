@@ -31,6 +31,31 @@ class RecordingSurface implements RenderSurface {
         this.record("strokeLine", startX, startY, endX, endY, color, width, opacity);
     }
 
+    public strokeQuadraticCurve(
+        startX: number,
+        startY: number,
+        controlX: number,
+        controlY: number,
+        endX: number,
+        endY: number,
+        color: string,
+        width: number,
+        opacity: number
+    ): void {
+        this.record(
+            "strokeQuadraticCurve",
+            startX,
+            startY,
+            controlX,
+            controlY,
+            endX,
+            endY,
+            color,
+            width,
+            opacity
+        );
+    }
+
     public fillCircle(
         x: number,
         y: number,
@@ -42,8 +67,20 @@ class RecordingSurface implements RenderSurface {
         this.record("fillCircle", x, y, radius, fillColor, strokeColor, strokeWidth);
     }
 
-    public fillText(text: string, x: number, y: number, color: string, font: string): void {
-        this.record("fillText", text, x, y, color, font);
+    public fillText(
+        text: string,
+        x: number,
+        y: number,
+        color: string,
+        font: string,
+        haloColor: string,
+        haloWidth: number
+    ): void {
+        this.record("fillText", text, x, y, color, font, haloColor, haloWidth);
+    }
+
+    public measureText(text: string): { width: number; ascent: number; descent: number } {
+        return { width: text.length * 6, ascent: 9, descent: 3 };
     }
 
     private record(kind: string, ...values: readonly unknown[]): void {
@@ -54,25 +91,53 @@ class RecordingSurface implements RenderSurface {
 function theme(prefix = "theme", labels = true, labelMinZoom = 0): VisualTheme {
     return Object.freeze({
         backgroundColor: `${prefix}-background`,
+        backgroundTexture: Object.freeze({
+            enabled: false,
+            color: `${prefix}-texture`,
+            spacing: 20,
+            size: 1,
+        }),
         terrainBands: Object.freeze([
             Object.freeze({ maximum: 0.3, color: `${prefix}-low` }),
             Object.freeze({ maximum: 0.7, color: `${prefix}-middle` }),
             Object.freeze({ maximum: 1, color: `${prefix}-high` }),
         ]),
-        connection: Object.freeze({ color: `${prefix}-connection`, width: 2, opacity: 0.5 }),
+        terrain: Object.freeze({
+            cellOverlap: 0,
+            contour: Object.freeze({
+                enabled: false,
+                color: `${prefix}-contour`,
+                width: 1,
+                opacity: 0.2,
+            }),
+        }),
+        connection: Object.freeze({
+            color: `${prefix}-connection`,
+            width: 2,
+            opacity: 0.5,
+            casingColor: `${prefix}-casing`,
+            casingWidth: 0,
+            casingOpacity: 0,
+            curveStrength: 0,
+        }),
         location: Object.freeze({
             fillColor: `${prefix}-location-fill`,
             strokeColor: `${prefix}-location-stroke`,
             strokeWidth: 1,
             radius: 3,
+            centerColor: `${prefix}-location-center`,
+            centerRadius: 0,
         }),
         label: Object.freeze({
             enabled: labels,
             minZoom: labelMinZoom,
             color: `${prefix}-label`,
             font: "12px serif",
-            offsetX: 4,
-            offsetY: -5,
+            offsetX: 1,
+            offsetY: -1,
+            haloColor: `${prefix}-halo`,
+            haloWidth: 0,
+            collisionPadding: 2,
         }),
     });
 }
@@ -113,6 +178,26 @@ function camera(): Camera2D {
         })
     );
     value.setPosition(0, 0);
+    return value;
+}
+
+function spaciousWorld(): GeographicWorld {
+    return new GeographicWorld({
+        width: 10,
+        height: 10,
+        heightField: new HeightField(1, 1, [0.5]),
+        locations: [
+            new WorldLocation({ knowledgeNodeId: "A", x: 3, y: 4, elevation: 0.5 }, 10, 10),
+            new WorldLocation({ knowledgeNodeId: "B", x: 7, y: 6, elevation: 0.5 }, 10, 10),
+        ],
+        connections: [],
+    });
+}
+
+function spaciousCamera(): Camera2D {
+    const value = camera();
+    value.setPosition(5, 5);
+    value.setZoom(8);
     return value;
 }
 
@@ -241,21 +326,77 @@ describe("CanvasRenderer", () => {
         });
         expect(surface.commands[8]).toEqual({
             kind: "fillText",
-            values: ["A", 54, 35, "theme-label", "12px serif"],
+            values: ["A", 51, 50, "theme-label", "12px serif", "theme-halo", 0],
         });
     });
 
-    it("uses Camera2D for every world coordinate including off-viewport positions", () => {
+    it("applies optional generic cartographic styling without knowing the theme identity", () => {
+        const base = theme("atlas");
+        const visualTheme: VisualTheme = Object.freeze({
+            ...base,
+            backgroundTexture: Object.freeze({
+                enabled: true,
+                color: "paper-grain",
+                spacing: 50,
+                size: 1,
+            }),
+            terrain: Object.freeze({
+                cellOverlap: 0.5,
+                contour: Object.freeze({
+                    enabled: true,
+                    color: "contour",
+                    width: 0.5,
+                    opacity: 0.2,
+                }),
+            }),
+            connection: Object.freeze({
+                ...base.connection,
+                casingColor: "road-casing",
+                casingWidth: 4,
+                casingOpacity: 0.3,
+                curveStrength: 6,
+            }),
+            location: Object.freeze({
+                ...base.location,
+                centerColor: "location-center",
+                centerRadius: 1,
+            }),
+            label: Object.freeze({
+                ...base.label,
+                haloColor: "label-halo",
+                haloWidth: 3,
+            }),
+        });
+        const surface = new RecordingSurface();
+
+        new CanvasRenderer(visualTheme).render(
+            world(
+                [location("A", 0, 0, 0.2), location("B", 1, 1, 0.8)],
+                [connection("R", "A", "B")]
+            ),
+            camera(),
+            surface
+        );
+
+        expect(surface.commands.some(({ values }) => values.includes("paper-grain"))).toBe(true);
+        expect(surface.commands.some(({ values }) => values.includes("contour"))).toBe(true);
+        expect(surface.commands.some(({ values }) => values.includes("road-casing"))).toBe(true);
+        expect(surface.commands.some(({ kind }) => kind === "strokeQuadraticCurve")).toBe(true);
+        expect(surface.commands.some(({ values }) => values.includes("location-center"))).toBe(
+            true
+        );
+        expect(surface.commands.some(({ values }) => values.includes("label-halo"))).toBe(true);
+    });
+
+    it("does not render a location whose label cannot fit in the visible World", () => {
         const value = camera();
         value.setPosition(100, -100);
         const surface = new RecordingSurface();
 
         new CanvasRenderer(theme()).render(world([location("A", 1, 1, 0.5)]), value, surface);
 
-        expect(surface.commands.find(({ kind }) => kind === "fillCircle")).toEqual({
-            kind: "fillCircle",
-            values: [-940, 1050, 3, "theme-location-fill", "theme-location-stroke", 1],
-        });
+        expect(surface.commands.some(({ kind }) => kind === "fillCircle")).toBe(false);
+        expect(surface.commands.some(({ kind }) => kind === "fillText")).toBe(false);
     });
 
     it("renders a 1 × 1 world", () => {
@@ -272,12 +413,7 @@ describe("CanvasRenderer", () => {
 
         new CanvasRenderer(theme()).render(oneCellWorld, camera(), surface);
 
-        expect(surface.commands.map(({ kind }) => kind)).toEqual([
-            "fillRect",
-            "fillRect",
-            "fillCircle",
-            "fillText",
-        ]);
+        expect(surface.commands.map(({ kind }) => kind)).toEqual(["fillRect", "fillRect"]);
     });
 
     it("preserves self-relations and parallel relations as distinct commands", () => {
@@ -300,11 +436,11 @@ describe("CanvasRenderer", () => {
 
     it("refuses an incoherent connection defensively", () => {
         const invalidWorld = {
-            width: 1,
-            height: 1,
+            width: 2,
+            height: 2,
             heightField: new HeightField(1, 1, [0]),
-            getConnections: () => [connection("R", "missing", "missing")],
-            getLocations: () => [],
+            getConnections: () => [connection("R", "A", "B")],
+            getLocations: () => [location("A", 0, 0, 0.5), location("B", 1, 1, 0.5)],
             getLocationByKnowledgeNodeId: () => undefined,
         } as unknown as GeographicWorld;
 
@@ -339,16 +475,16 @@ describe("CanvasRenderer", () => {
         );
 
         expect(surface.commands.some(({ kind }) => kind === "fillText")).toBe(false);
-        expect(surface.commands.filter(({ kind }) => kind === "fillCircle")).toHaveLength(2);
-        expect(surface.commands.filter(({ kind }) => kind === "strokeLine")).toHaveLength(1);
+        expect(surface.commands.filter(({ kind }) => kind === "fillCircle")).toHaveLength(0);
+        expect(surface.commands.filter(({ kind }) => kind === "strokeLine")).toHaveLength(0);
     });
 
-    it.each([5, 8])("renders labels at or above the theme threshold: zoom %s", (zoom) => {
+    it.each([8, 10])("renders labels at or above the theme threshold: zoom %s", (zoom) => {
         const surface = new RecordingSurface();
         const value = camera();
         value.setZoom(zoom);
 
-        new CanvasRenderer(theme("lod", true, 5)).render(
+        new CanvasRenderer(theme("lod", true, 8)).render(
             world([location("A", 0, 0, 0.5)]),
             value,
             surface
@@ -360,12 +496,12 @@ describe("CanvasRenderer", () => {
     it("lets another theme change the label threshold without renderer changes", () => {
         const geographicWorld = world([location("A", 0, 0, 0.5)]);
         const value = camera();
-        value.setZoom(6);
+        value.setZoom(10);
         const visible = new RecordingSurface();
         const hidden = new RecordingSurface();
 
-        new CanvasRenderer(theme("early", true, 5)).render(geographicWorld, value, visible);
-        new CanvasRenderer(theme("late", true, 7)).render(geographicWorld, value, hidden);
+        new CanvasRenderer(theme("early", true, 8)).render(geographicWorld, value, visible);
+        new CanvasRenderer(theme("late", true, 11)).render(geographicWorld, value, hidden);
 
         expect(visible.commands.some(({ kind }) => kind === "fillText")).toBe(true);
         expect(hidden.commands.some(({ kind }) => kind === "fillText")).toBe(false);
@@ -389,30 +525,128 @@ describe("CanvasRenderer", () => {
     });
 
     it("accepts interchangeable generic label providers with an explicit ID fallback", () => {
-        const geographicWorld = world([location("A", 0, 0, 0.5), location("B", 1, 1, 0.5)]);
+        const geographicWorld = spaciousWorld();
         const first = new RecordingSurface();
         const second = new RecordingSurface();
 
-        new CanvasRenderer(theme(), (id) => (id === "A" ? "Alpha" : undefined)).render(
-            geographicWorld,
-            camera(),
-            first
-        );
-        new CanvasRenderer(theme(), (id) => `Alternate ${id}`).render(
-            geographicWorld,
-            camera(),
-            second
-        );
+        new CanvasRenderer(theme(), (id) =>
+            id === "A" ? { text: "Alpha", priority: 2, minZoom: 0 } : undefined
+        ).render(geographicWorld, spaciousCamera(), first);
+        new CanvasRenderer(theme(), (id) => ({
+            text: `X ${id}`,
+            priority: 1,
+            minZoom: 0,
+        })).render(geographicWorld, spaciousCamera(), second);
 
         expect(
             first.commands.filter(({ kind }) => kind === "fillText").map(({ values }) => values[0])
         ).toEqual(["Alpha", "B"]);
         expect(
             second.commands.filter(({ kind }) => kind === "fillText").map(({ values }) => values[0])
-        ).toEqual(["Alternate A", "Alternate B"]);
+        ).toEqual(["X A", "X B"]);
         expect(
             geographicWorld.getLocations().map(({ knowledgeNodeId }) => knowledgeNodeId)
         ).toEqual(["A", "B"]);
+    });
+
+    it("declutters by priority and canonical identity with deterministic text metrics", () => {
+        const geographicWorld = new GeographicWorld({
+            width: 10,
+            height: 10,
+            heightField: new HeightField(1, 1, [0.5]),
+            locations: [
+                new WorldLocation({ knowledgeNodeId: "low", x: 0, y: 0, elevation: 0.5 }, 10, 10),
+                new WorldLocation({ knowledgeNodeId: "high", x: 0, y: 0, elevation: 0.5 }, 10, 10),
+            ],
+            connections: [],
+        });
+        const surface = new RecordingSurface();
+
+        new CanvasRenderer(theme(), (id) => ({
+            text: id,
+            priority: id === "high" ? 10 : 1,
+            minZoom: 0,
+        })).render(geographicWorld, spaciousCamera(), surface);
+
+        expect(
+            surface.commands
+                .filter(({ kind }) => kind === "fillText")
+                .map(({ values }) => values[0])
+        ).toEqual(["high"]);
+    });
+
+    it("moves a border label to the opposite side instead of leaving the World", () => {
+        const geographicWorld = new GeographicWorld({
+            width: 10,
+            height: 10,
+            heightField: new HeightField(1, 1, [0.5]),
+            locations: [
+                new WorldLocation({ knowledgeNodeId: "edge", x: 9, y: 5, elevation: 0.5 }, 10, 10),
+            ],
+            connections: [],
+        });
+        const surface = new RecordingSurface();
+
+        new CanvasRenderer(theme(), () => ({ text: "Edge", priority: 1, minZoom: 0 })).render(
+            geographicWorld,
+            spaciousCamera(),
+            surface
+        );
+
+        const text = surface.commands.find(({ kind }) => kind === "fillText");
+        expect(text).toBeDefined();
+        expect(text?.values[1]).toBeLessThan(82);
+    });
+
+    it("renders a route only when both endpoint labels are retained", () => {
+        const base = spaciousWorld();
+        const geographicWorld = new GeographicWorld({
+            width: base.width,
+            height: base.height,
+            heightField: base.heightField,
+            locations: base.getLocations(),
+            connections: [connection("R", "A", "B")],
+        });
+        const surface = new RecordingSurface();
+
+        new CanvasRenderer(theme(), (id) => ({
+            text: id,
+            priority: 1,
+            minZoom: id === "A" ? 0 : 20,
+        })).render(geographicWorld, spaciousCamera(), surface);
+
+        expect(surface.commands.filter(({ kind }) => kind === "fillCircle")).toHaveLength(1);
+        expect(surface.commands.filter(({ kind }) => kind === "strokeLine")).toHaveLength(0);
+        expect(surface.commands.filter(({ kind }) => kind === "fillText")).toHaveLength(1);
+    });
+
+    it("reveals a location and its route together after crossing its zoom threshold", () => {
+        const base = spaciousWorld();
+        const geographicWorld = new GeographicWorld({
+            width: base.width,
+            height: base.height,
+            heightField: base.heightField,
+            locations: base.getLocations(),
+            connections: [connection("R", "A", "B")],
+        });
+        const provider = (id: string) => ({
+            text: id,
+            priority: 1,
+            minZoom: id === "A" ? 0 : 12,
+        });
+        const before = new RecordingSurface();
+        const after = new RecordingSurface();
+        const lowZoom = spaciousCamera();
+        const highZoom = spaciousCamera();
+        highZoom.setZoom(16);
+
+        new CanvasRenderer(theme(), provider).render(geographicWorld, lowZoom, before);
+        new CanvasRenderer(theme(), provider).render(geographicWorld, highZoom, after);
+
+        expect(before.commands.filter(({ kind }) => kind === "fillCircle")).toHaveLength(1);
+        expect(before.commands.filter(({ kind }) => kind === "strokeLine")).toHaveLength(0);
+        expect(after.commands.filter(({ kind }) => kind === "fillCircle")).toHaveLength(2);
+        expect(after.commands.filter(({ kind }) => kind === "strokeLine")).toHaveLength(1);
     });
 
     it("does not mutate the world or camera and is repeatable", () => {

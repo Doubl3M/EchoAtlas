@@ -71,6 +71,29 @@ export class CanvasRenderSurface implements RenderSurface {
         this.context.restore();
     }
 
+    public strokeQuadraticCurve(
+        startX: number,
+        startY: number,
+        controlX: number,
+        controlY: number,
+        endX: number,
+        endY: number,
+        color: string,
+        width: number,
+        opacity: number
+    ): void {
+        this.context.save();
+        this.context.strokeStyle = color;
+        this.context.lineWidth = width;
+        this.context.globalAlpha = opacity;
+        this.context.lineCap = "round";
+        this.context.beginPath();
+        this.context.moveTo(startX, startY);
+        this.context.quadraticCurveTo(controlX, controlY, endX, endY);
+        this.context.stroke();
+        this.context.restore();
+    }
+
     public fillCircle(
         x: number,
         y: number,
@@ -90,12 +113,45 @@ export class CanvasRenderSurface implements RenderSurface {
         this.context.restore();
     }
 
-    public fillText(text: string, x: number, y: number, color: string, font: string): void {
+    public measureText(
+        text: string,
+        font: string
+    ): {
+        readonly width: number;
+        readonly ascent: number;
+        readonly descent: number;
+    } {
         this.context.save();
-        this.context.fillStyle = color;
+        this.context.font = font;
+        const metrics = this.context.measureText(text);
+        this.context.restore();
+        return Object.freeze({
+            width: metrics.width,
+            ascent: metrics.actualBoundingBoxAscent,
+            descent: metrics.actualBoundingBoxDescent,
+        });
+    }
+
+    public fillText(
+        text: string,
+        x: number,
+        y: number,
+        color: string,
+        font: string,
+        haloColor: string,
+        haloWidth: number
+    ): void {
+        this.context.save();
         this.context.font = font;
         this.context.textAlign = "start";
         this.context.textBaseline = "alphabetic";
+        if (haloWidth > 0) {
+            this.context.strokeStyle = haloColor;
+            this.context.lineWidth = haloWidth;
+            this.context.lineJoin = "round";
+            this.context.strokeText(text, x, y);
+        }
+        this.context.fillStyle = color;
         this.context.fillText(text, x, y);
         this.context.restore();
     }

@@ -29,12 +29,20 @@ export class CountingRenderSurface implements RenderSurface {
         this.lines += 1;
     }
 
+    public strokeQuadraticCurve(): void {
+        this.lines += 1;
+    }
+
     public fillCircle(): void {
         this.circles += 1;
     }
 
     public fillText(): void {
         this.labels += 1;
+    }
+
+    public measureText(text: string): { width: number; ascent: number; descent: number } {
+        return { width: text.length * 7, ascent: 10, descent: 3 };
     }
 
     public getCounts(): RenderCommandCounts {
