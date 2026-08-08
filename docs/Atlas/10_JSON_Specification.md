@@ -286,8 +286,9 @@ Aucune collection supplémentaire n'est déduite des tags.
 Les écoutes sont des événements temporels. Elles n'appartiennent pas à `MusicCatalog` et ne sont
 pas acceptées par le format importable V1 défini ici.
 
-Un futur modèle d'historique pourra notamment représenter les faits déjà identifiés : album,
-date, source, durée et complétion. Ce futur contrat ne fait pas partie de JSON Import V1.
+Le modèle de Listening History distinct requis pour la navigation temporelle V1 pourra notamment
+représenter les faits déjà identifiés : album, date, source, durée et complétion. Ce contrat ne fait
+pas partie de JSON Import V1.
 
 ---
 

@@ -34,16 +34,17 @@ livraison. L'ordre des catégories et des entrées n'exprime aucun classement.
 
 ## Libellés applicatifs
 
-- **Constat / besoin :** la démonstration emploie actuellement les IDs techniques comme labels.
-- **Contraintes :** découpler les textes applicatifs avant leur usage réel, sans les placer dans le
-  Knowledge Graph ou le World Engine.
-- **Statut :** dette connue de la démonstration.
+- **Constat / besoin :** la première carte résout les labels Music via un provider générique; les
+  futures politiques de libellés restent applicatives.
+- **Contraintes :** ne jamais placer les textes applicatifs dans le Knowledge Graph ou le World
+  Engine.
+- **Statut :** fondation livrée; raffinements futurs non engagés.
 
 ## Chevauchement des labels
 
 - **Constat / besoin :** des mondes plus denses nécessiteront une stratégie lisible pour les labels
   qui se chevauchent, ainsi qu'une éventuelle gestion des labels proches des limites du monde ou
-  du viewport.
+  du viewport et un calibrage des seuils d'apparition selon les thèmes.
 - **Contraintes :** conserver les identités sémantiques et ne pas modifier la géographie pour
   résoudre un problème d'affichage.
 - **Statut :** besoin futur.
@@ -62,11 +63,11 @@ livraison. L'ordre des catégories et des entrées n'exprime aucun classement.
 
 ## Commandes utilisateur de pan et zoom
 
-- **Constat / besoin :** `Camera2D` fournit les transformations, mais aucun binding clavier,
-  souris ou tactile n'existe encore.
-- **Contraintes :** placer les événements dans la future couche d'interaction; garder Camera
-  indépendante du navigateur et du World.
-- **Statut :** besoin de la première carte navigable.
+- **Constat / besoin :** les bindings Pointer et Wheel de la première carte navigable pilotent
+  désormais `Camera2D` via le contrôleur d'interaction générique.
+- **Contraintes :** conserver les événements navigateur dans la couche Application; garder Camera
+  et Interaction indépendantes du navigateur et du World.
+- **Statut :** fondation livrée en Phase 10.
 
 ## Sélection, hover et navigation
 
@@ -78,6 +79,9 @@ livraison. L'ordre des catégories et des entrées n'exprime aucun classement.
 ---
 
 # User Journey / Analytics
+
+Le User Journey Analytics décrit l'usage d'EchoAtlas. Il reste distinct du Listening History,
+qui décrit les écoutes musicales et alimente la navigation temporelle critique pour V1.
 
 ## Parcours sémantiques
 
@@ -120,25 +124,25 @@ livraison. L'ordre des catégories et des entrées n'exprime aucun classement.
   ni introduire de migration implicite.
 - **Statut :** extension éventuelle.
 
-## Modèle d'historique d'écoute
-
-- **Constat / besoin :** `listens` est identifié comme donnée temporelle importante mais reste hors
-  de `MusicCatalog` et de JSON Import V1.
-- **Contraintes :** créer ultérieurement un modèle séparé du catalogue structurel, de la navigation
-  et des analytics.
-- **Statut :** besoin futur documenté.
-
 ---
 
 # Data / Application
 
+## Interface multilingue et localisation
+
+- **Constat / besoin :** les textes de l'interface devront pouvoir être traduits indépendamment
+  des noms et titres provenant des données musicales.
+- **Contraintes :** ne modifier ni les IDs canoniques, ni le Knowledge Graph, ni le World, ni le
+  déterminisme; conserver les textes UI dans la couche Application ou UI.
+- **Statut :** besoin futur identifié, sans système i18n engagé.
+
 ## Exploitation de `metadata.seed`
 
-- **Constat / besoin :** JSON Import V1 conserve la seed sans encore la transmettre à la génération
-  du World.
+- **Constat / besoin :** la première carte transmet explicitement la seed conservée par JSON Import
+  à la génération du World.
 - **Contraintes :** branchement explicite dans la couche Application; aucune metadata dans le
   Knowledge Graph.
-- **Statut :** intégration future.
+- **Statut :** intégrée en Phase 10.
 
 ---
 

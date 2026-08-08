@@ -48,8 +48,8 @@ Never the opposite.
 | Phase 7 — Renderer | ✅ Complete |
 | Phase 8 — Music Interpreter | ✅ Complete |
 | Phase 9 — JSON Import | ✅ Complete |
-| Phase 10 — First Navigable Map | ▶️ Next |
-| Phase 11 — Optimization | ⏳ Planned |
+| Phase 10 — First Navigable Map | ✅ Complete |
+| Phase 11 — Optimization | ▶️ Next |
 | Phase 12 — Version 1.0 | ⏳ Planned |
 
 ---
@@ -288,7 +288,6 @@ Translate musical data into semantics.
 Deliverables
 
 - Metrics
-- Listening history
 - Artist relationships
 - Album relationships
 - Playlist interpretation
@@ -327,56 +326,19 @@ Objective
 
 Connect the complete pipeline into an explorable application.
 
-Examples
-
-Artist
-
-↓
-
-City
-
-Album
-
-↓
-
-Building
-
-Affinity
-
-↓
-
-Road
-
-Obsession
-
-↓
-
-Mountain
-
-Discovery
-
-↓
-
-Port
-
-Abandon
-
-↓
-
-Ruin
-
 Deliverables
 
-- Search
-- Filters
-- Tooltips
-- Statistics
-- Time navigation
-- Layer controls
+- Complete JSON to rendered World pipeline
+- First displayed music map
+- Music labels
+- Pan
+- Zoom
+- Resize
+- First functional spatial navigation
 
 Exit Criteria
 
-A complete atlas can be generated and navigated.
+The complete pipeline produces a displayed music map with functional spatial navigation.
 
 ---
 
@@ -411,6 +373,30 @@ The application can:
 - save a project
 - reload a project
 - explore the generated world
+
+V1 Critical
+
+- Temporal navigation
+- A distinct listening-history model composed conceptually of Listening Events
+
+Temporal navigation lets users explore how their musical atlas evolves over time. It is a
+structuring product hypothesis for giving users a reason to revisit their atlas, to be validated
+after delivery rather than treated as a demonstrated retention effect.
+
+`MusicCatalog` remains the structural musical domain. Listening history represents events through
+time and remains separate from the catalog and from User Journey Analytics. `listens` must not be
+reintroduced into `MusicCatalog`.
+
+Temporal reconstruction must be deterministic from explicit inputs. Generic layers must not gain
+an implicit notion of the current time.
+
+V1 Required
+
+- Search
+- Filters
+- Contextual information and tooltips
+- Statistics
+- Layer controls
 
 Everything else belongs to Version 2.
 

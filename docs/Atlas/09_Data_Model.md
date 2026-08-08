@@ -81,8 +81,8 @@ ImportedMusicDocument
 Les métadonnées du document ne deviennent ni des entités musicales, ni des nœuds du Knowledge
 Graph.
 
-Les événements d'écoute appartiendront à un futur modèle d'historique distinct. Les paramètres
-applicatifs n'appartiennent pas au catalogue musical.
+Les événements d'écoute appartiendront au modèle de Listening History distinct requis pour la
+navigation temporelle V1. Les paramètres applicatifs n'appartiennent pas au catalogue musical.
 
 ## Identités musicales
 

@@ -90,6 +90,30 @@ construit ni Knowledge Graph ni World.
 Erreur d'import stable indiquant une catégorie `syntax` ou `validation`, un chemin JSON et une
 raison indépendante de l'interface utilisateur.
 
+## Listening History
+
+Historique temporel distinct de `MusicCatalog`, composé conceptuellement de Listening Events. Il
+décrit l'histoire musicale de l'utilisateur et alimente la Temporal Navigation. Sa reconstruction
+reste déterministe à partir d'entrées explicites, sans notion implicite de « maintenant ».
+
+## Listening Event
+
+Événement explicite appartenant au Listening History et représentant un fait d'écoute dans le
+temps. Il ne devient ni une propriété structurelle de `MusicCatalog`, ni un événement analytics de
+navigation.
+
+## Temporal Navigation
+
+Exploration de l'évolution de l'atlas musical à partir du Listening History. Elle est critique
+pour Version 1.0 et reste distincte du temps d'exécution, du framerate et du parcours de
+l'utilisateur dans l'interface.
+
+## User Journey Analytics
+
+Analyse future de la manière dont l'utilisateur parcourt EchoAtlas, fondée à terme sur des
+événements sémantiques tels qu'un focus d'entité ou le suivi d'une relation. Elle ne décrit pas les
+écoutes musicales et reste hors du périmètre V1 obligatoire actuel.
+
 ---
 
 # Knowledge
