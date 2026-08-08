@@ -106,7 +106,15 @@ navigation.
 
 Exploration de l'évolution de l'atlas musical à partir du Listening History. Elle est critique
 pour Version 1.0 et reste distincte du temps d'exécution, du framerate et du parcours de
-l'utilisateur dans l'interface.
+l'utilisateur dans l'interface. Elle reconstruit un `World(T)` historiquement fidèle plutôt que de
+masquer simplement les éléments apparus après `T`.
+
+## World(T)
+
+Snapshot géographique à l'instant explicite `T`, déterminé par `MusicCatalog`, le Listening History
+jusqu'à `T`, la seed, les règles temporelles et une version traçable de l'algorithme de génération.
+À entrées identiques, un accès direct et un retour ultérieur à `T` produisent exactement le même
+snapshot. Le User Journey Analytics n'y participe jamais.
 
 ## User Journey Analytics
 
@@ -198,6 +206,12 @@ algorithmes procéduraux déterministes.
 
 Garantie que des entrées identiques produisent exactement le même résultat observable,
 indépendamment du temps, de la locale, du framerate et de l'ordre d'entrée non sémantique.
+
+Pour la navigation temporelle, `T` et le Listening History jusqu'à `T` sont des entrées explicites.
+Le déterminisme de `World(T)` n'impose ni les mêmes coordonnées entre `T1` et `T2`, ni la conservation
+du layout d'une ancienne version d'algorithme. Les coordonnées golden actuelles protègent
+l'implémentation présente contre les régressions involontaires; elles ne constituent pas une
+promesse de compatibilité éternelle.
 
 ## DeterministicRandom
 

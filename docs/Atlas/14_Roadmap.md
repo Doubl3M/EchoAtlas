@@ -126,6 +126,11 @@ pas un effet de rétention démontré.
 Analytics. La reconstruction temporelle dépend uniquement d'entrées explicites et déterministes,
 sans notion implicite de « maintenant » dans les couches génériques.
 
+Pour un instant explicite `T`, `World(T)` dépend du catalogue, du Listening History jusqu'à `T`, de
+la seed, des règles temporelles et d'une version traçable de l'algorithme. Le même ensemble d'entrées
+reconstruit exactement le même snapshot. Des instants ou versions d'algorithme différents ne sont
+pas tenus de conserver les mêmes coordonnées ou le même layout.
+
 **V1 Required**
 
 - recherche ;

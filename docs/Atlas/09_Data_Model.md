@@ -84,6 +84,34 @@ Graph.
 Les événements d'écoute appartiendront au modèle de Listening History distinct requis pour la
 navigation temporelle V1. Les paramètres applicatifs n'appartiennent pas au catalogue musical.
 
+## Snapshot temporel du Monde
+
+Le Monde temporel est une reconstruction déterministe :
+
+```text
+MusicCatalog
++ ListeningHistory jusqu'à T
++ seed
++ règles temporelles
++ version de l'algorithme de génération
+→ World(T)
+```
+
+`MusicCatalog` décrit la structure musicale. `ListeningHistory` décrit les événements musicaux
+jusqu'à l'instant explicite `T`. User Journey Analytics décrit uniquement le parcours dans
+EchoAtlas et ne participe jamais à `World(T)`.
+
+À entrées identiques, accéder directement à `T` ou y revenir plus tard produit exactement le même
+snapshot. La version des règles temporelles et de l'algorithme de génération reste explicite ou
+traçable lorsqu'elle est nécessaire à cette reproductibilité.
+
+La fidélité historique ne consiste pas à masquer les éléments apparus après `T`. L'état complet est
+reconstruit depuis l'historique disponible à cette date. Ainsi, selon de futures règles produit, un
+artiste sans écoute pendant six mois pourra devenir une ruine et une route inutilisée pendant un an
+pourra disparaître sous l'herbe. En remontant avant ces transformations, la ruine pourra redevenir un
+lieu actif et la route réapparaître. Ces exemples définissent le sens attendu, pas leur future
+implémentation.
+
 ## Identités musicales
 
 L'identité d'une entité musicale est formée de son kind et de son identifiant canonique.

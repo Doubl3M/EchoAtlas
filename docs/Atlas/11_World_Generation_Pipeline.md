@@ -285,9 +285,11 @@ Le moteur applique :
 - expansion ;
 - renaissance.
 
-Aucun objet n'apparaît brutalement.
+Les règles temporelles interprètent le Listening History jusqu'à un instant explicite `T`.
 
-Chaque évolution possède une continuité.
+Pour un même `T` et les mêmes entrées, le snapshot reste exactement reproductible. Entre deux
+instants distincts, aucune continuité stricte des coordonnées ou du layout n'est imposée : le Monde
+peut changer si l'histoire musicale et les règles temporelles le demandent.
 
 ---
 
@@ -383,52 +385,40 @@ Aucune dépendance circulaire.
 
 ---
 
-# Pipeline incrémental
+# Reconstruction temporelle
 
-Lorsqu'une nouvelle écoute apparaît, le pipeline complet n'est pas relancé.
-
-Le moteur détermine les étapes concernées.
-
-Exemple :
+La navigation temporelle reconstruit un snapshot historique complet :
 
 ```
-Nouvelle écoute
-
-↓
-
-Graph
-
-↓
-
-Analysis
-
-↓
-
-Interpretation
-
-↓
-
-Simulation
-
-↓
-
-Renderer
+MusicCatalog
++ ListeningHistory jusqu'à T
++ seed
++ règles temporelles
++ version de l'algorithme de génération
+→ World(T)
 ```
 
-Les continents ne sont pas recalculés inutilement.
+`T` ne provient jamais de l'heure système, d'un « maintenant » implicite ou du chemin de navigation
+de l'utilisateur. Ouvrir directement `T` ou revenir à `T` plus tard produit le même snapshot.
+
+Cette reconstruction ne consiste pas à masquer les éléments postérieurs à `T`. Une ruine actuelle
+peut être un lieu actif dans un snapshot antérieur ; une route aujourd'hui disparue peut y
+réapparaître. Les règles détaillées correspondantes ne sont pas encore implémentées.
 
 ---
 
 # Pipeline complet
 
-Le pipeline complet est réservé :
+Le pipeline complet est notamment utilisé :
 
 - au premier lancement ;
 - à une nouvelle seed ;
 - à un changement majeur de version ;
 - à une reconstruction volontaire.
 
-Le reste du temps, le moteur privilégie une mise à jour locale.
+Une future mise à jour locale reste une optimisation possible. Elle doit produire le même
+`World(T)` que la reconstruction complète pour les mêmes entrées et ne devient jamais une source de
+vérité dépendante du chemin suivi.
 
 ---
 
