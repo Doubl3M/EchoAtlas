@@ -325,6 +325,7 @@ function prepareWorkload(
 
 function configWithoutRelaxation(config: WorldConfig): WorldConfig {
     return new WorldConfig({
+        generationVersion: "world-v1-exact",
         width: config.width,
         height: config.height,
         placementIterations: 0,

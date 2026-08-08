@@ -506,8 +506,8 @@ A temporal world is defined conceptually by:
 MusicCatalog
 + ListeningHistory up to T
 + seed
-+ temporal rules
-+ generation algorithm version
++ temporal rules version
++ WorldConfig
 → World(T)
 ```
 
@@ -519,6 +519,13 @@ Determinism applies to each `World(T)`. It does not require identical coordinate
 between `T1` and `T2`, nor compatibility with layouts produced by a different algorithm version.
 Algorithm and temporal-rule versions must be explicit or traceable whenever reproducibility across
 versions requires them.
+
+`WorldConfig` contains the `WorldGenerationVersion`, logical dimensions, `TerrainConfig` and current
+explicit placement parameters. `WorldConfig.generationVersion` identifies the observable geographic
+generation physics. Its current value, `world-v1-exact`, resolves to the established exact placement
+without exposing indexed buffers or other implementation details. It is distinct from
+`metadata.version`, which versions the imported JSON format. A future project format must persist
+the World configuration needed to reconstruct historical snapshots.
 
 A future placement optimization may therefore change the layout. It must preserve the seed,
 contractual canonical ordering, relation semantics, immutable snapshots, the Knowledge/World

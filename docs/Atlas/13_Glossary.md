@@ -112,9 +112,18 @@ masquer simplement les éléments apparus après `T`.
 ## World(T)
 
 Snapshot géographique à l'instant explicite `T`, déterminé par `MusicCatalog`, le Listening History
-jusqu'à `T`, la seed, les règles temporelles et une version traçable de l'algorithme de génération.
-À entrées identiques, un accès direct et un retour ultérieur à `T` produisent exactement le même
-snapshot. Le User Journey Analytics n'y participe jamais.
+jusqu'à `T`, la seed, la version des règles temporelles et `WorldConfig`. Cette configuration contient
+notamment `WorldGenerationVersion`, les dimensions logiques, `TerrainConfig` et les paramètres
+explicites de placement actuels. À entrées identiques, un accès direct et un retour ultérieur à `T`
+produisent exactement le même snapshot. Le User Journey Analytics n'y participe jamais.
+
+## WorldGenerationVersion
+
+Version explicite de la physique géographique observable utilisée pour produire un World, portée par
+`WorldConfig.generationVersion`. La seule version actuelle, `world-v1-exact`, conserve le placement
+exact existant. Elle est indépendante de `metadata.version`, qui versionne le format JSON importé.
+La `WorldConfig` devra être enregistrée par tout futur format de projet permettant de reconstruire
+un `World(T)`.
 
 ## User Journey Analytics
 

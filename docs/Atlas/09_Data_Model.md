@@ -92,8 +92,8 @@ Le Monde temporel est une reconstruction déterministe :
 MusicCatalog
 + ListeningHistory jusqu'à T
 + seed
-+ règles temporelles
-+ version de l'algorithme de génération
++ version des règles temporelles
++ WorldConfig
 → World(T)
 ```
 
@@ -104,6 +104,12 @@ EchoAtlas et ne participe jamais à `World(T)`.
 À entrées identiques, accéder directement à `T` ou y revenir plus tard produit exactement le même
 snapshot. La version des règles temporelles et de l'algorithme de génération reste explicite ou
 traçable lorsqu'elle est nécessaire à cette reproductibilité.
+
+`WorldConfig` contient notamment `WorldGenerationVersion`, les dimensions logiques, `TerrainConfig`
+et les paramètres explicites de placement actuels. `WorldConfig.generationVersion` identifie la
+physique géographique observable ; sa valeur actuelle est `world-v1-exact`. Elle est distincte de
+`metadata.version`, qui versionne uniquement le format JSON importé. Tout futur format de projet
+capable de reconstruire un Monde historique devra conserver cette configuration World.
 
 La fidélité historique ne consiste pas à masquer les éléments apparus après `T`. L'état complet est
 reconstruit depuis l'historique disponible à cette date. Ainsi, selon de futures règles produit, un

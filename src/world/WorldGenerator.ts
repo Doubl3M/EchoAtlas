@@ -6,6 +6,7 @@ import { GeographicWorld } from "./GeographicWorld";
 import { placeKnowledgeNodes } from "./IndexedWorldPlacement";
 import { WorldConfig } from "./WorldConfig";
 import { WorldConnection } from "./WorldConnection";
+import type { WorldGenerationVersion } from "./WorldGenerationVersion";
 import { WorldLocation } from "./WorldLocation";
 import { WorldTerrainMapping } from "./WorldTerrainMapping";
 
@@ -19,7 +20,13 @@ export class WorldGenerator {
         const heightField = new TerrainGenerator().generate(seed, config.terrain);
         const nodes = graph.getNodes();
         const relations = graph.getRelations();
-        const positions = placeKnowledgeNodes(seed, config, nodes, relations);
+        const positions = placeNodesForGenerationVersion(
+            config.generationVersion,
+            seed,
+            config,
+            nodes,
+            relations
+        );
         const terrainMapping = new WorldTerrainMapping(
             config.width,
             config.height,
@@ -58,5 +65,18 @@ export class WorldGenerator {
             locations,
             connections,
         });
+    }
+}
+
+function placeNodesForGenerationVersion(
+    version: WorldGenerationVersion,
+    seed: SeedInput | Seed,
+    config: WorldConfig,
+    nodes: Parameters<typeof placeKnowledgeNodes>[2],
+    relations: Parameters<typeof placeKnowledgeNodes>[3]
+): ReturnType<typeof placeKnowledgeNodes> {
+    switch (version) {
+        case "world-v1-exact":
+            return placeKnowledgeNodes(seed, config, nodes, relations);
     }
 }

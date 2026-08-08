@@ -31,6 +31,8 @@ The project follows Semantic Versioning.
 
 - World logical dimensions and terrain resolution can now be configured independently while
   preserving the historical one-to-one mapping behavior.
+- World generation configurations now identify their observable geographic physics through an
+  explicit `WorldGenerationVersion`.
 
 ## Fixed
 

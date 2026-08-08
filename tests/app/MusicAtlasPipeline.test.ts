@@ -8,6 +8,7 @@ import { demoMusicDocumentJson } from "../../src/app/demoMusicDocument";
 
 function worldConfig(): WorldConfig {
     return new WorldConfig({
+        generationVersion: "world-v1-exact",
         width: 8,
         height: 6,
         placementIterations: 4,

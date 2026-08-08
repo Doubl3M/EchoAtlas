@@ -400,13 +400,20 @@ La navigation temporelle reconstruit un snapshot historique complet :
 MusicCatalog
 + ListeningHistory jusqu'à T
 + seed
-+ règles temporelles
-+ version de l'algorithme de génération
++ version des règles temporelles
++ WorldConfig
 → World(T)
 ```
 
 `T` ne provient jamais de l'heure système, d'un « maintenant » implicite ou du chemin de navigation
 de l'utilisateur. Ouvrir directement `T` ou revenir à `T` plus tard produit le même snapshot.
+
+`WorldConfig` contient notamment `WorldGenerationVersion`, les dimensions logiques, `TerrainConfig`
+et les paramètres explicites de placement actuels. Sa version actuelle `world-v1-exact` désigne la
+physique de placement exacte observable, sans figer ses structures internes. Cette
+`WorldConfig.generationVersion` ne doit pas être confondue avec `metadata.version`, qui décrit le
+format du JSON importé. Un futur format de projet devra conserver cette configuration pour permettre
+la reconstruction historique ; aucune persistance n'est introduite ici.
 
 Cette reconstruction ne consiste pas à masquer les éléments postérieurs à `T`. Une ruine actuelle
 peut être un lieu actif dans un snapshot antérieur ; une route aujourd'hui disparue peut y

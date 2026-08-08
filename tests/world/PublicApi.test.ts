@@ -6,6 +6,7 @@ import type {
     WorldConnectionOptions,
     WorldCellBounds,
     WorldLocationOptions,
+    WorldGenerationVersion,
     TerrainCellIndex,
 } from "../../src/world";
 
@@ -24,6 +25,7 @@ describe("world public API", () => {
     });
 
     it("exports only the construction contracts as types", () => {
+        const generationVersion: WorldGenerationVersion = "world-v1-exact";
         const contracts: readonly [
             keyof GeographicWorldOptions,
             keyof WorldConfigOptions,
@@ -33,7 +35,8 @@ describe("world public API", () => {
             keyof WorldCellBounds,
         ] = ["locations", "terrain", "knowledgeRelationId", "knowledgeNodeId", "x", "x0"];
 
-        expect(contracts).toEqual([
+        expect([generationVersion, ...contracts]).toEqual([
+            "world-v1-exact",
             "locations",
             "terrain",
             "knowledgeRelationId",

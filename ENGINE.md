@@ -476,8 +476,8 @@ Temporal navigation may affect world generation only through explicit inputs: a 
 MusicCatalog
 + ListeningHistory up to T
 + seed
-+ temporal rules
-+ generation algorithm version
++ temporal rules version
++ WorldConfig
 → World(T)
 ```
 
@@ -488,6 +488,12 @@ later.
 Different instants may legitimately produce different positions, routes, regions or other
 geographic elements. Strict geographic continuity between `T1` and `T2` is not an Engine invariant;
 historical fidelity is.
+
+`WorldConfig` contains the `WorldGenerationVersion`, logical dimensions, `TerrainConfig` and current
+explicit placement parameters. `WorldConfig.generationVersion` versions observable geographic
+physics; `world-v1-exact` preserves the current exact placement. It is unrelated to the JSON
+document's `metadata.version`. Any future persisted project supporting historical reconstruction
+must retain its World configuration.
 
 ---
 
