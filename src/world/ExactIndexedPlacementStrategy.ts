@@ -1,55 +1,27 @@
-import { DeterministicRandom, type Seed, type SeedInput } from "../engine/math";
-import type { KnowledgeNode, KnowledgeRelation } from "../knowledge";
-
-import type { WorldConfig } from "./WorldConfig";
-
-export interface IndexedWorldPositions {
-    readonly x: Float64Array;
-    readonly y: Float64Array;
-}
-
-/** Internal exact placement using canonical numeric indices instead of IDs in the hot loop. */
-export function placeKnowledgeNodes(
-    seed: SeedInput | Seed,
-    config: WorldConfig,
-    nodes: readonly KnowledgeNode[],
-    relations: readonly KnowledgeRelation[]
-): IndexedWorldPositions {
-    const nodeIds = nodes.map(({ id }) => id);
-    const positions = createInitialPositions(seed, config, nodeIds);
-    const relationIndices = indexRelations(nodeIds, relations);
-    relaxPositions(nodeIds, positions, relationIndices, config);
-    return positions;
-}
+import type {
+    IndexedWorldPositions,
+    WorldPlacementInput,
+    WorldPlacementRelation,
+    WorldPlacementStrategy,
+} from "./WorldPlacementStrategy";
 
 interface IndexedRelations {
     readonly sources: Uint32Array;
     readonly targets: Uint32Array;
 }
 
-function createInitialPositions(
-    seed: SeedInput | Seed,
-    config: WorldConfig,
-    nodeIds: readonly string[]
-): IndexedWorldPositions {
-    const x = new Float64Array(nodeIds.length);
-    const y = new Float64Array(nodeIds.length);
-    const random = new DeterministicRandom(seed);
-    for (let index = 0; index < nodeIds.length; index += 1) {
-        const nodeRandom = random.fork(`world-location:${nodeIds[index]}`);
-        x[index] = randomCoordinate(nodeRandom, config.width);
-        y[index] = randomCoordinate(nodeRandom, config.height);
+/** Internal exact placement using canonical numeric indices in the hot loop. */
+export class ExactIndexedPlacementStrategy implements WorldPlacementStrategy {
+    public place(input: WorldPlacementInput): IndexedWorldPositions {
+        const relationIndices = indexRelations(input.nodeIds, input.relations);
+        relaxPositions(input, relationIndices);
+        return input.initialPositions;
     }
-    return { x, y };
-}
-
-function randomCoordinate(random: DeterministicRandom, size: number): number {
-    return size === 1 ? 0 : random.nextRange(0, size - 1);
 }
 
 function indexRelations(
     nodeIds: readonly string[],
-    relations: readonly KnowledgeRelation[]
+    relations: readonly WorldPlacementRelation[]
 ): IndexedRelations {
     const nodeIndices = new Map(nodeIds.map((id, index) => [id, index]));
     const sources = new Uint32Array(relations.length);
@@ -69,27 +41,28 @@ function requireNodeIndex(indices: ReadonlyMap<string, number>, nodeId: string):
     return index;
 }
 
-function relaxPositions(
-    nodeIds: readonly string[],
-    positions: IndexedWorldPositions,
-    relations: IndexedRelations,
-    config: WorldConfig
-): void {
-    const displacementX = new Float64Array(nodeIds.length);
-    const displacementY = new Float64Array(nodeIds.length);
-    for (let iteration = 0; iteration < config.placementIterations; iteration += 1) {
+function relaxPositions(input: WorldPlacementInput, relations: IndexedRelations): void {
+    const displacementX = new Float64Array(input.nodeIds.length);
+    const displacementY = new Float64Array(input.nodeIds.length);
+    for (let iteration = 0; iteration < input.placementIterations; iteration += 1) {
         // Reusing buffers is safe because every force is accumulated before any position moves.
         displacementX.fill(0);
         displacementY.fill(0);
-        applyRepulsion(nodeIds, positions, displacementX, displacementY, config.repulsionStrength);
+        applyRepulsion(
+            input.nodeIds,
+            input.initialPositions,
+            displacementX,
+            displacementY,
+            input.repulsionStrength
+        );
         applyAttraction(
-            positions,
+            input.initialPositions,
             relations,
             displacementX,
             displacementY,
-            config.attractionStrength
+            input.attractionStrength
         );
-        applyDisplacements(positions, displacementX, displacementY, config);
+        applyDisplacements(input, displacementX, displacementY);
     }
 }
 
@@ -138,14 +111,21 @@ function applyAttraction(
 }
 
 function applyDisplacements(
-    positions: IndexedWorldPositions,
+    input: WorldPlacementInput,
     displacementX: Float64Array,
-    displacementY: Float64Array,
-    config: WorldConfig
+    displacementY: Float64Array
 ): void {
-    for (let index = 0; index < positions.x.length; index += 1) {
-        positions.x[index] = clamp(positions.x[index] + displacementX[index], 0, config.width - 1);
-        positions.y[index] = clamp(positions.y[index] + displacementY[index], 0, config.height - 1);
+    for (let index = 0; index < input.initialPositions.x.length; index += 1) {
+        input.initialPositions.x[index] = clamp(
+            input.initialPositions.x[index] + displacementX[index],
+            0,
+            input.width - 1
+        );
+        input.initialPositions.y[index] = clamp(
+            input.initialPositions.y[index] + displacementY[index],
+            0,
+            input.height - 1
+        );
     }
 }
 

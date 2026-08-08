@@ -527,6 +527,11 @@ without exposing indexed buffers or other implementation details. It is distinct
 `metadata.version`, which versions the imported JSON format. A future project format must persist
 the World configuration needed to reconstruct historical snapshots.
 
+Inside World, `WorldGenerator` creates canonical initial positions and resolves the generation
+version to a private placement strategy. Placement strategies receive only canonical IDs,
+relations, initial numeric buffers, logical dimensions and explicit placement parameters. They are
+not part of the public World API.
+
 A future placement optimization may therefore change the layout. It must preserve the seed,
 contractual canonical ordering, relation semantics, immutable snapshots, the Knowledge/World
 boundary, Renderer independence and reproducibility for a given `World(T)`. Exact coordinates from

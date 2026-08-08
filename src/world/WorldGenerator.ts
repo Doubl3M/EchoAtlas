@@ -3,10 +3,10 @@ import { TerrainGenerator } from "../engine/terrain";
 import { KnowledgeGraph } from "../knowledge";
 
 import { GeographicWorld } from "./GeographicWorld";
-import { placeKnowledgeNodes } from "./IndexedWorldPlacement";
+import { resolveWorldPlacementStrategy } from "./resolveWorldPlacementStrategy";
 import { WorldConfig } from "./WorldConfig";
 import { WorldConnection } from "./WorldConnection";
-import type { WorldGenerationVersion } from "./WorldGenerationVersion";
+import { createWorldInitialPositions } from "./WorldInitialPositions";
 import { WorldLocation } from "./WorldLocation";
 import { WorldTerrainMapping } from "./WorldTerrainMapping";
 
@@ -20,13 +20,24 @@ export class WorldGenerator {
         const heightField = new TerrainGenerator().generate(seed, config.terrain);
         const nodes = graph.getNodes();
         const relations = graph.getRelations();
-        const positions = placeNodesForGenerationVersion(
-            config.generationVersion,
+        const nodeIds = nodes.map(({ id }) => id);
+        const initialPositions = createWorldInitialPositions(
             seed,
-            config,
-            nodes,
-            relations
+            nodeIds,
+            config.width,
+            config.height
         );
+        const placementStrategy = resolveWorldPlacementStrategy(config.generationVersion);
+        const positions = placementStrategy.place({
+            nodeIds,
+            relations,
+            initialPositions,
+            width: config.width,
+            height: config.height,
+            placementIterations: config.placementIterations,
+            attractionStrength: config.attractionStrength,
+            repulsionStrength: config.repulsionStrength,
+        });
         const terrainMapping = new WorldTerrainMapping(
             config.width,
             config.height,
@@ -65,18 +76,5 @@ export class WorldGenerator {
             locations,
             connections,
         });
-    }
-}
-
-function placeNodesForGenerationVersion(
-    version: WorldGenerationVersion,
-    seed: SeedInput | Seed,
-    config: WorldConfig,
-    nodes: Parameters<typeof placeKnowledgeNodes>[2],
-    relations: Parameters<typeof placeKnowledgeNodes>[3]
-): ReturnType<typeof placeKnowledgeNodes> {
-    switch (version) {
-        case "world-v1-exact":
-            return placeKnowledgeNodes(seed, config, nodes, relations);
     }
 }
