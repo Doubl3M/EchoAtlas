@@ -7,3 +7,5 @@ export type { WorldConnectionOptions } from "./WorldConnection";
 export { WorldGenerator } from "./WorldGenerator";
 export { WorldLocation } from "./WorldLocation";
 export type { WorldLocationOptions } from "./WorldLocation";
+export { WorldTerrainMapping } from "./WorldTerrainMapping";
+export type { TerrainCellIndex, WorldCellBounds } from "./WorldTerrainMapping";

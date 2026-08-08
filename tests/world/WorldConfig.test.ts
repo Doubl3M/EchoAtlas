@@ -79,9 +79,12 @@ describe("WorldConfig", () => {
         ).toBeInstanceOf(WorldConfig);
     });
 
-    it("requires terrain dimensions to match the world", () => {
-        expect(() => new WorldConfig(options({ terrain: terrain(7, 6) }))).toThrow(
-            "Terrain dimensions must match the world dimensions."
-        );
+    it("accepts an explicit terrain resolution independent of the World extent", () => {
+        const config = new WorldConfig(options({ terrain: terrain(4, 3) }));
+
+        expect(config.width).toBe(8);
+        expect(config.height).toBe(6);
+        expect(config.terrain.width).toBe(4);
+        expect(config.terrain.height).toBe(3);
     });
 });

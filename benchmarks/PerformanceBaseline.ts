@@ -1,4 +1,5 @@
 import { Camera2D, CameraConfig } from "../src/engine/camera";
+import { TerrainGenerator } from "../src/engine/terrain";
 import type { KnowledgeGraph } from "../src/knowledge";
 import { MusicInterpreter, type MusicCatalog } from "../src/music";
 import { MusicJsonImporter } from "../src/music/import";
@@ -17,6 +18,7 @@ import {
     createBenchmarkDataset,
     placementDatasetDefinitions,
     terrainDatasetDefinitions,
+    worldTerrainDatasetDefinitions,
     type BenchmarkDataset,
     type BenchmarkDatasetDefinition,
 } from "./musicLibraryFixtures";
@@ -42,9 +44,13 @@ export interface PerformanceProfileResult {
     readonly relations: number;
     readonly locations: number;
     readonly connections: number;
+    readonly world: string;
     readonly terrain: string;
+    readonly terrainCells: number;
+    readonly renderRectanglesPerFrame: number;
     readonly importMs: TimingStatistics;
     readonly knowledgeMs: TimingStatistics;
+    readonly terrainMs: TimingStatistics;
     readonly worldMs: TimingStatistics;
     readonly renderLabelsMs: TimingStatistics;
     readonly renderNoLabelsMs: TimingStatistics;
@@ -69,6 +75,12 @@ export interface PerformanceBaselineReport {
     readonly profiles: readonly PerformanceProfileResult[];
     readonly placementSeries: readonly ScalingSeriesResult[];
     readonly terrainSeries: readonly ScalingSeriesResult[];
+}
+
+export interface WorldTerrainBenchmarkReport {
+    readonly warmupRuns: number;
+    readonly measuredRuns: number;
+    readonly profiles: readonly PerformanceProfileResult[];
 }
 
 interface PreparedDataset {
@@ -103,6 +115,18 @@ export function runPerformanceBaseline(runtime: BenchmarkRuntime): PerformanceBa
     });
 }
 
+export function runWorldTerrainBenchmark(runtime: BenchmarkRuntime): WorldTerrainBenchmarkReport {
+    return Object.freeze({
+        warmupRuns: WARMUP_RUNS,
+        measuredRuns: MEASURED_RUNS,
+        profiles: Object.freeze(
+            worldTerrainDatasetDefinitions.map((definition) =>
+                measureProfile(createBenchmarkDataset(definition), runtime)
+            )
+        ),
+    });
+}
+
 function measureProfile(
     dataset: BenchmarkDataset,
     runtime: BenchmarkRuntime
@@ -124,6 +148,10 @@ function measureProfile(
     const knowledgeMs = measureRepeated(() => interpreter.interpret(prepared.catalog), runtime);
     const worldMs = measureRepeated(
         () => generator.generate(prepared.seed, dataset.worldConfig, prepared.graph),
+        runtime
+    );
+    const terrainMs = measureRepeated(
+        () => new TerrainGenerator().generate(prepared.seed, dataset.worldConfig.terrain),
         runtime
     );
     const renderLabelsMs = measureRepeated(
@@ -148,9 +176,14 @@ function measureProfile(
         relations: observation.relations,
         locations: observation.locations,
         connections: observation.connections,
+        world: `${dataset.worldConfig.width}x${dataset.worldConfig.height}`,
         terrain: terrainDimensions(dataset.definition),
+        terrainCells: prepared.world.heightField.width * prepared.world.heightField.height,
+        renderRectanglesPerFrame:
+            prepared.world.heightField.width * prepared.world.heightField.height + 1,
         importMs,
         knowledgeMs,
+        terrainMs,
         worldMs,
         renderLabelsMs,
         renderNoLabelsMs,
@@ -228,7 +261,7 @@ function runCompletePipeline(dataset: BenchmarkDataset): PipelineObservation {
     const surface = new CountingRenderSurface(1_024, 768);
     new CanvasRenderer(new SeventiesTheme()).render(world, createCamera(dataset), surface);
 
-    if (surface.getCounts().rectangles !== world.width * world.height + 1) {
+    if (surface.getCounts().rectangles !== world.heightField.width * world.heightField.height + 1) {
         throw new Error("Renderer did not visit every terrain cell.");
     }
     return {
@@ -268,5 +301,7 @@ function requireSeed(seed: number | undefined): number {
 }
 
 function terrainDimensions(definition: BenchmarkDatasetDefinition): string {
-    return `${definition.worldWidth}x${definition.worldHeight}`;
+    return `${definition.terrainWidth ?? definition.worldWidth}x${
+        definition.terrainHeight ?? definition.worldHeight
+    }`;
 }

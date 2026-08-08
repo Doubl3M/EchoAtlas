@@ -4,7 +4,9 @@ import type {
     GeographicWorldOptions,
     WorldConfigOptions,
     WorldConnectionOptions,
+    WorldCellBounds,
     WorldLocationOptions,
+    TerrainCellIndex,
 } from "../../src/world";
 
 describe("world public API", () => {
@@ -17,6 +19,7 @@ describe("world public API", () => {
             "WorldConnection",
             "WorldGenerator",
             "WorldLocation",
+            "WorldTerrainMapping",
         ]);
     });
 
@@ -26,13 +29,17 @@ describe("world public API", () => {
             keyof WorldConfigOptions,
             keyof WorldConnectionOptions,
             keyof WorldLocationOptions,
-        ] = ["locations", "terrain", "knowledgeRelationId", "knowledgeNodeId"];
+            keyof TerrainCellIndex,
+            keyof WorldCellBounds,
+        ] = ["locations", "terrain", "knowledgeRelationId", "knowledgeNodeId", "x", "x0"];
 
         expect(contracts).toEqual([
             "locations",
             "terrain",
             "knowledgeRelationId",
             "knowledgeNodeId",
+            "x",
+            "x0",
         ]);
     });
 });

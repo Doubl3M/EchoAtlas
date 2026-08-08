@@ -457,6 +457,10 @@ Application orchestrates.
 
 Ownership is always explicit.
 
+The World logical extent is independent of the Terrain sample-grid resolution. Terrain remains a
+generic numeric grid; World owns the deterministic cell mapping used for geography, and Render
+only projects those cells into World space.
+
 ---
 
 # Time

@@ -26,12 +26,15 @@ console.table(
         entities: result.entities,
         relations: result.relations,
         terrain: result.terrain,
+        cells: result.terrainCells,
         "import ms": formatTiming(result.importMs),
         "knowledge ms": formatTiming(result.knowledgeMs),
+        "terrain ms": formatTiming(result.terrainMs),
         "world ms": formatTiming(result.worldMs),
         "render labels ms": formatTiming(result.renderLabelsMs),
         "render no labels ms": formatTiming(result.renderNoLabelsMs),
         "total ms": formatTiming(result.totalMs),
+        "render rectangles/frame": result.renderRectanglesPerFrame,
         "heap delta MiB": formatMebibytes(result.heapDeltaBytes),
     }))
 );

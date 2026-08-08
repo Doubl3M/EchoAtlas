@@ -7,6 +7,8 @@ export interface BenchmarkDatasetDefinition {
     readonly relationCount: number;
     readonly worldWidth: number;
     readonly worldHeight: number;
+    readonly terrainWidth?: number;
+    readonly terrainHeight?: number;
     readonly placementIterations: number;
 }
 
@@ -80,6 +82,28 @@ export const benchmarkDatasetDefinitions: readonly BenchmarkDatasetDefinition[] 
     }),
 ]);
 
+/** Dedicated comparison kept out of the general baseline because the 1:1 profile is costly. */
+export const worldTerrainDatasetDefinitions: readonly BenchmarkDatasetDefinition[] = Object.freeze([
+    Object.freeze({
+        name: "large-world-1to1-terrain",
+        entityCount: 40,
+        relationCount: 60,
+        worldWidth: 1_024,
+        worldHeight: 768,
+        placementIterations: 8,
+    }),
+    Object.freeze({
+        name: "large-world-reduced-terrain",
+        entityCount: 40,
+        relationCount: 60,
+        worldWidth: 1_024,
+        worldHeight: 768,
+        terrainWidth: 256,
+        terrainHeight: 192,
+        placementIterations: 8,
+    }),
+]);
+
 /** Diagnostic series: only graph size changes; terrain and placement settings remain fixed. */
 export const placementDatasetDefinitions: readonly BenchmarkDatasetDefinition[] = Object.freeze(
     [40, 160, 480, 1_000].map((entityCount) =>
@@ -94,20 +118,22 @@ export const placementDatasetDefinitions: readonly BenchmarkDatasetDefinition[] 
     )
 );
 
-/** Diagnostic series: only terrain dimensions change; graph and placement settings remain fixed. */
+/** Diagnostic series: only terrain resolution changes; graph and logical World remain fixed. */
 export const terrainDatasetDefinitions: readonly BenchmarkDatasetDefinition[] = Object.freeze(
     [
         [64, 48],
         [128, 96],
         [256, 192],
         [512, 384],
-    ].map(([worldWidth, worldHeight]) =>
+    ].map(([terrainWidth, terrainHeight]) =>
         Object.freeze({
-            name: `terrain-${worldWidth}x${worldHeight}`,
+            name: `terrain-${terrainWidth}x${terrainHeight}`,
             entityCount: 40,
             relationCount: 60,
-            worldWidth,
-            worldHeight,
+            worldWidth: 512,
+            worldHeight: 384,
+            terrainWidth,
+            terrainHeight,
             placementIterations: 8,
         })
     )
@@ -130,8 +156,8 @@ export function createBenchmarkDataset(definition: BenchmarkDatasetDefinition): 
         relations: Object.freeze(createRelations(collections.endpoints, definition.relationCount)),
     });
     const terrain = new TerrainConfig({
-        width: definition.worldWidth,
-        height: definition.worldHeight,
+        width: definition.terrainWidth ?? definition.worldWidth,
+        height: definition.terrainHeight ?? definition.worldHeight,
         baseFrequency: 0.035,
         octaves: 4,
         persistence: 0.5,
@@ -228,6 +254,8 @@ function validateDefinition(definition: BenchmarkDatasetDefinition): void {
         ["relationCount", definition.relationCount],
         ["worldWidth", definition.worldWidth],
         ["worldHeight", definition.worldHeight],
+        ["terrainWidth", definition.terrainWidth ?? definition.worldWidth],
+        ["terrainHeight", definition.terrainHeight ?? definition.worldHeight],
         ["placementIterations", definition.placementIterations],
     ] as const) {
         if (!Number.isSafeInteger(value) || value <= 0) {

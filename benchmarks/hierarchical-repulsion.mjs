@@ -94,7 +94,7 @@ console.log(
     "Near-collision tolerance: < 0.05 world units over a deterministic sample of at most 20,000 pairs."
 );
 console.log(
-    "Logical World dimensions and HeightField resolution are coupled by the current WorldConfig contract; this spike constructs matching TerrainConfig values but does not generate their HeightFields during placement-only series."
+    "Logical World dimensions and HeightField resolution are independent; this placement-only spike keeps matching TerrainConfig values but does not generate their HeightFields."
 );
 console.log(`Total benchmark duration: ${milliseconds(duration)} ms`);
 

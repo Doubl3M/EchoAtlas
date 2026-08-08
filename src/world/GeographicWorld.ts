@@ -22,13 +22,6 @@ export class GeographicWorld {
     private readonly connectionsByRelationId: ReadonlyMap<string, WorldConnection>;
 
     public constructor(options: GeographicWorldOptions) {
-        if (
-            options.heightField.width !== options.width ||
-            options.heightField.height !== options.height
-        ) {
-            throw new RangeError("Height-field dimensions must match the world dimensions.");
-        }
-
         this.width = options.width;
         this.height = options.height;
         this.heightField = options.heightField;
