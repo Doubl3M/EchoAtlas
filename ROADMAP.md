@@ -390,6 +390,11 @@ reintroduced into `MusicCatalog`.
 Temporal reconstruction must be deterministic from explicit inputs. Generic layers must not gain
 an implicit notion of the current time.
 
+For a requested instant `T`, temporal navigation reconstructs `World(T)` from the structural
+`MusicCatalog`, the distinct Listening History up to `T`, the seed, the temporal rules and a
+traceable generation-algorithm version. Direct access to `T` and a later return to `T` must produce
+the same snapshot. Geographic continuity between different instants is not required.
+
 V1 Required
 
 - Search

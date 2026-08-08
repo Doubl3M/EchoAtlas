@@ -475,7 +475,7 @@ Never through global state.
 
 # Determinism
 
-The following inputs define a world:
+For a non-temporal generation, the following explicit inputs define a world:
 
 - seed
 - configuration
@@ -488,6 +488,34 @@ Changing hardware must never change the world.
 Changing FPS must never change the world.
 
 Changing operating system must never change the world.
+
+## Temporal snapshots
+
+A temporal world is defined conceptually by:
+
+```text
+MusicCatalog
++ ListeningHistory up to T
++ seed
++ temporal rules
++ generation algorithm version
+→ World(T)
+```
+
+`T` is an explicit input. No generic layer may derive it implicitly from the system clock, a notion
+of "now" or the user's navigation path. Direct access to `T` and a later return to `T` must
+reconstruct exactly the same snapshot from identical inputs.
+
+Determinism applies to each `World(T)`. It does not require identical coordinates, routes or regions
+between `T1` and `T2`, nor compatibility with layouts produced by a different algorithm version.
+Algorithm and temporal-rule versions must be explicit or traceable whenever reproducibility across
+versions requires them.
+
+A future placement optimization may therefore change the layout. It must preserve the seed,
+contractual canonical ordering, relation semantics, immutable snapshots, the Knowledge/World
+boundary, Renderer independence and reproducibility for a given `World(T)`. Exact coordinates from
+the current algorithm are regression references for that implementation, not a permanent public
+contract.
 
 ---
 

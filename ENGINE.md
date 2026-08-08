@@ -463,9 +463,27 @@ Ownership is always explicit.
 
 Time affects interaction.
 
-Time never affects world generation.
+Implicit runtime time never affects world generation.
 
-The same seed generates the same geography today and ten years from now.
+Temporal navigation may affect world generation only through explicit inputs: a requested instant
+`T`, Listening History up to `T`, temporal rules and a traceable generation-algorithm version.
+
+```text
+MusicCatalog
++ ListeningHistory up to T
++ seed
++ temporal rules
++ generation algorithm version
+→ World(T)
+```
+
+The system clock, an implicit notion of "now" and the path used to reach `T` never participate.
+Identical inputs reconstruct exactly the same `World(T)`, whether it is opened directly or revisited
+later.
+
+Different instants may legitimately produce different positions, routes, regions or other
+geographic elements. Strict geographic continuity between `T1` and `T2` is not an Engine invariant;
+historical fidelity is.
 
 ---
 
