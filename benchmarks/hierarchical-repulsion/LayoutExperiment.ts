@@ -1,8 +1,9 @@
 import { DeterministicRandom, type SeedInput } from "../../src/engine/math";
 import type { KnowledgeGraph } from "../../src/knowledge";
 import type { WorldConfig } from "../../src/world";
-
-import { BarnesHutTree } from "./BarnesHutTree";
+import { BarnesHutPlacementStrategy } from "../../src/world/BarnesHutPlacementStrategy";
+import { ExactIndexedPlacementStrategy } from "../../src/world/ExactIndexedPlacementStrategy";
+import type { WorldPlacementRelation } from "../../src/world/WorldPlacementStrategy";
 
 export interface ExperimentalLayout {
     readonly ids: readonly string[];
@@ -10,6 +11,7 @@ export interface ExperimentalLayout {
     readonly y: Float64Array;
     readonly sourceIndices: Uint32Array;
     readonly targetIndices: Uint32Array;
+    readonly relations: readonly WorldPlacementRelation[];
 }
 
 export type RepulsionMethod = "EXACT" | "HIERARCHICAL";
@@ -37,7 +39,10 @@ export function createExperimentalLayout(
         sourceIndices[index] = requireIndex(indexById, relations[index].sourceId);
         targetIndices[index] = requireIndex(indexById, relations[index].targetId);
     }
-    return { ids, x, y, sourceIndices, targetIndices };
+    const placementRelations = Object.freeze(
+        relations.map(({ sourceId, targetId }) => Object.freeze({ sourceId, targetId }))
+    );
+    return { ids, x, y, sourceIndices, targetIndices, relations: placementRelations };
 }
 
 export function cloneLayout(layout: ExperimentalLayout): ExperimentalLayout {
@@ -47,6 +52,7 @@ export function cloneLayout(layout: ExperimentalLayout): ExperimentalLayout {
         y: layout.y.slice(),
         sourceIndices: layout.sourceIndices,
         targetIndices: layout.targetIndices,
+        relations: layout.relations,
     };
 }
 
@@ -58,9 +64,16 @@ export function runLayout(
     iterations = config.placementIterations
 ): ExperimentalLayout {
     const layout = cloneLayout(initial);
-    for (let iteration = 0; iteration < iterations; iteration += 1) {
-        runIteration(layout, config, method, theta);
-    }
+    placementStrategy(method, theta).place({
+        nodeIds: layout.ids,
+        relations: layout.relations,
+        initialPositions: layout,
+        width: config.width,
+        height: config.height,
+        placementIterations: iterations,
+        attractionStrength: config.attractionStrength,
+        repulsionStrength: config.repulsionStrength,
+    });
     return layout;
 }
 
@@ -70,67 +83,25 @@ export function runIteration(
     method: RepulsionMethod,
     theta: number
 ): void {
-    const displacementX = new Float64Array(layout.ids.length);
-    const displacementY = new Float64Array(layout.ids.length);
-    if (method === "EXACT") {
-        applyExactRepulsion(layout, config.repulsionStrength, displacementX, displacementY);
-    } else {
-        const tree = new BarnesHutTree(layout, config.width, config.height);
-        for (let index = 0; index < layout.ids.length; index += 1) {
-            tree.accumulateRepulsion(
-                index,
-                theta,
-                config.repulsionStrength,
-                displacementX,
-                displacementY
-            );
-        }
-    }
-    applyAttraction(layout, config.attractionStrength, displacementX, displacementY);
-    for (let index = 0; index < layout.ids.length; index += 1) {
-        layout.x[index] = clamp(layout.x[index] + displacementX[index], 0, config.width - 1);
-        layout.y[index] = clamp(layout.y[index] + displacementY[index], 0, config.height - 1);
-    }
+    placementStrategy(method, theta).place({
+        nodeIds: layout.ids,
+        relations: layout.relations,
+        initialPositions: layout,
+        width: config.width,
+        height: config.height,
+        placementIterations: 1,
+        attractionStrength: config.attractionStrength,
+        repulsionStrength: config.repulsionStrength,
+    });
 }
 
-function applyExactRepulsion(
-    layout: ExperimentalLayout,
-    strength: number,
-    displacementX: Float64Array,
-    displacementY: Float64Array
-): void {
-    for (let left = 0; left < layout.ids.length; left += 1) {
-        for (let right = left + 1; right < layout.ids.length; right += 1) {
-            let deltaX = layout.x[left] - layout.x[right];
-            const deltaY = layout.y[left] - layout.y[right];
-            if (deltaX === 0 && deltaY === 0) {
-                deltaX = layout.ids[left] < layout.ids[right] ? -1 : 1;
-            }
-            const scale = strength / (deltaX * deltaX + deltaY * deltaY + 1);
-            displacementX[left] += deltaX * scale;
-            displacementY[left] += deltaY * scale;
-            displacementX[right] -= deltaX * scale;
-            displacementY[right] -= deltaY * scale;
-        }
-    }
-}
-
-function applyAttraction(
-    layout: ExperimentalLayout,
-    strength: number,
-    displacementX: Float64Array,
-    displacementY: Float64Array
-): void {
-    for (let index = 0; index < layout.sourceIndices.length; index += 1) {
-        const source = layout.sourceIndices[index];
-        const target = layout.targetIndices[index];
-        const deltaX = (layout.x[target] - layout.x[source]) * strength;
-        const deltaY = (layout.y[target] - layout.y[source]) * strength;
-        displacementX[source] += deltaX;
-        displacementY[source] += deltaY;
-        displacementX[target] -= deltaX;
-        displacementY[target] -= deltaY;
-    }
+function placementStrategy(
+    method: RepulsionMethod,
+    theta: number
+): ExactIndexedPlacementStrategy | BarnesHutPlacementStrategy {
+    return method === "EXACT"
+        ? new ExactIndexedPlacementStrategy()
+        : new BarnesHutPlacementStrategy(theta);
 }
 
 function requireIndex(indices: ReadonlyMap<string, number>, id: string): number {
@@ -139,8 +110,4 @@ function requireIndex(indices: ReadonlyMap<string, number>, id: string): number 
         throw new Error(`Missing experimental node index: ${id}`);
     }
     return index;
-}
-
-function clamp(value: number, minimum: number, maximum: number): number {
-    return Math.min(maximum, Math.max(minimum, value));
 }

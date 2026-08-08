@@ -17,7 +17,7 @@ const duration = performance.now() - startedAt;
 console.log("EchoAtlas deterministic hierarchical-repulsion spike");
 console.log(`Node ${process.version} · ${process.platform} ${process.arch}`);
 console.log(
-    "Experimental checks: PASS (Exact Indexed parity across fixtures/seeds, deterministic tree/layout, split boundaries, coincident points)."
+    "Experimental checks: PASS (production Exact Indexed parity across fixtures/seeds, production-candidate Barnes-Hut determinism, split boundaries, coincident points)."
 );
 console.log(
     `${report.warmupRuns} warmup + ${report.measuredRuns} measured runs; 8 placement iterations; Barnes-Hut theta ${report.theta} (experimental).`
