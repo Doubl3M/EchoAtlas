@@ -16,7 +16,8 @@
         "test": "vitest",
         "test:run": "vitest run",
         "test:e2e": "node --test tests/e2e/first-navigable-map.test.mjs",
-        "benchmark": "node --expose-gc benchmarks/run.mjs"
+        "benchmark": "node --expose-gc benchmarks/run.mjs",
+        "benchmark:world-scaling": "node benchmarks/world-scaling.mjs"
     },
     "devDependencies": {
         "@eslint/js": "^9.32.0",
