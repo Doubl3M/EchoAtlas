@@ -33,6 +33,7 @@ The project follows Semantic Versioning.
   preserving the historical one-to-one mapping behavior.
 - World generation configurations now identify their observable geographic physics through an
   explicit `WorldGenerationVersion`.
+- World placement physics now sit behind a private version-resolved strategy boundary.
 
 ## Fixed
 
