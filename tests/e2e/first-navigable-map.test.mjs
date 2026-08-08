@@ -1,0 +1,147 @@
+import assert from "node:assert/strict";
+import { mkdir } from "node:fs/promises";
+import process from "node:process";
+import test from "node:test";
+
+import puppeteer from "puppeteer-core";
+
+import { ViteServer } from "./support/ViteServer.mjs";
+
+const CHROME_EXECUTABLE = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
+const ARTIFACT_PATH = "artifacts/e2e/first-navigable-map-failure.png";
+
+test("First Navigable Map works in local headless Chrome", async () => {
+    const server = new ViteServer();
+    let browser;
+    let page;
+    let failed = false;
+
+    try {
+        await server.start();
+        browser = await puppeteer.launch({
+            executablePath: CHROME_EXECUTABLE,
+            headless: true,
+            args: [
+                "--disable-background-networking",
+                "--disable-component-update",
+                "--disable-default-apps",
+                "--disable-sync",
+                "--no-first-run",
+            ],
+        });
+        page = await browser.newPage();
+        await page.setViewport({ width: 1100, height: 760 });
+        await page.setRequestInterception(true);
+        const serverOrigin = new globalThis.URL(server.url).origin;
+        const externalRequests = [];
+        page.on("request", (request) => {
+            const requestUrl = new globalThis.URL(request.url());
+            if (requestUrl.origin !== serverOrigin) {
+                externalRequests.push(request.url());
+                void request.abort();
+                return;
+            }
+            if (requestUrl.pathname === "/favicon.ico") {
+                void request.respond({ status: 204 });
+                return;
+            }
+            void request.continue();
+        });
+
+        const pageErrors = [];
+        const consoleErrors = [];
+        page.on("pageerror", (error) => pageErrors.push(error.message));
+        page.on("console", (message) => {
+            if (message.type() === "error") {
+                consoleErrors.push(message.text());
+            }
+        });
+
+        const response = await page.goto(server.url, { waitUntil: "networkidle0" });
+        assert.ok(response, "Navigation must return an HTTP response.");
+        assert.equal(response.status(), 200);
+        assert.equal(await page.title(), "EchoAtlas — Geographic World");
+        await page.waitForSelector("canvas");
+        assert.equal(
+            await page.$eval("header p", (element) => element.textContent),
+            "Drag to explore · Scroll to zoom"
+        );
+
+        const initial = await canvasState(page);
+        assert.ok(initial.cssWidth > 0 && initial.cssHeight > 0);
+        assert.ok(initial.width > 0 && initial.height > 0);
+
+        await page.mouse.move(initial.cssWidth / 2, initial.cssHeight / 2);
+        await page.mouse.down();
+        await page.mouse.move(initial.cssWidth / 2 + 140, initial.cssHeight / 2 + 80, {
+            steps: 8,
+        });
+        await page.mouse.up();
+        await renderedFrames(page);
+        const afterPan = await canvasState(page);
+        assert.notEqual(afterPan.dataUrl, initial.dataUrl, "A browser drag must redraw the map.");
+
+        await page.mouse.move(afterPan.cssWidth * 0.7, afterPan.cssHeight * 0.4);
+        await page.mouse.wheel({ deltaY: -500 });
+        await renderedFrames(page);
+        const afterZoom = await canvasState(page);
+        assert.notEqual(
+            afterZoom.dataUrl,
+            afterPan.dataUrl,
+            "A browser wheel event must redraw the map."
+        );
+
+        await page.setViewport({ width: 900, height: 640 });
+        await page.waitForFunction(() => {
+            const canvas = globalThis.document.querySelector("canvas");
+            return canvas?.getBoundingClientRect().width === 900;
+        });
+        await renderedFrames(page);
+        const afterResize = await canvasState(page);
+        assert.equal(afterResize.cssWidth, 900);
+        assert.equal(afterResize.cssHeight, 640);
+        assert.equal(afterResize.width, Math.round(afterResize.cssWidth * afterResize.dpr));
+        assert.equal(afterResize.height, Math.round(afterResize.cssHeight * afterResize.dpr));
+        assert.notEqual(afterResize.dataUrl, afterZoom.dataUrl, "Resize must produce a new frame.");
+
+        assert.deepEqual(pageErrors, []);
+        assert.deepEqual(consoleErrors, []);
+        assert.deepEqual(externalRequests, []);
+    } catch (error) {
+        failed = true;
+        if (page !== undefined) {
+            await mkdir("artifacts/e2e", { recursive: true });
+            await page.screenshot({ path: ARTIFACT_PATH, fullPage: true });
+        }
+        throw error;
+    } finally {
+        await browser?.close();
+        await server.stop();
+        if (failed) {
+            process.stderr.write(`E2E failure screenshot: ${ARTIFACT_PATH}\n`);
+        }
+    }
+});
+
+async function canvasState(page) {
+    return page.$eval("canvas", (canvas) => {
+        const bounds = canvas.getBoundingClientRect();
+        return {
+            cssWidth: bounds.width,
+            cssHeight: bounds.height,
+            width: canvas.width,
+            height: canvas.height,
+            dpr: globalThis.window.devicePixelRatio,
+            dataUrl: canvas.toDataURL(),
+        };
+    });
+}
+
+async function renderedFrames(page) {
+    await page.evaluate(
+        () =>
+            new Promise((resolve) => {
+                globalThis.requestAnimationFrame(() => globalThis.requestAnimationFrame(resolve));
+            })
+    );
+}
