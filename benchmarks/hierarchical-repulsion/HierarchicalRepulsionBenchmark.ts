@@ -3,10 +3,10 @@ import type { KnowledgeGraph } from "../../src/knowledge";
 import { MusicInterpreter } from "../../src/music";
 import { MusicJsonImporter } from "../../src/music/import";
 import { WorldConfig, WorldGenerator } from "../../src/world";
+import { BarnesHutTree } from "../../src/world/BarnesHutTree";
 
 import { createBenchmarkDataset } from "../musicLibraryFixtures";
 import type { BenchmarkDatasetDefinition } from "../musicLibraryFixtures";
-import { BarnesHutTree } from "./BarnesHutTree";
 import {
     cloneLayout,
     createExperimentalLayout,
@@ -383,13 +383,24 @@ function runExperimentalChecks(): void {
         y: new Float64Array([0, 23.5, 23.5, 47]),
         sourceIndices: new Uint32Array(),
         targetIndices: new Uint32Array(),
+        relations: Object.freeze([]),
     };
     const firstX = new Float64Array(4);
     const firstY = new Float64Array(4);
     const secondX = new Float64Array(4);
     const secondY = new Float64Array(4);
-    const firstTree = new BarnesHutTree(boundaryAndCollisionLayout, 64, 48);
-    const secondTree = new BarnesHutTree(boundaryAndCollisionLayout, 64, 48);
+    const firstTree = new BarnesHutTree(
+        boundaryAndCollisionLayout.ids,
+        boundaryAndCollisionLayout,
+        64,
+        48
+    );
+    const secondTree = new BarnesHutTree(
+        boundaryAndCollisionLayout.ids,
+        boundaryAndCollisionLayout,
+        64,
+        48
+    );
     for (let index = 0; index < 4; index += 1) {
         firstTree.accumulateRepulsion(index, CANDIDATE_THETA, 0.8, firstX, firstY);
         secondTree.accumulateRepulsion(index, CANDIDATE_THETA, 0.8, secondX, secondY);
