@@ -4,6 +4,7 @@ import type {
     ConnectionVisualStyle,
     ElevationBand,
     LabelVisualStyle,
+    LabelProvider,
     LocationVisualStyle,
     RenderSurface,
     VisualTheme,
@@ -28,8 +29,9 @@ describe("render public API", () => {
             keyof LabelVisualStyle,
             keyof VisualTheme,
             keyof RenderSurface,
-        ] = ["maximum", "opacity", "radius", "enabled", "terrainBands", "fillRect"];
+            ReturnType<LabelProvider>,
+        ] = ["maximum", "opacity", "radius", "minZoom", "terrainBands", "fillRect", undefined];
 
-        expect(keys).toHaveLength(6);
+        expect(keys).toHaveLength(7);
     });
 });

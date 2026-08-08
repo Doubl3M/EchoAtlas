@@ -4,15 +4,21 @@ import type { GeographicWorld, WorldLocation } from "../world";
 import type { RenderSurface } from "./RenderSurface";
 import type { ElevationBand, VisualTheme } from "./VisualTheme";
 
+export type LabelProvider = (knowledgeNodeId: string) => string | undefined;
+
+const identityLabelProvider: LabelProvider = (knowledgeNodeId) => knowledgeNodeId;
+
 /** Stateless layered rendering of a GeographicWorld through Camera2D. */
 export class CanvasRenderer {
     private readonly theme: VisualTheme;
     private readonly fallbackTerrainColor: string;
+    private readonly labelProvider: LabelProvider;
 
-    public constructor(theme: VisualTheme) {
+    public constructor(theme: VisualTheme, labelProvider: LabelProvider = identityLabelProvider) {
         const finalBand = CanvasRenderer.validateTerrainBands(theme);
         this.theme = theme;
         this.fallbackTerrainColor = finalBand.color;
+        this.labelProvider = labelProvider;
     }
 
     public render(world: GeographicWorld, camera: Camera2D, surface: RenderSurface): void {
@@ -87,7 +93,7 @@ export class CanvasRenderer {
     }
 
     private renderLabels(world: GeographicWorld, camera: Camera2D, surface: RenderSurface): void {
-        if (!this.theme.label.enabled) {
+        if (!this.theme.label.enabled || camera.getZoom() < this.theme.label.minZoom) {
             return;
         }
         for (const location of world.getLocations()) {
@@ -96,9 +102,10 @@ export class CanvasRenderer {
     }
 
     private renderLabel(location: WorldLocation, camera: Camera2D, surface: RenderSurface): void {
+        const label = this.labelProvider(location.knowledgeNodeId) ?? location.knowledgeNodeId;
         const point = camera.worldToScreen(location.x, location.y);
         surface.fillText(
-            location.knowledgeNodeId,
+            label,
             point.x + this.theme.label.offsetX,
             point.y + this.theme.label.offsetY,
             this.theme.label.color,

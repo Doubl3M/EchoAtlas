@@ -31,6 +31,7 @@ export class SeventiesTheme implements VisualTheme {
     });
     public readonly label: LabelVisualStyle = Object.freeze({
         enabled: true,
+        minZoom: 12,
         color: "#3f3025",
         font: "600 12px Georgia, serif",
         offsetX: 7,

@@ -1,4 +1,5 @@
 export { CanvasRenderer } from "./CanvasRenderer";
+export type { LabelProvider } from "./CanvasRenderer";
 export { CanvasRenderSurface } from "./CanvasRenderSurface";
 export type { RenderSurface } from "./RenderSurface";
 export { SeventiesTheme } from "./themes/SeventiesTheme";

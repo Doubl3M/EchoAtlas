@@ -51,7 +51,7 @@ class RecordingSurface implements RenderSurface {
     }
 }
 
-function theme(prefix = "theme", labels = true): VisualTheme {
+function theme(prefix = "theme", labels = true, labelMinZoom = 0): VisualTheme {
     return Object.freeze({
         backgroundColor: `${prefix}-background`,
         terrainBands: Object.freeze([
@@ -68,6 +68,7 @@ function theme(prefix = "theme", labels = true): VisualTheme {
         }),
         label: Object.freeze({
             enabled: labels,
+            minZoom: labelMinZoom,
             color: `${prefix}-label`,
             font: "12px serif",
             offsetX: 4,
@@ -297,6 +298,96 @@ describe("CanvasRenderer", () => {
         );
 
         expect(surface.commands.some(({ kind }) => kind === "fillText")).toBe(false);
+    });
+
+    it("hides only labels below the theme zoom threshold", () => {
+        const locations = [location("A", 0, 0, 0.2), location("B", 1, 1, 0.8)];
+        const connections = [connection("R", "A", "B")];
+        const surface = new RecordingSurface();
+        const value = camera();
+        value.setZoom(4);
+
+        new CanvasRenderer(theme("lod", true, 5)).render(
+            world(locations, connections),
+            value,
+            surface
+        );
+
+        expect(surface.commands.some(({ kind }) => kind === "fillText")).toBe(false);
+        expect(surface.commands.filter(({ kind }) => kind === "fillCircle")).toHaveLength(2);
+        expect(surface.commands.filter(({ kind }) => kind === "strokeLine")).toHaveLength(1);
+    });
+
+    it.each([5, 8])("renders labels at or above the theme threshold: zoom %s", (zoom) => {
+        const surface = new RecordingSurface();
+        const value = camera();
+        value.setZoom(zoom);
+
+        new CanvasRenderer(theme("lod", true, 5)).render(
+            world([location("A", 0, 0, 0.5)]),
+            value,
+            surface
+        );
+
+        expect(surface.commands.filter(({ kind }) => kind === "fillText")).toHaveLength(1);
+    });
+
+    it("lets another theme change the label threshold without renderer changes", () => {
+        const geographicWorld = world([location("A", 0, 0, 0.5)]);
+        const value = camera();
+        value.setZoom(6);
+        const visible = new RecordingSurface();
+        const hidden = new RecordingSurface();
+
+        new CanvasRenderer(theme("early", true, 5)).render(geographicWorld, value, visible);
+        new CanvasRenderer(theme("late", true, 7)).render(geographicWorld, value, hidden);
+
+        expect(visible.commands.some(({ kind }) => kind === "fillText")).toBe(true);
+        expect(hidden.commands.some(({ kind }) => kind === "fillText")).toBe(false);
+    });
+
+    it("keeps labels disabled at every zoom and does not mutate Camera or Theme", () => {
+        const visualTheme = theme("disabled", false, 5);
+        const value = camera();
+        value.setZoom(20);
+        const positionBefore = value.getPosition();
+        const zoomBefore = value.getZoom();
+        const labelBefore = { ...visualTheme.label };
+        const surface = new RecordingSurface();
+
+        new CanvasRenderer(visualTheme).render(world([location("A", 0, 0, 0.5)]), value, surface);
+
+        expect(surface.commands.some(({ kind }) => kind === "fillText")).toBe(false);
+        expect(value.getPosition()).toEqual(positionBefore);
+        expect(value.getZoom()).toBe(zoomBefore);
+        expect(visualTheme.label).toEqual(labelBefore);
+    });
+
+    it("accepts interchangeable generic label providers with an explicit ID fallback", () => {
+        const geographicWorld = world([location("A", 0, 0, 0.5), location("B", 1, 1, 0.5)]);
+        const first = new RecordingSurface();
+        const second = new RecordingSurface();
+
+        new CanvasRenderer(theme(), (id) => (id === "A" ? "Alpha" : undefined)).render(
+            geographicWorld,
+            camera(),
+            first
+        );
+        new CanvasRenderer(theme(), (id) => `Alternate ${id}`).render(
+            geographicWorld,
+            camera(),
+            second
+        );
+
+        expect(
+            first.commands.filter(({ kind }) => kind === "fillText").map(({ values }) => values[0])
+        ).toEqual(["Alpha", "B"]);
+        expect(
+            second.commands.filter(({ kind }) => kind === "fillText").map(({ values }) => values[0])
+        ).toEqual(["Alternate A", "Alternate B"]);
+        expect(
+            geographicWorld.getLocations().map(({ knowledgeNodeId }) => knowledgeNodeId)
+        ).toEqual(["A", "B"]);
     });
 
     it("does not mutate the world or camera and is repeatable", () => {
