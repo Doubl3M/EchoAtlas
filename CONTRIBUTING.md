@@ -238,6 +238,23 @@ initial reference environment is macOS Monterey 12.7.6 on x86_64 with Node v22.2
 minimum supported configuration. JIT and garbage collection remain sources of variance, and heap
 figures are not absolutely comparable between passages.
 
+`npm run benchmark:world-scaling` isolates graph-size growth in `WorldGenerator` on a fixed 64×48
+terrain. Phase 11 uses three approximate development workloads for before/after comparisons:
+
+| Workload | Reference size | Purpose |
+|---|---:|---|
+| Representative | ≈ 1,000 KnowledgeNodes | Routine Phase 11 comparison |
+| Heavy | ≈ 5,000 KnowledgeNodes | Projected or explicitly forced heavy campaign |
+| Stress | ≈ 10,000 KnowledgeNodes | Projected or explicitly forced stress campaign |
+
+Synthetic fixtures use approximately 1.5 relations per node. These workloads are measurement
+references only: they are not user limits, supported maxima, V1 exit criteria, performance budgets
+or product promises. The command measures 250, 500, 1,000 and 2,000 nodes progressively, then uses
+the stable large-tier `time / n²` coefficient to project Heavy and Stress. A benchmark-only guard
+skips a target when its projected repeated campaign exceeds 30 seconds. Explicit investigation may
+override that protection with `npm run benchmark:world-scaling -- --force-targets`; ordinary runs
+must prefer projections when the current implementation would make repetitions disproportionate.
+
 ---
 
 # Determinism
