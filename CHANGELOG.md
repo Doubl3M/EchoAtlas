@@ -29,6 +29,9 @@ The project follows Semantic Versioning.
 
 ## Changed
 
+- The browser showcase now presents a denser music catalog through a warmer, layered cartographic
+  theme with seamless terrain, curved roads, atlas markers, prioritized decluttered labels and a
+  selectable Music detail cartouche.
 - World logical dimensions and terrain resolution can now be configured independently while
   preserving the historical one-to-one mapping behavior.
 - World generation configurations now identify their observable geographic physics through an

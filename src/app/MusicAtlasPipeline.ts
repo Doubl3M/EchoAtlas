@@ -1,7 +1,7 @@
 import type { KnowledgeGraph } from "../knowledge";
-import { MusicInterpreter, type MusicCatalog } from "../music";
+import { MusicInterpreter, type MusicCatalog, type MusicEntityKind } from "../music";
 import { MusicJsonImporter } from "../music/import";
-import type { LabelProvider } from "../render";
+import type { LabelDescriptor, LabelProvider } from "../render";
 import type { GeographicWorld, WorldConfig } from "../world";
 import { WorldGenerator } from "../world";
 
@@ -31,7 +31,7 @@ export function createMusicAtlasSnapshot(
 }
 
 export function createMusicLabelProvider(catalog: MusicCatalog): LabelProvider {
-    const labels = new Map<string, string>();
+    const labels = new Map<string, LabelDescriptor>();
     for (const entity of catalog.getEntities()) {
         const label =
             entity.kind === "album" || entity.kind === "track"
@@ -40,8 +40,25 @@ export function createMusicLabelProvider(catalog: MusicCatalog): LabelProvider {
                   ? entity.name
                   : undefined;
         if (label !== undefined) {
-            labels.set(`music:${entity.kind}:${entity.id}`, label);
+            const detail = labelDetailByKind[entity.kind];
+            if (detail !== undefined) {
+                labels.set(
+                    `music:${entity.kind}:${entity.id}`,
+                    Object.freeze({ text: label, ...detail })
+                );
+            }
         }
     }
-    return (knowledgeNodeId: string): string | undefined => labels.get(knowledgeNodeId);
+    return (knowledgeNodeId: string): LabelDescriptor | undefined => labels.get(knowledgeNodeId);
 }
+
+// Showcase priorities are application presentation policy, not Music or Renderer semantics.
+const labelDetailByKind: Readonly<
+    Partial<Record<MusicEntityKind, Readonly<{ priority: number; minZoom: number }>>>
+> = Object.freeze({
+    artist: Object.freeze({ priority: 100, minZoom: 0 }),
+    playlist: Object.freeze({ priority: 85, minZoom: 7 }),
+    label: Object.freeze({ priority: 75, minZoom: 9 }),
+    album: Object.freeze({ priority: 50, minZoom: 14 }),
+    track: Object.freeze({ priority: 20, minZoom: 22 }),
+});

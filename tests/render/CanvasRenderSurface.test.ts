@@ -11,6 +11,8 @@ interface CanvasFixture {
         lineWidth: number;
         globalAlpha: number;
         font: string;
+        lineJoin: CanvasLineJoin;
+        lineCap: CanvasLineCap;
     };
 }
 
@@ -22,6 +24,8 @@ function fixture(hasContext = true): CanvasFixture {
         lineWidth: 1,
         globalAlpha: 1,
         font: "",
+        lineJoin: "miter" as CanvasLineJoin,
+        lineCap: "butt" as CanvasLineCap,
     };
     const context = {
         ...state,
@@ -33,11 +37,20 @@ function fixture(hasContext = true): CanvasFixture {
         beginPath: () => operations.push("begin"),
         moveTo: (...values: readonly number[]) => operations.push(`move:${values.join(",")}`),
         lineTo: (...values: readonly number[]) => operations.push(`line:${values.join(",")}`),
+        quadraticCurveTo: (...values: readonly number[]) =>
+            operations.push(`quadratic:${values.join(",")}`),
         stroke: () => operations.push("stroke"),
         arc: (...values: readonly number[]) => operations.push(`arc:${values.join(",")}`),
         fill: () => operations.push("fill"),
         fillText: (text: string, ...values: readonly number[]) =>
             operations.push(`text:${text}:${values.join(",")}`),
+        strokeText: (text: string, ...values: readonly number[]) =>
+            operations.push(`strokeText:${text}:${values.join(",")}`),
+        measureText: (text: string) => ({
+            width: text.length * 6,
+            actualBoundingBoxAscent: 9,
+            actualBoundingBoxDescent: 3,
+        }),
     };
     const canvas = {
         width: 0,
@@ -110,8 +123,9 @@ describe("CanvasRenderSurface", () => {
 
         surface.fillRect(1, 2, 3, 4, "red");
         surface.strokeLine(1, 2, 3, 4, "blue", 5, 0.5);
+        surface.strokeQuadraticCurve(1, 2, 3, 4, 5, 6, "ochre", 2, 0.7);
         surface.fillCircle(6, 7, 8, "orange", "brown", 2);
-        surface.fillText("node-a", 9, 10, "black", "12px serif");
+        surface.fillText("node-a", 9, 10, "black", "12px serif", "cream", 3);
 
         expect(value.operations).toEqual([
             "save",
@@ -125,13 +139,32 @@ describe("CanvasRenderSurface", () => {
             "restore",
             "save",
             "begin",
+            "move:1,2",
+            "quadratic:3,4,5,6",
+            "stroke",
+            "restore",
+            "save",
+            "begin",
             `arc:6,7,8,0,${Math.PI * 2}`,
             "fill",
             "stroke",
             "restore",
             "save",
+            "strokeText:node-a:9,10",
             "text:node-a:9,10",
             "restore",
         ]);
+    });
+
+    it("measures text using the selected font without leaking Canvas state", () => {
+        const value = fixture();
+        const surface = new CanvasRenderSurface(value.canvas);
+
+        expect(surface.measureText("Atlas", "12px serif")).toEqual({
+            width: 30,
+            ascent: 9,
+            descent: 3,
+        });
+        expect(value.operations).toEqual(["save", "restore"]);
     });
 });

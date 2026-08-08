@@ -33,9 +33,9 @@ describe("Music Atlas application pipeline", () => {
         const changedSeedDocument = demoMusicDocumentJson.replace('"seed": 1977', '"seed": 1978');
         const changedSeed = createMusicAtlasSnapshot(changedSeedDocument, worldConfig());
         expect(snapshot.seed).toBe(1977);
-        expect(snapshot.catalog.getEntities()).toHaveLength(12);
-        expect(snapshot.graph.getNodes()).toHaveLength(12);
-        expect(snapshot.world.getLocations()).toHaveLength(12);
+        expect(snapshot.catalog.getEntities()).toHaveLength(47);
+        expect(snapshot.graph.getNodes()).toHaveLength(47);
+        expect(snapshot.world.getLocations()).toHaveLength(47);
         expect(snapshot.graph.getNode("music:artist:stevie-wonder")?.id).toBe(
             "music:artist:stevie-wonder"
         );
@@ -48,11 +48,15 @@ describe("Music Atlas application pipeline", () => {
 
     it("provides human labels without leaking Music data into Knowledge or World", () => {
         const snapshot = createMusicAtlasSnapshot(demoMusicDocumentJson, worldConfig());
-        expect(snapshot.labels("music:artist:stevie-wonder")).toBe("Stevie Wonder");
-        expect(snapshot.labels("music:album:rumours")).toBe("Rumours");
-        expect(snapshot.labels("music:track:dreams")).toBe("Dreams");
-        expect(snapshot.labels("music:label:motown")).toBe("Motown");
-        expect(snapshot.labels("music:playlist:night-drive")).toBe("Night Drive");
+        expect(snapshot.labels("music:artist:stevie-wonder")).toEqual({
+            text: "Stevie Wonder",
+            priority: 100,
+            minZoom: 0,
+        });
+        expect(snapshot.labels("music:album:rumours")?.text).toBe("Rumours");
+        expect(snapshot.labels("music:track:dreams")?.text).toBe("Dreams");
+        expect(snapshot.labels("music:label:motown")?.text).toBe("Motown");
+        expect(snapshot.labels("music:playlist:night-drive")?.text).toBe("Night Drive");
         expect(Object.keys(snapshot.graph.getNode("music:artist:stevie-wonder") ?? {})).toEqual([
             "id",
             "kind",
@@ -127,8 +131,8 @@ describe("Music Atlas application pipeline", () => {
 
         const first = createMusicAtlasSnapshot(demoMusicDocumentJson, worldConfig());
         const changed = createMusicAtlasSnapshot(JSON.stringify(changedDocument), worldConfig());
-        expect(first.labels("music:artist:stevie-wonder")).toBe("Stevie Wonder");
-        expect(changed.labels("music:artist:stevie-wonder")).toBe("Stevie Wonder Renamed");
+        expect(first.labels("music:artist:stevie-wonder")?.text).toBe("Stevie Wonder");
+        expect(changed.labels("music:artist:stevie-wonder")?.text).toBe("Stevie Wonder Renamed");
         expect(changed.graph.getNodes()).toEqual(first.graph.getNodes());
         expect(changed.world.getLocations()).toEqual(first.world.getLocations());
     });
