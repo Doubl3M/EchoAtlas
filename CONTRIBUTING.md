@@ -219,6 +219,25 @@ Use `npm run test:run` for the Vitest suite and `npm run test:e2e` for the separ
 Chrome/Puppeteer browser smoke test. Puppeteer is development tooling, not an application
 dependency.
 
+Use `npm run benchmark` for the separate Phase 11 performance baseline. It measures deterministic
+synthetic libraries through import, Knowledge Graph construction, World generation and an
+instrumented Renderer surface. It does not measure browser Canvas painting, interaction latency or
+end-user hardware. Compare results only on the same machine and runtime: Node timing, JIT and
+garbage collection make cross-machine memory and duration comparisons non-equivalent.
+
+Each timing is an independent experiment with two unreported warmups followed by five measured
+runs. The report shows the median and the observed minimum/maximum; the complete pipeline is timed
+directly and is never reconstructed by adding stage medians. A fixed-terrain placement series
+varies only graph size, while a fixed-graph terrain series varies only HeightField dimensions.
+
+The non-normative development baseline uses `small` (40 entities), `medium` (160) and `large`
+(480) fixtures, with proportionally growing relations and terrain dimensions. These sizes expose
+growth without defining V1 capacity limits or performance budgets. Heap deltas are directional
+indicators collected after an explicit pre-run garbage collection, not absolute object sizes. The
+initial reference environment is macOS Monterey 12.7.6 on x86_64 with Node v22.23.2; it is not a
+minimum supported configuration. JIT and garbage collection remain sources of variance, and heap
+figures are not absolutely comparable between passages.
+
 ---
 
 # Determinism
