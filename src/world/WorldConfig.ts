@@ -1,8 +1,14 @@
 import { TerrainConfig } from "../engine/terrain";
 
+import {
+    isSupportedWorldGenerationVersion,
+    type WorldGenerationVersion,
+} from "./WorldGenerationVersion";
+
 const MAX_PLACEMENT_ITERATIONS = 1_000;
 
 export interface WorldConfigOptions {
+    readonly generationVersion: WorldGenerationVersion;
     readonly width: number;
     readonly height: number;
     readonly placementIterations: number;
@@ -13,6 +19,7 @@ export interface WorldConfigOptions {
 
 /** Immutable parameters for deterministic geographic generation. */
 export class WorldConfig {
+    public readonly generationVersion: WorldGenerationVersion;
     public readonly width: number;
     public readonly height: number;
     public readonly placementIterations: number;
@@ -21,12 +28,16 @@ export class WorldConfig {
     public readonly terrain: TerrainConfig;
 
     public constructor(options: WorldConfigOptions) {
+        if (!isSupportedWorldGenerationVersion(options.generationVersion)) {
+            throw new RangeError("generationVersion must be a supported World generation version.");
+        }
         WorldConfig.validateDimension(options.width, "width");
         WorldConfig.validateDimension(options.height, "height");
         WorldConfig.validateIterations(options.placementIterations);
         WorldConfig.validateStrength(options.attractionStrength, "attractionStrength");
         WorldConfig.validateStrength(options.repulsionStrength, "repulsionStrength");
 
+        this.generationVersion = options.generationVersion;
         this.width = options.width;
         this.height = options.height;
         this.placementIterations = options.placementIterations;

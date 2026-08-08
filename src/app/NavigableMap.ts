@@ -59,6 +59,7 @@ function createWorldConfig(): WorldConfig {
         offsetY: -5,
     });
     return new WorldConfig({
+        generationVersion: "world-v1-exact",
         width: WORLD_WIDTH,
         height: WORLD_HEIGHT,
         placementIterations: 24,

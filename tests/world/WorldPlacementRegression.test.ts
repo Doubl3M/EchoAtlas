@@ -38,6 +38,7 @@ describe("indexed World placement regression", () => {
             });
             const imported = new MusicJsonImporter().import(dataset.document);
             const graph = new MusicInterpreter().interpret(imported.catalog);
+            expect(dataset.worldConfig.generationVersion).toBe("world-v1-exact");
             const locations = new WorldGenerator()
                 .generate(seed, dataset.worldConfig, graph)
                 .getLocations();

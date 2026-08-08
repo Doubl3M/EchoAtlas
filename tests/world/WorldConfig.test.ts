@@ -18,6 +18,7 @@ function terrain(width = 8, height = 6): TerrainConfig {
 
 function options(overrides: Partial<WorldConfigOptions> = {}): WorldConfigOptions {
     return {
+        generationVersion: "world-v1-exact",
         width: 8,
         height: 6,
         placementIterations: 12,
@@ -33,8 +34,22 @@ describe("WorldConfig", () => {
         const config = new WorldConfig(options());
 
         expect(config).toEqual(options());
+        expect(config.generationVersion).toBe("world-v1-exact");
         expect(Object.isFrozen(config)).toBe(true);
     });
+
+    it.each(["world-v2-unknown", "", 1, null, undefined])(
+        "rejects the unsupported generation version %s at runtime",
+        (generationVersion) => {
+            expect(
+                () =>
+                    new WorldConfig({
+                        ...options(),
+                        generationVersion,
+                    } as unknown as WorldConfigOptions)
+            ).toThrow("generationVersion must be a supported World generation version.");
+        }
+    );
 
     it.each([0, -1, 1.5, Number.NaN, Number.POSITIVE_INFINITY])(
         "rejects the invalid width %s",

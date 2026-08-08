@@ -7,6 +7,7 @@ import { GeographicWorld, WorldConfig, WorldGenerator } from "../../src/world";
 
 function config(width = 7, height = 5): WorldConfig {
     return new WorldConfig({
+        generationVersion: "world-v1-exact",
         width,
         height,
         placementIterations: 8,

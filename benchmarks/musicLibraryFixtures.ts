@@ -166,6 +166,7 @@ export function createBenchmarkDataset(definition: BenchmarkDatasetDefinition): 
         offsetY: 17,
     });
     const worldConfig = new WorldConfig({
+        generationVersion: "world-v1-exact",
         width: definition.worldWidth,
         height: definition.worldHeight,
         placementIterations: definition.placementIterations,
