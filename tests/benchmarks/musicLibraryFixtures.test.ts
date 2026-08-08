@@ -5,6 +5,7 @@ import {
     createBenchmarkDataset,
     placementDatasetDefinitions,
     terrainDatasetDefinitions,
+    worldTerrainDatasetDefinitions,
 } from "../../benchmarks/musicLibraryFixtures";
 import { projectTier, type MeasuredWorldScalingTier } from "../../benchmarks/WorldScalingBenchmark";
 import {
@@ -69,9 +70,9 @@ describe("benchmark music library fixtures", () => {
 
     it("varies only terrain dimensions in the terrain series", () => {
         expect(
-            terrainDatasetDefinitions.map(({ worldWidth, worldHeight }) => [
-                worldWidth,
-                worldHeight,
+            terrainDatasetDefinitions.map(({ terrainWidth, terrainHeight }) => [
+                terrainWidth,
+                terrainHeight,
             ])
         ).toEqual([
             [64, 48],
@@ -82,9 +83,34 @@ describe("benchmark music library fixtures", () => {
         expect(new Set(terrainDatasetDefinitions.map(({ entityCount }) => entityCount))).toEqual(
             new Set([40])
         );
+        expect(new Set(terrainDatasetDefinitions.map(({ worldWidth }) => worldWidth))).toEqual(
+            new Set([512])
+        );
+        expect(new Set(terrainDatasetDefinitions.map(({ worldHeight }) => worldHeight))).toEqual(
+            new Set([384])
+        );
         expect(
             new Set(terrainDatasetDefinitions.map(({ relationCount }) => relationCount))
         ).toEqual(new Set([60]));
+    });
+
+    it("keeps the costly World/Terrain comparison out of the general baseline", () => {
+        expect(benchmarkDatasetDefinitions.map(({ name }) => name)).toEqual([
+            "small",
+            "medium",
+            "large",
+        ]);
+        expect(
+            worldTerrainDatasetDefinitions.map(
+                ({ worldWidth, worldHeight, terrainWidth, terrainHeight }) => ({
+                    world: `${worldWidth}x${worldHeight}`,
+                    terrain: `${terrainWidth ?? worldWidth}x${terrainHeight ?? worldHeight}`,
+                })
+            )
+        ).toEqual([
+            { world: "1024x768", terrain: "1024x768" },
+            { world: "1024x768", terrain: "256x192" },
+        ]);
     });
 
     it("defines the non-normative Phase 11 workload references", () => {

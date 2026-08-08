@@ -193,6 +193,12 @@ The World layer never reads music.
 
 It only reads semantic structures.
 
+The logical World extent and terrain resolution are separate explicit configuration inputs. World
+owns the deterministic mapping from geographic coordinates to the generic terrain cell grid.
+When Terrain is finer than the World, all cells remain renderable across the continuous visual
+extent, although the historical WorldLocation domain `[0, dimension - 1]` may not sample cells next
+to the exclusive visual boundary.
+
 ---
 
 ## Engine
@@ -230,6 +236,9 @@ Reads the World and uses Engine primitives.
 It never modifies the World.
 
 Application rendering exists only in `src/render/`.
+
+Terrain cells are projected into logical World space through the canonical World mapping; the
+Renderer does not decide how geographic locations obtain elevation.
 
 There is no application renderer in `engine/`.
 

@@ -187,6 +187,31 @@ describe("CanvasRenderer", () => {
         ]);
     });
 
+    it("renders terrain resolution cells across the complete logical World extent", () => {
+        const decoupledWorld = new GeographicWorld({
+            width: 8,
+            height: 4,
+            heightField: new HeightField(4, 2, [0, 0.2, 0.4, 0.6, 0.7, 0.8, 0.9, 1]),
+            locations: [],
+            connections: [],
+        });
+        const surface = new RecordingSurface();
+
+        new CanvasRenderer(theme()).render(decoupledWorld, camera(), surface);
+
+        const terrainCommands = surface.commands.slice(1);
+        expect(terrainCommands).toHaveLength(8);
+        expect(terrainCommands[0]).toEqual({
+            kind: "fillRect",
+            values: [50, 40, 20, 20, "theme-low"],
+        });
+        expect(terrainCommands[1]?.values[0]).toBe(70);
+        expect(terrainCommands[7]).toEqual({
+            kind: "fillRect",
+            values: [110, 60, 20, 20, "theme-high"],
+        });
+    });
+
     it("renders layers in background, terrain, connections, locations, labels order", () => {
         const locations = [location("A", 0, 0, 0.2), location("B", 1, 1, 0.8)];
         const connections = [connection("R", "A", "B")];

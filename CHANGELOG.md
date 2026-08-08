@@ -29,7 +29,8 @@ The project follows Semantic Versioning.
 
 ## Changed
 
-Nothing yet.
+- World logical dimensions and terrain resolution can now be configured independently while
+  preserving the historical one-to-one mapping behavior.
 
 ## Fixed
 

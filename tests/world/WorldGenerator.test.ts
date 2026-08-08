@@ -25,6 +25,23 @@ function config(width = 7, height = 5): WorldConfig {
     });
 }
 
+function decoupledConfig(): WorldConfig {
+    return new WorldConfig({
+        ...config(8, 4),
+        placementIterations: 0,
+        terrain: new TerrainConfig({
+            width: 4,
+            height: 2,
+            baseFrequency: 0.17,
+            octaves: 3,
+            persistence: 0.55,
+            lacunarity: 2,
+            offsetX: -1.5,
+            offsetY: -2.25,
+        }),
+    });
+}
+
 function node(id: string, weight = 1): KnowledgeNode {
     return new KnowledgeNode({ id, kind: "concept", weight });
 }
@@ -66,6 +83,21 @@ describe("WorldGenerator", () => {
             y: 0,
             elevation: world.heightField.get(0, 0),
         });
+    });
+
+    it("samples a decoupled terrain through the canonical containing-cell mapping", () => {
+        const graph = new KnowledgeGraph(
+            Array.from({ length: 20 }, (_, index) => node(`node:${index}`))
+        );
+        const world = new WorldGenerator().generate("decoupled", decoupledConfig(), graph);
+
+        expect(world.heightField.width).toBe(4);
+        expect(world.heightField.height).toBe(2);
+        for (const location of world.getLocations()) {
+            const terrainX = Math.min(3, Math.floor((location.x * 4) / 8));
+            const terrainY = Math.min(1, Math.floor((location.y * 2) / 4));
+            expect(location.elevation).toBe(world.heightField.get(terrainX, terrainY));
+        }
     });
 
     it.each([

@@ -83,17 +83,19 @@ describe("GeographicWorld", () => {
         expect(edge.targetKnowledgeNodeId).toBe("B");
     });
 
-    it("requires matching terrain dimensions", () => {
-        expect(
-            () =>
-                new GeographicWorld({
-                    width: 1,
-                    height: 2,
-                    heightField: heightField(),
-                    locations: [],
-                    connections: [],
-                })
-        ).toThrow("Height-field dimensions must match the world dimensions.");
+    it("accepts a terrain resolution independent of its logical dimensions", () => {
+        const world = new GeographicWorld({
+            width: 8,
+            height: 4,
+            heightField: heightField(),
+            locations: [],
+            connections: [],
+        });
+
+        expect(world.width).toBe(8);
+        expect(world.height).toBe(4);
+        expect(world.heightField.width).toBe(2);
+        expect(world.heightField.height).toBe(2);
     });
 
     it("rejects a location outside the snapshot dimensions", () => {

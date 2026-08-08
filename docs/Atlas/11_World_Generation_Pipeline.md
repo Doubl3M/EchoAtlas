@@ -21,6 +21,13 @@ Le pipeline est :
 - modulaire ;
 - extensible.
 
+L'étendue logique du World et la résolution de sa grille Terrain sont deux entrées explicites et
+indépendantes. Le World associe déterministement ses coordonnées aux cellules Terrain ; le Terrain
+reste une grille numérique générique et le Renderer ne décide jamais de l'altitude d'un lieu.
+Une grille Terrain plus fine que le World reste valide : toutes ses cellules couvrent l'étendue
+visuelle continue, même si le domaine historique des WorldLocations `[0, dimension - 1]` ne permet
+pas nécessairement à une localisation d'échantillonner les cellules voisines de la borne visuelle.
+
 ---
 
 # Vue d'ensemble

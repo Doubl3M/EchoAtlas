@@ -7,6 +7,7 @@ import { placeKnowledgeNodes } from "./IndexedWorldPlacement";
 import { WorldConfig } from "./WorldConfig";
 import { WorldConnection } from "./WorldConnection";
 import { WorldLocation } from "./WorldLocation";
+import { WorldTerrainMapping } from "./WorldTerrainMapping";
 
 /** Stateless deterministic translation from semantic graph to geographic snapshot. */
 export class WorldGenerator {
@@ -19,19 +20,23 @@ export class WorldGenerator {
         const nodes = graph.getNodes();
         const relations = graph.getRelations();
         const positions = placeKnowledgeNodes(seed, config, nodes, relations);
+        const terrainMapping = new WorldTerrainMapping(
+            config.width,
+            config.height,
+            heightField.width,
+            heightField.height
+        );
 
         const locations = nodes.map((node, index) => {
-            // A continuous position uses its containing cell; the upper clamp protects bounds.
             const x = positions.x[index];
             const y = positions.y[index];
-            const terrainX = Math.min(config.width - 1, Math.floor(x));
-            const terrainY = Math.min(config.height - 1, Math.floor(y));
+            const terrainCell = terrainMapping.worldToTerrainCell(x, y);
             return new WorldLocation(
                 {
                     knowledgeNodeId: node.id,
                     x,
                     y,
-                    elevation: heightField.get(terrainX, terrainY),
+                    elevation: heightField.get(terrainCell.x, terrainCell.y),
                 },
                 config.width,
                 config.height

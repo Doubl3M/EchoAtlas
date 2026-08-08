@@ -27,10 +27,6 @@ export class WorldConfig {
         WorldConfig.validateStrength(options.attractionStrength, "attractionStrength");
         WorldConfig.validateStrength(options.repulsionStrength, "repulsionStrength");
 
-        if (options.terrain.width !== options.width || options.terrain.height !== options.height) {
-            throw new RangeError("Terrain dimensions must match the world dimensions.");
-        }
-
         this.width = options.width;
         this.height = options.height;
         this.placementIterations = options.placementIterations;

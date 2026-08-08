@@ -1,5 +1,5 @@
 import type { Camera2D } from "../engine/camera";
-import type { GeographicWorld, WorldLocation } from "../world";
+import { WorldTerrainMapping, type GeographicWorld, type WorldLocation } from "../world";
 
 import type { RenderSurface } from "./RenderSurface";
 import type { ElevationBand, VisualTheme } from "./VisualTheme";
@@ -34,16 +34,24 @@ export class CanvasRenderer {
     }
 
     private renderTerrain(world: GeographicWorld, camera: Camera2D, surface: RenderSurface): void {
-        for (let y = 0; y < world.height; y += 1) {
-            for (let x = 0; x < world.width; x += 1) {
-                const topLeft = camera.worldToScreen(x, y);
-                const bottomRight = camera.worldToScreen(x + 1, y + 1);
+        const heightField = world.heightField;
+        const terrainMapping = new WorldTerrainMapping(
+            world.width,
+            world.height,
+            heightField.width,
+            heightField.height
+        );
+        for (let y = 0; y < heightField.height; y += 1) {
+            for (let x = 0; x < heightField.width; x += 1) {
+                const bounds = terrainMapping.terrainCellToWorldBounds(x, y);
+                const topLeft = camera.worldToScreen(bounds.x0, bounds.y0);
+                const bottomRight = camera.worldToScreen(bounds.x1, bounds.y1);
                 surface.fillRect(
                     topLeft.x,
                     topLeft.y,
                     bottomRight.x - topLeft.x,
                     bottomRight.y - topLeft.y,
-                    this.terrainColor(world.heightField.get(x, y))
+                    this.terrainColor(heightField.get(x, y))
                 );
             }
         }
