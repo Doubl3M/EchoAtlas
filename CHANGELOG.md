@@ -29,6 +29,9 @@ The project follows Semantic Versioning.
 
 ## Changed
 
+- Relational atlas navigation now performs a safely framed, kind-scaled, cancellable and
+  reduced-motion-aware Camera journey to the selected World location while preserving generic
+  Renderer and domain boundaries.
 - Music selection now opens an integrated seventies-inspired exploration panel that preserves the
   map context and displays only validated catalog attributes.
 - The exploration panel now resolves deterministic Knowledge Graph neighbours back to real Music

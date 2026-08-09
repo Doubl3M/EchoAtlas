@@ -2,6 +2,7 @@
 
 import { describe, expect, it } from "vitest";
 
+import cameraJourneySource from "../../src/app/CameraJourney.ts?raw";
 import interactionSource from "../../src/engine/interaction/CameraInteractionController.ts?raw";
 import navigableMapSource from "../../src/app/NavigableMap.ts?raw";
 import mainSource from "../../src/main.ts?raw";
@@ -19,6 +20,15 @@ describe("First Navigable Map architecture", () => {
             /DOM|MouseEvent|PointerEvent|WheelEvent|document|window/
         );
         expect(interactionSource).not.toMatch(/analytics|tracking/i);
+    });
+
+    it("keeps Camera journey timing in app and independent from domain modules", () => {
+        const imports = [...cameraJourneySource.matchAll(/from\s+["']([^"']+)["']/g)].map(
+            ([, path]) => path
+        );
+        expect(imports).toEqual(["../engine/camera"]);
+        expect(cameraJourneySource).not.toMatch(/analytics|tracking/i);
+        expect(navigableMapSource).toContain("requestAnimationFrame");
     });
 
     it("keeps render independent from Music", () => {
