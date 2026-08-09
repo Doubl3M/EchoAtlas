@@ -52,8 +52,10 @@ describe("Music Atlas application pipeline", () => {
             text: "Stevie Wonder",
             priority: 100,
             minZoom: 0,
+            landmarkKind: "city",
         });
         expect(snapshot.labels("music:album:rumours")?.text).toBe("Rumours");
+        expect(snapshot.labels("music:album:rumours")?.landmarkKind).toBeUndefined();
         expect(snapshot.labels("music:track:dreams")?.text).toBe("Dreams");
         expect(snapshot.labels("music:label:motown")?.text).toBe("Motown");
         expect(snapshot.labels("music:playlist:night-drive")?.text).toBe("Night Drive");

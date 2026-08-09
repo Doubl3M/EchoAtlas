@@ -29,6 +29,12 @@ The project follows Semantic Versioning.
 
 ## Changed
 
+- The navigable map now sits within a responsive seventies-inspired editorial home shell with
+  real zoom controls, recentering, World statistics and a restyled Music selection card.
+- Terrain rendering now uses cached visual interpolation, organic altitude bands, shorelines and
+  deterministic cartographic relief ornaments without changing geographic elevation.
+- Artist presentation now maps to deterministic, zoom-sensitive City landmarks while preserving
+  generic Renderer contracts, canonical Knowledge identities and World coordinates.
 - The browser showcase now presents a denser music catalog through a warmer, layered cartographic
   theme with seamless terrain, curved roads, atlas markers, prioritized decluttered labels and a
   selectable Music detail cartouche.

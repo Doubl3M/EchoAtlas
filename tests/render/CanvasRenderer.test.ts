@@ -19,6 +19,20 @@ class RecordingSurface implements RenderSurface {
         this.record("fillRect", x, y, width, height, color);
     }
 
+    public drawRaster(
+        raster: {
+            readonly width: number;
+            readonly height: number;
+            readonly colors: readonly string[];
+        },
+        x: number,
+        y: number,
+        width: number,
+        height: number
+    ): void {
+        this.record("drawRaster", raster, x, y, width, height);
+    }
+
     public strokeLine(
         startX: number,
         startY: number,
@@ -104,11 +118,29 @@ function theme(prefix = "theme", labels = true, labelMinZoom = 0): VisualTheme {
         ]),
         terrain: Object.freeze({
             cellOverlap: 0,
+            rasterScale: 1,
             contour: Object.freeze({
                 enabled: false,
                 color: `${prefix}-contour`,
                 width: 1,
                 opacity: 0.2,
+            }),
+            water: Object.freeze({
+                maximum: 0.3,
+                shorelineColor: `${prefix}-shoreline`,
+                shorelineWidth: 1,
+                shorelineOpacity: 0,
+            }),
+            ornaments: Object.freeze({
+                enabled: false,
+                spacing: 10,
+                density: 0,
+                reliefMinimum: 0.8,
+                waterColor: `${prefix}-water-mark`,
+                reliefColor: `${prefix}-relief-mark`,
+                width: 1,
+                opacity: 0,
+                size: 2,
             }),
         }),
         connection: Object.freeze({
@@ -127,6 +159,24 @@ function theme(prefix = "theme", labels = true, labelMinZoom = 0): VisualTheme {
             radius: 3,
             centerColor: `${prefix}-location-center`,
             centerRadius: 0,
+        }),
+        landmarks: Object.freeze({
+            city: Object.freeze({
+                enabled: true,
+                detailZoom: 12,
+                compactWidth: 10,
+                compactHeight: 8,
+                detailedWidth: 16,
+                detailedHeight: 12,
+                widthVariation: 0.1,
+                fillColor: `${prefix}-city-fill`,
+                secondaryColor: `${prefix}-city-secondary`,
+                detailColor: `${prefix}-city-detail`,
+                strokeColor: `${prefix}-city-stroke`,
+                strokeWidth: 1,
+                labelGap: 2,
+                hitPadding: 3,
+            }),
         }),
         label: Object.freeze({
             enabled: labels,
@@ -250,12 +300,50 @@ describe("CanvasRenderer", () => {
 
         new CanvasRenderer(theme()).render(boundaryWorld, camera(), surface);
 
-        expect(surface.commands.slice(1).map(({ values }) => values[4])).toEqual([
-            "theme-low",
-            "theme-low",
-            "theme-middle",
-            "theme-high",
+        expect(
+            (surface.commands[1]?.values[0] as { readonly colors: readonly string[] }).colors
+        ).toEqual(["theme-low", "theme-low", "theme-middle", "theme-high"]);
+    });
+
+    it("creates a deterministic bilinearly sampled visual raster without mutating terrain", () => {
+        const base = theme("smooth");
+        const smoothTheme = Object.freeze({
+            ...base,
+            terrain: Object.freeze({ ...base.terrain, rasterScale: 2 }),
+        });
+        const terrainWorld = world();
+        const before = terrainWorld.heightField.toArray();
+        const first = new RecordingSurface();
+        const second = new RecordingSurface();
+
+        const renderer = new CanvasRenderer(smoothTheme);
+        renderer.render(terrainWorld, camera(), first);
+        renderer.render(terrainWorld, camera(), second);
+
+        const firstRaster = first.commands[1]?.values[0] as {
+            readonly width: number;
+            readonly height: number;
+            readonly colors: readonly string[];
+        };
+        const secondRaster = second.commands[1]?.values[0] as typeof firstRaster;
+        expect([firstRaster.width, firstRaster.height, firstRaster.colors.length]).toEqual([
+            4, 4, 16,
         ]);
+        expect(firstRaster.colors).toEqual(secondRaster.colors);
+        expect(terrainWorld.heightField.toArray()).toEqual(before);
+    });
+
+    it.each([0, 1.5, 9])("rejects invalid terrain raster scale %s", (rasterScale) => {
+        const base = theme();
+        expect(
+            () =>
+                new CanvasRenderer(
+                    Object.freeze({
+                        ...base,
+                        terrain: Object.freeze({ ...base.terrain, rasterScale }),
+                    })
+                )
+        ).toThrow("Terrain raster scale");
     });
 
     it("renders an empty world as background then deterministic terrain", () => {
@@ -263,13 +351,12 @@ describe("CanvasRenderer", () => {
 
         new CanvasRenderer(theme()).render(world(), camera(), surface);
 
-        expect(surface.commands).toEqual([
-            { kind: "fillRect", values: [0, 0, 100, 80, "theme-background"] },
-            { kind: "fillRect", values: [50, 40, 10, 10, "theme-low"] },
-            { kind: "fillRect", values: [60, 40, 10, 10, "theme-middle"] },
-            { kind: "fillRect", values: [50, 50, 10, 10, "theme-middle"] },
-            { kind: "fillRect", values: [60, 50, 10, 10, "theme-high"] },
-        ]);
+        expect(surface.commands[0]).toEqual({
+            kind: "fillRect",
+            values: [0, 0, 100, 80, "theme-background"],
+        });
+        expect(surface.commands[1]?.kind).toBe("drawRaster");
+        expect(surface.commands[1]?.values.slice(1)).toEqual([50, 40, 20, 20]);
     });
 
     it("renders terrain resolution cells across the complete logical World extent", () => {
@@ -284,17 +371,17 @@ describe("CanvasRenderer", () => {
 
         new CanvasRenderer(theme()).render(decoupledWorld, camera(), surface);
 
-        const terrainCommands = surface.commands.slice(1);
-        expect(terrainCommands).toHaveLength(8);
-        expect(terrainCommands[0]).toEqual({
-            kind: "fillRect",
-            values: [50, 40, 20, 20, "theme-low"],
-        });
-        expect(terrainCommands[1]?.values[0]).toBe(70);
-        expect(terrainCommands[7]).toEqual({
-            kind: "fillRect",
-            values: [110, 60, 20, 20, "theme-high"],
-        });
+        const terrain = surface.commands[1];
+        expect(terrain?.kind).toBe("drawRaster");
+        expect(terrain?.values.slice(1)).toEqual([50, 40, 80, 40]);
+        const raster = terrain?.values[0] as {
+            readonly width: number;
+            readonly height: number;
+            readonly colors: readonly string[];
+        };
+        expect([raster.width, raster.height, raster.colors.length]).toEqual([4, 2, 8]);
+        expect(raster.colors[0]).toBe("theme-low");
+        expect(raster.colors[7]).toBe("theme-high");
     });
 
     it("renders layers in background, terrain, connections, locations, labels order", () => {
@@ -306,25 +393,22 @@ describe("CanvasRenderer", () => {
 
         expect(surface.commands.map(({ kind }) => kind)).toEqual([
             "fillRect",
-            "fillRect",
-            "fillRect",
-            "fillRect",
-            "fillRect",
+            "drawRaster",
             "strokeLine",
             "fillCircle",
             "fillCircle",
             "fillText",
             "fillText",
         ]);
-        expect(surface.commands[5]).toEqual({
+        expect(surface.commands[2]).toEqual({
             kind: "strokeLine",
             values: [50, 40, 60, 50, "theme-connection", 2, 0.5],
         });
-        expect(surface.commands[6]).toEqual({
+        expect(surface.commands[3]).toEqual({
             kind: "fillCircle",
             values: [50, 40, 3, "theme-location-fill", "theme-location-stroke", 1],
         });
-        expect(surface.commands[8]).toEqual({
+        expect(surface.commands[5]).toEqual({
             kind: "fillText",
             values: ["A", 51, 50, "theme-label", "12px serif", "theme-halo", 0],
         });
@@ -341,6 +425,7 @@ describe("CanvasRenderer", () => {
                 size: 1,
             }),
             terrain: Object.freeze({
+                ...base.terrain,
                 cellOverlap: 0.5,
                 contour: Object.freeze({
                     enabled: true,
@@ -388,14 +473,157 @@ describe("CanvasRenderer", () => {
         expect(surface.commands.some(({ values }) => values.includes("label-halo"))).toBe(true);
     });
 
+    it("renders deterministic optional terrain ornaments below routes and labels", () => {
+        const base = theme("ornament");
+        const ornamentTheme = Object.freeze({
+            ...base,
+            terrain: Object.freeze({
+                ...base.terrain,
+                ornaments: Object.freeze({
+                    ...base.terrain.ornaments,
+                    enabled: true,
+                    spacing: 1,
+                    density: 1,
+                    reliefMinimum: 0.8,
+                    opacity: 0.5,
+                }),
+            }),
+        });
+        const first = new RecordingSurface();
+        const second = new RecordingSurface();
+        const renderer = new CanvasRenderer(ornamentTheme);
+        const terrainWorld = world(
+            [location("A", 0, 0, 0.2), location("B", 1, 1, 0.8)],
+            [connection("R", "A", "B")]
+        );
+
+        renderer.render(terrainWorld, camera(), first);
+        renderer.render(terrainWorld, camera(), second);
+
+        expect(first.commands).toEqual(second.commands);
+        const ornamentIndex = first.commands.findIndex(({ values }) =>
+            values.includes("ornament-water-mark")
+        );
+        const routeIndex = first.commands.findIndex(({ values }) =>
+            values.includes("ornament-connection")
+        );
+        expect(ornamentIndex).toBeGreaterThan(1);
+        expect(ornamentIndex).toBeLessThan(routeIndex);
+    });
+
+    it("renders a generic city landmark deterministically from canonical identity", () => {
+        const cityProvider = (id: string) => ({
+            text: id,
+            priority: 10,
+            minZoom: 0,
+            landmarkKind: "city" as const,
+        });
+        const first = new RecordingSurface();
+        const second = new RecordingSurface();
+        const different = new RecordingSurface();
+        const renderer = new CanvasRenderer(theme("city"), cityProvider);
+
+        renderer.render(world([location("A", 0, 0, 0.5)]), camera(), first);
+        renderer.render(world([location("A", 0, 0, 0.5)]), camera(), second);
+        renderer.render(world([location("different-city", 0, 0, 0.5)]), camera(), different);
+
+        expect(first.commands).toEqual(second.commands);
+        expect(first.commands).not.toEqual(different.commands);
+        expect(first.commands.some(({ values }) => values.includes("city-city-fill"))).toBe(true);
+        expect(first.commands.some(({ values }) => values.includes("city-location-fill"))).toBe(
+            false
+        );
+    });
+
+    it("adds deterministic city detail only after the theme zoom threshold", () => {
+        const provider = () => ({
+            text: "A",
+            priority: 10,
+            minZoom: 0,
+            landmarkKind: "city" as const,
+        });
+        const compactSurface = new RecordingSurface();
+        const detailedSurface = new RecordingSurface();
+        const compactCamera = camera();
+        const detailedCamera = camera();
+        detailedCamera.setZoom(15);
+        const renderer = new CanvasRenderer(theme("lod"), provider);
+
+        renderer.render(world([location("A", 0, 0, 0.5)]), compactCamera, compactSurface);
+        renderer.render(world([location("A", 0, 0, 0.5)]), detailedCamera, detailedSurface);
+
+        expect(detailedSurface.commands.length).toBeGreaterThan(compactSurface.commands.length);
+    });
+
+    it("keeps a detailed city label outside the landmark silhouette", () => {
+        const visualTheme = theme("label-clearance");
+        const value = camera();
+        value.setZoom(15);
+        const surface = new RecordingSurface();
+
+        new CanvasRenderer(visualTheme, () => ({
+            text: "A",
+            priority: 10,
+            minZoom: 0,
+            landmarkKind: "city",
+        })).render(world([location("A", 0, 0, 0.5)]), value, surface);
+
+        const label = surface.commands.find(({ kind }) => kind === "fillText");
+        const center = value.worldToScreen(0, 0);
+        const maximumHalfWidth =
+            (visualTheme.landmarks.city.detailedWidth *
+                (1 + visualTheme.landmarks.city.widthVariation)) /
+            2;
+        const labelLeft = Number(label?.values[1]);
+        const labelRight = labelLeft + surface.measureText("A").width;
+
+        expect(label).toBeDefined();
+        expect(
+            labelRight <= center.x - maximumHalfWidth || labelLeft >= center.x + maximumHalfWidth
+        ).toBe(true);
+    });
+
+    it("can disable city landmarks through the theme and fall back to a marker", () => {
+        const base = theme("disabled-city");
+        const disabled = Object.freeze({
+            ...base,
+            landmarks: Object.freeze({
+                city: Object.freeze({ ...base.landmarks.city, enabled: false }),
+            }),
+        });
+        const surface = new RecordingSurface();
+
+        new CanvasRenderer(disabled, () => ({
+            text: "A",
+            priority: 10,
+            minZoom: 0,
+            landmarkKind: "city",
+        })).render(world([location("A", 0, 0, 0.5)]), camera(), surface);
+
+        expect(
+            surface.commands.some(({ values }) => values.includes("disabled-city-location-fill"))
+        ).toBe(true);
+        expect(
+            surface.commands.some(({ values }) => values.includes("disabled-city-city-fill"))
+        ).toBe(false);
+    });
+
     it("does not render a location whose label cannot fit in the visible World", () => {
         const value = camera();
         value.setPosition(100, -100);
         const surface = new RecordingSurface();
 
-        new CanvasRenderer(theme()).render(world([location("A", 1, 1, 0.5)]), value, surface);
+        new CanvasRenderer(theme("hidden-city"), () => ({
+            text: "Hidden city",
+            priority: 1,
+            minZoom: 0,
+            landmarkKind: "city",
+        })).render(world([location("A", 1, 1, 0.5)]), value, surface);
 
         expect(surface.commands.some(({ kind }) => kind === "fillCircle")).toBe(false);
+        expect(
+            surface.commands.some(({ values }) => values.includes("hidden-city-city-fill"))
+        ).toBe(false);
         expect(surface.commands.some(({ kind }) => kind === "fillText")).toBe(false);
     });
 
@@ -413,7 +641,7 @@ describe("CanvasRenderer", () => {
 
         new CanvasRenderer(theme()).render(oneCellWorld, camera(), surface);
 
-        expect(surface.commands.map(({ kind }) => kind)).toEqual(["fillRect", "fillRect"]);
+        expect(surface.commands.map(({ kind }) => kind)).toEqual(["fillRect", "drawRaster"]);
     });
 
     it("preserves self-relations and parallel relations as distinct commands", () => {

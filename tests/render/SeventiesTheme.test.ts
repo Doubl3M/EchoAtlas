@@ -12,8 +12,12 @@ describe("SeventiesTheme", () => {
         expect(theme.terrainBands.every((band) => Object.isFrozen(band))).toBe(true);
         expect(Object.isFrozen(theme.terrain)).toBe(true);
         expect(Object.isFrozen(theme.terrain.contour)).toBe(true);
+        expect(Object.isFrozen(theme.terrain.water)).toBe(true);
+        expect(Object.isFrozen(theme.terrain.ornaments)).toBe(true);
         expect(Object.isFrozen(theme.connection)).toBe(true);
         expect(Object.isFrozen(theme.location)).toBe(true);
+        expect(Object.isFrozen(theme.landmarks)).toBe(true);
+        expect(Object.isFrozen(theme.landmarks.city)).toBe(true);
         expect(Object.isFrozen(theme.label)).toBe(true);
         expect(() => Object.assign(theme.location as { radius: number }, { radius: 100 })).toThrow(
             TypeError
@@ -38,5 +42,13 @@ describe("SeventiesTheme", () => {
 
     it("shows labels only from its selected detail threshold", () => {
         expect(new SeventiesTheme().label.minZoom).toBe(0);
+    });
+
+    it("keeps compact cities restrained and detailed cities in the illustrated range", () => {
+        const city = new SeventiesTheme().landmarks.city;
+
+        expect(city.compactWidth).toBe(20);
+        expect(city.detailedWidth * (1 - city.widthVariation)).toBeGreaterThanOrEqual(45);
+        expect(city.detailedWidth * (1 + city.widthVariation)).toBeLessThanOrEqual(60);
     });
 });

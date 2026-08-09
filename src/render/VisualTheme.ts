@@ -21,7 +21,30 @@ export interface TerrainContourStyle {
 export interface TerrainVisualStyle {
     /** Screen-space overlap removes backing-store seams without changing World geometry. */
     readonly cellOverlap: number;
+    /** Visual-only bilinear sampling multiplier; it never changes geographic elevation. */
+    readonly rasterScale: number;
     readonly contour: TerrainContourStyle;
+    readonly water: TerrainWaterStyle;
+    readonly ornaments: TerrainOrnamentStyle;
+}
+
+export interface TerrainWaterStyle {
+    readonly maximum: number;
+    readonly shorelineColor: string;
+    readonly shorelineWidth: number;
+    readonly shorelineOpacity: number;
+}
+
+export interface TerrainOrnamentStyle {
+    readonly enabled: boolean;
+    readonly spacing: number;
+    readonly density: number;
+    readonly reliefMinimum: number;
+    readonly waterColor: string;
+    readonly reliefColor: string;
+    readonly width: number;
+    readonly opacity: number;
+    readonly size: number;
 }
 
 export interface ConnectionVisualStyle {
@@ -57,6 +80,28 @@ export interface LabelVisualStyle {
     readonly collisionPadding: number;
 }
 
+export interface CityLandmarkVisualStyle {
+    readonly enabled: boolean;
+    readonly detailZoom: number;
+    readonly compactWidth: number;
+    readonly compactHeight: number;
+    readonly detailedWidth: number;
+    readonly detailedHeight: number;
+    /** Maximum proportional width variation derived deterministically from identity. */
+    readonly widthVariation: number;
+    readonly fillColor: string;
+    readonly secondaryColor: string;
+    readonly detailColor: string;
+    readonly strokeColor: string;
+    readonly strokeWidth: number;
+    readonly labelGap: number;
+    readonly hitPadding: number;
+}
+
+export interface LandmarkVisualStyle {
+    readonly city: CityLandmarkVisualStyle;
+}
+
 /** Complete visual tokens consumed by CanvasRenderer without theme-specific branches. */
 export interface VisualTheme {
     readonly backgroundColor: string;
@@ -65,5 +110,6 @@ export interface VisualTheme {
     readonly terrain: TerrainVisualStyle;
     readonly connection: ConnectionVisualStyle;
     readonly location: LocationVisualStyle;
+    readonly landmarks: LandmarkVisualStyle;
     readonly label: LabelVisualStyle;
 }

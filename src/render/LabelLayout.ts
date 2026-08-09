@@ -5,13 +5,17 @@ export interface LabelDescriptor {
     readonly text: string;
     readonly priority: number;
     readonly minZoom: number;
+    readonly landmarkKind?: LandmarkKind;
 }
+
+export type LandmarkKind = "city";
 
 export interface LabelCandidate {
     readonly knowledgeNodeId: string;
     readonly descriptor: LabelDescriptor;
     readonly markerX: number;
     readonly markerY: number;
+    readonly markerClearance?: number;
 }
 
 export interface ScreenBounds {
@@ -67,10 +71,13 @@ function placements(
     metrics: { readonly width: number; readonly ascent: number; readonly descent: number },
     style: LabelVisualStyle
 ): readonly LabelRectangle[] {
-    const rightX = candidate.markerX + style.offsetX;
-    const leftX = candidate.markerX - style.offsetX - metrics.width;
-    const upperY = candidate.markerY + style.offsetY;
-    const lowerY = candidate.markerY - style.offsetY + metrics.ascent;
+    const clearance = candidate.markerClearance ?? 0;
+    const horizontalOffset = Math.max(style.offsetX, clearance);
+    const verticalOffset = Math.max(Math.abs(style.offsetY), clearance);
+    const rightX = candidate.markerX + horizontalOffset;
+    const leftX = candidate.markerX - horizontalOffset - metrics.width;
+    const upperY = candidate.markerY - verticalOffset;
+    const lowerY = candidate.markerY + verticalOffset + metrics.ascent;
     return [
         rectangle(candidate.knowledgeNodeId, candidate.descriptor, rightX, upperY, metrics),
         rectangle(candidate.knowledgeNodeId, candidate.descriptor, leftX, upperY, metrics),

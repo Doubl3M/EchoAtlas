@@ -6,6 +6,7 @@ import interactionSource from "../../src/engine/interaction/CameraInteractionCon
 import navigableMapSource from "../../src/app/NavigableMap.ts?raw";
 import mainSource from "../../src/main.ts?raw";
 import rendererSource from "../../src/render/CanvasRenderer.ts?raw";
+import shellSource from "../../src/ui/SeventiesHomeShell.ts?raw";
 import uiTextSource from "../../src/app/UiText.ts?raw";
 
 describe("First Navigable Map architecture", () => {
@@ -35,9 +36,12 @@ describe("First Navigable Map architecture", () => {
     it("centralizes the user-facing copy introduced by this phase in app", () => {
         expect(uiTextSource).toContain("Drag to explore · Scroll to zoom");
         expect(uiTextSource).toContain("EchoAtlas navigable music atlas");
+        expect(uiTextSource).toContain("Cartographie musicale");
+        expect(uiTextSource).toContain("Votre voyage");
         expect(navigableMapSource).not.toMatch(
             /Drag to explore|Scroll to zoom|navigable music atlas/
         );
+        expect(shellSource).not.toMatch(/Cartographie musicale|Votre voyage|Zoom avant/);
         expect(interactionSource).not.toMatch(/Drag to explore|Scroll to zoom/);
         expect(rendererSource).not.toMatch(/Drag to explore|Scroll to zoom/);
     });

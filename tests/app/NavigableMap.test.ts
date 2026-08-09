@@ -62,4 +62,20 @@ describe("navigable map location hit testing", () => {
             findLocationAtScreen(world, camera, hiddenMarker.x, hiddenMarker.y, 11, new Set(["B"]))
         ).toBeUndefined();
     });
+
+    it("uses a larger presentation-specific hit radius for a visible city", () => {
+        const { world, camera } = fixture();
+        const marker = camera.worldToScreen(4, 5);
+
+        expect(
+            findLocationAtScreen(
+                world,
+                camera,
+                marker.x + 16,
+                marker.y,
+                (id) => (id === "A" ? 18 : 11),
+                new Set(["A"])
+            )?.knowledgeNodeId
+        ).toBe("A");
+    });
 });
