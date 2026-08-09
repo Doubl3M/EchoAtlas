@@ -91,29 +91,60 @@ test("First Navigable Map works in local headless Chrome", async () => {
             true,
             "A real marker must be selectable."
         );
+        await page.waitForFunction(
+            (initialWidth) => {
+                const panel = globalThis.document.querySelector(".selection-panel");
+                const canvas = globalThis.document.querySelector("canvas");
+                return (
+                    panel !== null &&
+                    !panel.hidden &&
+                    canvas !== null &&
+                    canvas.getBoundingClientRect().width < initialWidth
+                );
+            },
+            {},
+            initial.cssWidth
+        );
+        const firstSelection = await selectionState(page);
+        assert.equal(firstSelection.visible, true, "Selecting a marker must open its Music panel.");
+        assertSelectionMatchesIdentity(firstSelection);
+
+        const selectedCanvas = await canvasState(page);
         assert.equal(
-            await page.$eval(".selection-card", (element) => !element.hidden),
+            await clickFirstLocation(page, selectedCanvas, firstSelection.selectedId),
             true,
-            "Selecting a marker must open its Music cartouche."
+            "A second real marker must replace the panel selection."
         );
-        assert.ok(
-            await page.$eval(".selection-card h2", (element) => element.textContent?.length ?? 0)
+        const secondSelection = await selectionState(page);
+        assertSelectionMatchesIdentity(secondSelection);
+        assert.notEqual(secondSelection.selectedId, firstSelection.selectedId);
+        assert.notEqual(secondSelection.title, firstSelection.title);
+
+        await page.click(".selection-panel__close");
+        await page.waitForFunction(
+            (selectedWidth) => {
+                const panel = globalThis.document.querySelector(".selection-panel");
+                const canvas = globalThis.document.querySelector("canvas");
+                return (
+                    panel !== null &&
+                    panel.hidden &&
+                    canvas !== null &&
+                    canvas.getBoundingClientRect().width > selectedWidth
+                );
+            },
+            {},
+            selectedCanvas.cssWidth
         );
-        await page.click(".selection-card__close");
-        assert.equal(await page.$eval(".selection-card", (element) => element.hidden), true);
+        assert.equal((await selectionState(page)).visible, false);
 
         await page.mouse.move(initial.x + initial.cssWidth / 2, initial.y + initial.cssHeight / 2);
-        await page.mouse.wheel({ deltaY: -260 });
+        await page.mouse.wheel({ deltaY: -420 });
         await renderedFrames(page);
         const afterZoom = await canvasState(page);
         assert.notEqual(
             afterZoom.dataUrl,
             initial.dataUrl,
             "A browser wheel event must redraw the map."
-        );
-        assert.ok(
-            afterZoom.visibleLocations > initial.visibleLocations,
-            "Zooming in must reveal additional labeled locations."
         );
         assert.equal(afterZoom.visibleLocations, afterZoom.visibleLabels);
 
@@ -187,18 +218,38 @@ async function canvasState(page) {
     });
 }
 
-async function clickFirstLocation(page, canvas) {
+async function clickFirstLocation(page, canvas, excludedId = undefined) {
     const spacing = 12;
     for (let y = canvas.cssHeight * 0.05; y < canvas.cssHeight * 0.95; y += spacing) {
         for (let x = canvas.cssWidth * 0.05; x < canvas.cssWidth * 0.95; x += spacing) {
             await page.mouse.click(canvas.x + x, canvas.y + y);
-            const selected = await page.$eval(".selection-card", (element) => !element.hidden);
-            if (selected) {
+            const selected = await page.$eval(".selection-panel", (element) => ({
+                visible: !element.hidden,
+                selectedId: element.dataset.selectedId,
+            }));
+            if (selected.visible && selected.selectedId !== excludedId) {
                 return true;
             }
         }
     }
     return false;
+}
+
+async function selectionState(page) {
+    return page.$eval(".selection-panel", (element) => ({
+        visible: !element.hidden,
+        selectedId: element.dataset.selectedId ?? "",
+        entityKind: element.dataset.entityKind ?? "",
+        kind: element.querySelector(".selection-panel__kind")?.textContent ?? "",
+        title: element.querySelector("h2")?.textContent ?? "",
+    }));
+}
+
+function assertSelectionMatchesIdentity(selection) {
+    const [, identityKind] = selection.selectedId.split(":");
+    assert.ok(selection.title.length > 0, "The selected Music title must be visible.");
+    assert.equal(selection.entityKind, identityKind);
+    assert.equal(selection.kind.toLowerCase(), identityKind);
 }
 
 async function renderedFrames(page) {

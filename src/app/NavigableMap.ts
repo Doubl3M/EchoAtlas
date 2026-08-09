@@ -7,7 +7,7 @@ import { WorldConfig, type GeographicWorld, type WorldLocation } from "../world"
 
 import { demoMusicDocumentJson } from "./demoMusicDocument";
 import { createMusicAtlasSnapshot } from "./MusicAtlasPipeline";
-import { createMusicSelectionCard } from "./MusicSelectionCard";
+import { createMusicSelectionPanel } from "./MusicSelectionPanel";
 import { uiText } from "./UiText";
 
 const WORLD_WIDTH = 96;
@@ -30,7 +30,7 @@ export function mountNavigableMap(root: HTMLElement): () => void {
     const surface = new CanvasRenderSurface(canvas);
     const theme = new SeventiesTheme();
     const renderer = new CanvasRenderer(theme, snapshot.labels);
-    const selectionCard = createMusicSelectionCard(snapshot.catalog);
+    const selectionPanel = createMusicSelectionPanel(snapshot.catalog);
     let visibleKnowledgeNodeIds: ReadonlySet<string> = new Set();
 
     const render = (): void => {
@@ -66,7 +66,7 @@ export function mountNavigableMap(root: HTMLElement): () => void {
     };
     const shell = createSeventiesHomeShell({
         canvas,
-        selectionCard: selectionCard.element,
+        selectionPanel: selectionPanel.element,
         text: uiText,
         locationCount: snapshot.world.getLocations().length,
         relationCount: snapshot.world.getConnections().length,
@@ -98,7 +98,7 @@ export function mountNavigableMap(root: HTMLElement): () => void {
             visibleKnowledgeNodeIds
         );
         if (location !== undefined) {
-            selectionCard.show(location.knowledgeNodeId);
+            selectionPanel.show(location.knowledgeNodeId);
         }
     };
     const removePointerInteractions = bindPointerInteractions(
