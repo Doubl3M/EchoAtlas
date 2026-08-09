@@ -44,7 +44,11 @@ export function createMusicLabelProvider(catalog: MusicCatalog): LabelProvider {
             if (detail !== undefined) {
                 labels.set(
                     `music:${entity.kind}:${entity.id}`,
-                    Object.freeze({ text: label, ...detail })
+                    Object.freeze({
+                        text: label,
+                        ...detail,
+                        ...(entity.kind === "artist" ? { landmarkKind: "city" as const } : {}),
+                    })
                 );
             }
         }

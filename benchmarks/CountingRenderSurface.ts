@@ -25,6 +25,10 @@ export class CountingRenderSurface implements RenderSurface {
         this.rectangles += 1;
     }
 
+    public drawRaster(): void {
+        this.rectangles += 1;
+    }
+
     public strokeLine(): void {
         this.lines += 1;
     }

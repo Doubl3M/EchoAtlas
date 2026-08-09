@@ -1,4 +1,4 @@
-import type { RenderSurface } from "./RenderSurface";
+import type { RenderRaster, RenderSurface } from "./RenderSurface";
 
 /** Browser adapter from the minimal RenderSurface contract to a Canvas 2D context. */
 export class CanvasRenderSurface implements RenderSurface {
@@ -6,6 +6,7 @@ export class CanvasRenderSurface implements RenderSurface {
     private readonly context: CanvasRenderingContext2D;
     private cssWidth = 1;
     private cssHeight = 1;
+    private readonly rasterCanvases = new WeakMap<RenderRaster, HTMLCanvasElement>();
 
     public constructor(canvas: HTMLCanvasElement) {
         const context = canvas.getContext("2d");
@@ -48,6 +49,35 @@ export class CanvasRenderSurface implements RenderSurface {
         this.context.save();
         this.context.fillStyle = color;
         this.context.fillRect(x, y, width, height);
+        this.context.restore();
+    }
+
+    public drawRaster(
+        raster: RenderRaster,
+        x: number,
+        y: number,
+        width: number,
+        height: number
+    ): void {
+        let source = this.rasterCanvases.get(raster);
+        if (source === undefined) {
+            source = document.createElement("canvas");
+            source.width = raster.width;
+            source.height = raster.height;
+            const context = source.getContext("2d");
+            if (context === null) {
+                throw new Error("Terrain raster Canvas 2D context is unavailable.");
+            }
+            for (let index = 0; index < raster.colors.length; index += 1) {
+                context.fillStyle = raster.colors[index] ?? "transparent";
+                context.fillRect(index % raster.width, Math.floor(index / raster.width), 1, 1);
+            }
+            this.rasterCanvases.set(raster, source);
+        }
+        this.context.save();
+        this.context.imageSmoothingEnabled = true;
+        this.context.imageSmoothingQuality = "high";
+        this.context.drawImage(source, x, y, width, height);
         this.context.restore();
     }
 

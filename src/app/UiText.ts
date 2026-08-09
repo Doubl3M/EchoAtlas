@@ -2,7 +2,17 @@
 export const uiText = Object.freeze({
     canvasLabel: "EchoAtlas navigable music atlas",
     title: "EchoAtlas",
+    subtitle: "Cartographie musicale",
+    navigationLabel: "Navigation principale",
+    explorer: "Explorer",
     navigationHelp: "Drag to explore · Scroll to zoom",
+    zoomIn: "Zoom avant",
+    zoomOut: "Zoom arrière",
+    recenter: "Recentrer la carte",
+    journey: "Votre voyage",
+    places: "Lieux",
+    relations: "Relations",
+    visible: "Visibles",
     closeSelection: "Close selected place",
     closeSymbol: "×",
     entityKinds: Object.freeze({

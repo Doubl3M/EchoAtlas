@@ -2,6 +2,7 @@ import { Camera2D, CameraConfig } from "../engine/camera";
 import { CameraInteractionController } from "../engine/interaction";
 import { TerrainConfig } from "../engine/terrain";
 import { CanvasRenderer, CanvasRenderSurface, SeventiesTheme } from "../render";
+import { createSeventiesHomeShell } from "../ui/SeventiesHomeShell";
 import { WorldConfig, type GeographicWorld, type WorldLocation } from "../world";
 
 import { demoMusicDocumentJson } from "./demoMusicDocument";
@@ -14,24 +15,22 @@ const WORLD_HEIGHT = 64;
 const TERRAIN_WIDTH = 192;
 const TERRAIN_HEIGHT = 128;
 const WHEEL_ZOOM_SENSITIVITY = 0.0015;
+const CONTROL_ZOOM_FACTOR = 1.3;
 const LOCATION_HIT_RADIUS = 11;
 const CLICK_MOVEMENT_TOLERANCE = 4;
 
 /** Browser adapter that binds DOM events to the generic interaction controller. */
 export function mountNavigableMap(root: HTMLElement): () => void {
-    const viewportWidth = Math.max(1, window.innerWidth);
-    const viewportHeight = Math.max(1, window.innerHeight);
     const worldConfig = createWorldConfig();
     const snapshot = createMusicAtlasSnapshot(demoMusicDocumentJson, worldConfig);
-    const camera = createCamera(viewportWidth, viewportHeight);
+    const camera = createCamera(1, 1);
     const interaction = new CameraInteractionController(camera);
     const canvas = document.createElement("canvas");
     canvas.setAttribute("aria-label", uiText.canvasLabel);
     const surface = new CanvasRenderSurface(canvas);
-    const renderer = new CanvasRenderer(new SeventiesTheme(), snapshot.labels);
-    const overlay = createOverlay();
+    const theme = new SeventiesTheme();
+    const renderer = new CanvasRenderer(theme, snapshot.labels);
     const selectionCard = createMusicSelectionCard(snapshot.catalog);
-    root.replaceChildren(canvas, overlay, selectionCard.element);
     let visibleKnowledgeNodeIds: ReadonlySet<string> = new Set();
 
     const render = (): void => {
@@ -39,21 +38,63 @@ export function mountNavigableMap(root: HTMLElement): () => void {
         visibleKnowledgeNodeIds = new Set(summary.visibleKnowledgeNodeIds);
         canvas.dataset.visibleLabels = String(summary.visibleLabelCount);
         canvas.dataset.visibleLocations = String(summary.visibleKnowledgeNodeIds.length);
+        shell.setVisibleLocationCount(summary.visibleKnowledgeNodeIds.length);
     };
     const resize = (): void => {
-        const width = Math.max(1, window.innerWidth);
-        const height = Math.max(1, window.innerHeight);
+        const bounds = shell.mapViewport.getBoundingClientRect();
+        const width = Math.max(1, bounds.width);
+        const height = Math.max(1, bounds.height);
         surface.resize(width, height, Math.max(1, window.devicePixelRatio));
         camera.setViewport(width, height);
         render();
     };
+    const recenter = (): void => {
+        const bounds = shell.mapViewport.getBoundingClientRect();
+        const fittedZoom =
+            Math.max(
+                Math.max(1, bounds.width) / WORLD_WIDTH,
+                Math.max(1, bounds.height) / WORLD_HEIGHT
+            ) * 0.96;
+        camera.setPosition(WORLD_WIDTH / 2, WORLD_HEIGHT / 2);
+        camera.setZoom(fittedZoom);
+        render();
+    };
+    const zoomFromCenter = (factor: number): void => {
+        const bounds = shell.mapViewport.getBoundingClientRect();
+        interaction.zoomAt(bounds.width / 2, bounds.height / 2, camera.getZoom() * factor);
+        render();
+    };
+    const shell = createSeventiesHomeShell({
+        canvas,
+        selectionCard: selectionCard.element,
+        text: uiText,
+        locationCount: snapshot.world.getLocations().length,
+        relationCount: snapshot.world.getConnections().length,
+        onZoomIn: () => zoomFromCenter(CONTROL_ZOOM_FACTOR),
+        onZoomOut: () => zoomFromCenter(1 / CONTROL_ZOOM_FACTOR),
+        onRecenter: recenter,
+    });
+    root.replaceChildren(shell.element);
     const selectLocation = (screenX: number, screenY: number): void => {
         const location = findLocationAtScreen(
             snapshot.world,
             camera,
             screenX,
             screenY,
-            LOCATION_HIT_RADIUS,
+            (knowledgeNodeId) => {
+                if (snapshot.labels(knowledgeNodeId)?.landmarkKind !== "city") {
+                    return LOCATION_HIT_RADIUS;
+                }
+                const city = theme.landmarks.city;
+                const extent =
+                    camera.getZoom() >= city.detailZoom
+                        ? Math.max(
+                              city.detailedWidth * (1 + city.widthVariation),
+                              city.detailedHeight
+                          ) / 2
+                        : Math.max(city.compactWidth, city.compactHeight) / 2;
+                return extent + city.hitPadding;
+            },
             visibleKnowledgeNodeIds
         );
         if (location !== undefined) {
@@ -67,13 +108,15 @@ export function mountNavigableMap(root: HTMLElement): () => void {
         selectLocation
     );
     const removeWheelInteraction = bindWheelInteraction(canvas, camera, interaction, render);
-    window.addEventListener("resize", resize);
     resize();
+    recenter();
+    const resizeObserver = new ResizeObserver(resize);
+    resizeObserver.observe(shell.mapViewport);
 
     return (): void => {
         removePointerInteractions();
         removeWheelInteraction();
-        window.removeEventListener("resize", resize);
+        resizeObserver.disconnect();
     };
 }
 
@@ -177,14 +220,12 @@ export function findLocationAtScreen(
     camera: Camera2D,
     screenX: number,
     screenY: number,
-    hitRadius: number,
+    hitRadius: number | ((knowledgeNodeId: string) => number),
     visibleKnowledgeNodeIds: ReadonlySet<string>
 ): WorldLocation | undefined {
     const target = camera.screenToWorld(screenX, screenY);
-    const worldRadius = hitRadius / camera.getZoom();
-    const maximumDistanceSquared = worldRadius * worldRadius;
     let selected: WorldLocation | undefined;
-    let selectedDistanceSquared = maximumDistanceSquared;
+    let selectedDistanceSquared = Number.POSITIVE_INFINITY;
     for (const location of world.getLocations()) {
         if (!visibleKnowledgeNodeIds.has(location.knowledgeNodeId)) {
             continue;
@@ -192,7 +233,13 @@ export function findLocationAtScreen(
         const deltaX = location.x - target.x;
         const deltaY = location.y - target.y;
         const distanceSquared = deltaX * deltaX + deltaY * deltaY;
-        if (distanceSquared <= selectedDistanceSquared) {
+        const screenRadius =
+            typeof hitRadius === "number" ? hitRadius : hitRadius(location.knowledgeNodeId);
+        const worldRadius = screenRadius / camera.getZoom();
+        if (
+            distanceSquared <= worldRadius * worldRadius &&
+            distanceSquared <= selectedDistanceSquared
+        ) {
             selected = location;
             selectedDistanceSquared = distanceSquared;
         }
@@ -219,14 +266,4 @@ function bindWheelInteraction(
     };
     canvas.addEventListener("wheel", wheel, { passive: false });
     return (): void => canvas.removeEventListener("wheel", wheel);
-}
-
-function createOverlay(): HTMLElement {
-    const heading = document.createElement("header");
-    const title = document.createElement("h1");
-    title.textContent = uiText.title;
-    const subtitle = document.createElement("p");
-    subtitle.textContent = uiText.navigationHelp;
-    heading.append(title, subtitle);
-    return heading;
 }

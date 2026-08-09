@@ -4,6 +4,8 @@ export interface RenderSurface {
 
     fillRect(x: number, y: number, width: number, height: number, color: string): void;
 
+    drawRaster(raster: RenderRaster, x: number, y: number, width: number, height: number): void;
+
     strokeLine(
         startX: number,
         startY: number,
@@ -46,6 +48,12 @@ export interface RenderSurface {
     ): void;
 
     measureText(text: string, font: string): RenderTextMetrics;
+}
+
+export interface RenderRaster {
+    readonly width: number;
+    readonly height: number;
+    readonly colors: readonly string[];
 }
 
 export interface RenderTextMetrics {

@@ -63,9 +63,18 @@ test("First Navigable Map works in local headless Chrome", async () => {
         assert.equal(await page.title(), "EchoAtlas — Geographic World");
         await page.waitForSelector("canvas");
         assert.equal(
-            await page.$eval("header p", (element) => element.textContent),
+            await page.$eval(".atlas-brand h1", (element) => element.textContent),
+            "EchoAtlas"
+        );
+        assert.equal(
+            await page.$eval(".atlas-brand p", (element) => element.textContent),
+            "Cartographie musicale"
+        );
+        assert.equal(
+            await page.$eval(".atlas-map__help", (element) => element.textContent),
             "Drag to explore · Scroll to zoom"
         );
+        assert.equal(await page.$eval(".atlas-journey dd", (element) => element.textContent), "47");
 
         const initial = await canvasState(page);
         assert.ok(initial.cssWidth > 0 && initial.cssHeight > 0);
@@ -93,7 +102,7 @@ test("First Navigable Map works in local headless Chrome", async () => {
         await page.click(".selection-card__close");
         assert.equal(await page.$eval(".selection-card", (element) => element.hidden), true);
 
-        await page.mouse.move(initial.cssWidth / 2, initial.cssHeight / 2);
+        await page.mouse.move(initial.x + initial.cssWidth / 2, initial.y + initial.cssHeight / 2);
         await page.mouse.wheel({ deltaY: -260 });
         await renderedFrames(page);
         const afterZoom = await canvasState(page);
@@ -108,11 +117,16 @@ test("First Navigable Map works in local headless Chrome", async () => {
         );
         assert.equal(afterZoom.visibleLocations, afterZoom.visibleLabels);
 
-        await page.mouse.move(afterZoom.cssWidth / 2, afterZoom.cssHeight / 2);
+        await page.mouse.move(
+            afterZoom.x + afterZoom.cssWidth / 2,
+            afterZoom.y + afterZoom.cssHeight / 2
+        );
         await page.mouse.down();
-        await page.mouse.move(afterZoom.cssWidth / 2 + 140, afterZoom.cssHeight / 2 + 80, {
-            steps: 8,
-        });
+        await page.mouse.move(
+            afterZoom.x + afterZoom.cssWidth / 2 + 140,
+            afterZoom.y + afterZoom.cssHeight / 2 + 80,
+            { steps: 8 }
+        );
         await page.mouse.up();
         await renderedFrames(page);
         const afterPan = await canvasState(page);
@@ -121,12 +135,17 @@ test("First Navigable Map works in local headless Chrome", async () => {
         await page.setViewport({ width: 900, height: 640 });
         await page.waitForFunction(() => {
             const canvas = globalThis.document.querySelector("canvas");
-            return canvas?.getBoundingClientRect().width === 900;
+            const viewport = globalThis.document.querySelector(".atlas-map__viewport");
+            return (
+                canvas !== null &&
+                viewport !== null &&
+                canvas.getBoundingClientRect().width === viewport.getBoundingClientRect().width
+            );
         });
         await renderedFrames(page);
         const afterResize = await canvasState(page);
-        assert.equal(afterResize.cssWidth, 900);
-        assert.equal(afterResize.cssHeight, 640);
+        assert.ok(afterResize.cssWidth > 0 && afterResize.cssWidth < 900);
+        assert.ok(afterResize.cssHeight > 0 && afterResize.cssHeight < 640);
         assert.equal(afterResize.width, Math.round(afterResize.cssWidth * afterResize.dpr));
         assert.equal(afterResize.height, Math.round(afterResize.cssHeight * afterResize.dpr));
         assert.notEqual(afterResize.dataUrl, afterPan.dataUrl, "Resize must produce a new frame.");
@@ -156,6 +175,8 @@ async function canvasState(page) {
         return {
             cssWidth: bounds.width,
             cssHeight: bounds.height,
+            x: bounds.x,
+            y: bounds.y,
             width: canvas.width,
             height: canvas.height,
             dpr: globalThis.window.devicePixelRatio,
@@ -170,7 +191,7 @@ async function clickFirstLocation(page, canvas) {
     const spacing = 12;
     for (let y = canvas.cssHeight * 0.05; y < canvas.cssHeight * 0.95; y += spacing) {
         for (let x = canvas.cssWidth * 0.05; x < canvas.cssWidth * 0.95; x += spacing) {
-            await page.mouse.click(x, y);
+            await page.mouse.click(canvas.x + x, canvas.y + y);
             const selected = await page.$eval(".selection-card", (element) => !element.hidden);
             if (selected) {
                 return true;

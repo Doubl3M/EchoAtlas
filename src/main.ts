@@ -1,4 +1,5 @@
 import { bootstrap, mountNavigableMap } from "./app";
+import "./ui/seventies-home.css";
 
 const root = document.querySelector<HTMLElement>("#app");
 if (root === null) {

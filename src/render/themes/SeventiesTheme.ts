@@ -2,6 +2,7 @@ import type {
     ConnectionVisualStyle,
     ElevationBand,
     LabelVisualStyle,
+    LandmarkVisualStyle,
     LocationVisualStyle,
     VisualTheme,
 } from "../VisualTheme";
@@ -30,11 +31,29 @@ export class SeventiesTheme implements VisualTheme {
     public readonly terrainBands = terrainBands;
     public readonly terrain = Object.freeze({
         cellOverlap: 0.65,
+        rasterScale: 4,
         contour: Object.freeze({
             enabled: true,
-            color: "#5e4938",
-            width: 0.7,
-            opacity: 0.16,
+            color: "#684b35",
+            width: 0.55,
+            opacity: 0.13,
+        }),
+        water: Object.freeze({
+            maximum: 0.24,
+            shorelineColor: "#4b625b",
+            shorelineWidth: 1.15,
+            shorelineOpacity: 0.48,
+        }),
+        ornaments: Object.freeze({
+            enabled: true,
+            spacing: 12,
+            density: 0.82,
+            reliefMinimum: 0.68,
+            waterColor: "#e0d7aa",
+            reliefColor: "#654735",
+            width: 0.8,
+            opacity: 0.56,
+            size: 4.4,
         }),
     });
     public readonly connection: ConnectionVisualStyle = Object.freeze({
@@ -53,6 +72,24 @@ export class SeventiesTheme implements VisualTheme {
         radius: 5.2,
         centerColor: "#f3dfad",
         centerRadius: 1.55,
+    });
+    public readonly landmarks: LandmarkVisualStyle = Object.freeze({
+        city: Object.freeze({
+            enabled: true,
+            detailZoom: 18,
+            compactWidth: 20,
+            compactHeight: 15,
+            detailedWidth: 52,
+            detailedHeight: 36,
+            widthVariation: 0.12,
+            fillColor: "#c66f3f",
+            secondaryColor: "#d7a14d",
+            detailColor: "#f0d79e",
+            strokeColor: "#55382f",
+            strokeWidth: 1.15,
+            labelGap: 5,
+            hitPadding: 4,
+        }),
     });
     public readonly label: LabelVisualStyle = Object.freeze({
         enabled: true,
