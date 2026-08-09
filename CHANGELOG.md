@@ -31,6 +31,8 @@ The project follows Semantic Versioning.
 
 - Music selection now opens an integrated seventies-inspired exploration panel that preserves the
   map context and displays only validated catalog attributes.
+- The exploration panel now resolves deterministic Knowledge Graph neighbours back to real Music
+  entities for semantic navigation without moving the map.
 - The navigable map now sits within a responsive seventies-inspired editorial home shell with
   real zoom controls, recentering, World statistics and a restyled Music selection card.
 - Terrain rendering now uses cached visual interpolation, organic altitude bands, shorelines and

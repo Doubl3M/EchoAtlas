@@ -8,6 +8,7 @@ import { WorldConfig, type GeographicWorld, type WorldLocation } from "../world"
 import { demoMusicDocumentJson } from "./demoMusicDocument";
 import { createMusicAtlasSnapshot } from "./MusicAtlasPipeline";
 import { createMusicSelectionPanel } from "./MusicSelectionPanel";
+import { createMusicSelectionRelationProvider } from "./MusicSelectionRelations";
 import { uiText } from "./UiText";
 
 const WORLD_WIDTH = 96;
@@ -30,7 +31,10 @@ export function mountNavigableMap(root: HTMLElement): () => void {
     const surface = new CanvasRenderSurface(canvas);
     const theme = new SeventiesTheme();
     const renderer = new CanvasRenderer(theme, snapshot.labels);
-    const selectionPanel = createMusicSelectionPanel(snapshot.catalog);
+    const selectionPanel = createMusicSelectionPanel(
+        snapshot.catalog,
+        createMusicSelectionRelationProvider(snapshot.catalog, snapshot.graph)
+    );
     let visibleKnowledgeNodeIds: ReadonlySet<string> = new Set();
 
     const render = (): void => {

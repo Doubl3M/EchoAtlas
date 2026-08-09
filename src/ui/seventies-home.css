@@ -437,19 +437,93 @@ button {
     font-weight: 700;
 }
 
-.selection-panel__future {
+.selection-panel__connections {
     position: relative;
     z-index: 1;
-    min-height: 8rem;
     margin-top: 1.2rem;
+}
+
+.selection-panel__connections h3 {
+    margin: 0 0 0.8rem;
+    color: var(--atlas-orange);
+    font-size: 1rem;
+    font-style: italic;
+    font-weight: 600;
+}
+
+.selection-panel__connections ul {
+    display: grid;
+    gap: 0.45rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.selection-panel__connections li {
+    margin: 0;
+}
+
+.selection-panel__connection {
+    position: relative;
+    display: grid;
+    width: 100%;
+    padding: 0.62rem 0.8rem 0.58rem;
+    overflow: hidden;
+    color: var(--atlas-ink);
+    text-align: left;
     background:
-        linear-gradient(135deg, transparent 48%, rgb(185 95 55 / 7%) 49% 51%, transparent 52%),
-        radial-gradient(circle, rgb(105 62 80 / 13%) 0 1px, transparent 1.5px);
-    background-size:
-        100% 100%,
-        12px 12px;
-    border-radius: 0.25rem 1rem 0.3rem 0.75rem;
-    opacity: 0.55;
+        linear-gradient(100deg, rgb(200 144 62 / 15%), transparent 62%), rgb(242 232 201 / 54%);
+    border: 1px solid rgb(118 80 55 / 30%);
+    border-radius: 0.25rem 0.75rem 0.22rem 0.55rem;
+    box-shadow: inset 3px 0 var(--atlas-ochre);
+    cursor: pointer;
+}
+
+.selection-panel__connection::after {
+    position: absolute;
+    right: 0.7rem;
+    bottom: 0.65rem;
+    color: var(--atlas-orange);
+    content: "›";
+    font-size: 1.1rem;
+}
+
+.selection-panel__connection:hover,
+.selection-panel__connection:focus-visible {
+    background-color: rgb(223 207 159 / 82%);
+    border-color: var(--atlas-orange);
+    outline: 2px solid rgb(185 95 55 / 24%);
+    outline-offset: 2px;
+}
+
+.selection-panel__connection-title {
+    padding-right: 1.2rem;
+    font-size: 0.92rem;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.selection-panel__connection-kind {
+    margin-top: 0.25rem;
+    color: var(--atlas-brown);
+    font-family: var(--atlas-sans);
+    font-size: 0.57rem;
+    font-weight: 700;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+}
+
+.selection-panel__connections-empty,
+.selection-panel__connections-more {
+    margin: 0;
+    color: var(--atlas-brown);
+    font-size: 0.78rem;
+    font-style: italic;
+}
+
+.selection-panel__connections-more {
+    margin-top: 0.65rem;
+    text-align: right;
 }
 
 .selection-panel__city {

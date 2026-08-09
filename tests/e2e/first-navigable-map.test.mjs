@@ -108,17 +108,31 @@ test("First Navigable Map works in local headless Chrome", async () => {
         const firstSelection = await selectionState(page);
         assert.equal(firstSelection.visible, true, "Selecting a marker must open its Music panel.");
         assertSelectionMatchesIdentity(firstSelection);
+        assert.equal(firstSelection.entityKind, "artist");
+        const connectionCount = await page.$$eval(
+            ".selection-panel__connection",
+            (connections) => connections.length
+        );
+        assert.ok(connectionCount > 0, "The selected Artist must expose real graph connections.");
 
         const selectedCanvas = await canvasState(page);
-        assert.equal(
-            await clickFirstLocation(page, selectedCanvas, firstSelection.selectedId),
-            true,
-            "A second real marker must replace the panel selection."
+        await page.click(".selection-panel__connection");
+        await page.waitForFunction(
+            (selectedId) =>
+                globalThis.document.querySelector(".selection-panel")?.dataset.selectedId !==
+                selectedId,
+            {},
+            firstSelection.selectedId
         );
         const secondSelection = await selectionState(page);
         assertSelectionMatchesIdentity(secondSelection);
         assert.notEqual(secondSelection.selectedId, firstSelection.selectedId);
         assert.notEqual(secondSelection.title, firstSelection.title);
+        assert.equal(
+            (await canvasState(page)).dataUrl,
+            selectedCanvas.dataUrl,
+            "Semantic panel navigation must not move or redraw the Camera."
+        );
 
         await page.click(".selection-panel__close");
         await page.waitForFunction(
