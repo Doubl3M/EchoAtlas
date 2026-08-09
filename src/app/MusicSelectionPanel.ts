@@ -14,10 +14,16 @@ export interface MusicSelectionPanel {
     close(): void;
 }
 
+export interface MusicSelectionPanelActions {
+    readonly onRelationSelected: (knowledgeNodeId: string) => void;
+    readonly onClose: () => void;
+}
+
 /** Browser-only editorial presentation of Music data resolved from a canonical node identity. */
 export function createMusicSelectionPanel(
     catalog: MusicCatalog,
-    relationProvider: MusicSelectionRelationProvider
+    relationProvider: MusicSelectionRelationProvider,
+    actions: MusicSelectionPanelActions
 ): MusicSelectionPanel {
     const entities = new Map<string, MusicEntity>(
         catalog
@@ -35,6 +41,11 @@ export function createMusicSelectionPanel(
         delete element.dataset.selectedId;
         delete element.dataset.entityKind;
         element.replaceChildren(closeButton);
+        actions.onClose();
+    };
+    const selectRelation = (knowledgeNodeId: string): void => {
+        show(knowledgeNodeId);
+        actions.onRelationSelected(knowledgeNodeId);
     };
     const show = (knowledgeNodeId: string): void => {
         const entity = entities.get(knowledgeNodeId);
@@ -48,7 +59,7 @@ export function createMusicSelectionPanel(
             createHeader(entity),
             ...(entity.kind === "artist" ? [createCityMotif()] : []),
             createAttributes(entity),
-            createConnections(relationProvider(knowledgeNodeId), show)
+            createConnections(relationProvider(knowledgeNodeId), selectRelation)
         );
         element.hidden = false;
     };

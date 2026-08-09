@@ -779,8 +779,8 @@ describe("CanvasRenderer", () => {
 
     it("declutters by priority and canonical identity with deterministic text metrics", () => {
         const geographicWorld = new GeographicWorld({
-            width: 10,
-            height: 10,
+            width: 20,
+            height: 20,
             heightField: new HeightField(1, 1, [0.5]),
             locations: [
                 new WorldLocation({ knowledgeNodeId: "low", x: 0, y: 0, elevation: 0.5 }, 10, 10),
@@ -801,6 +801,48 @@ describe("CanvasRenderer", () => {
                 .filter(({ kind }) => kind === "fillText")
                 .map(({ values }) => values[0])
         ).toEqual(["high"]);
+    });
+
+    it("prioritizes a focused destination over zoom thresholds and colliding labels", () => {
+        const geographicWorld = new GeographicWorld({
+            width: 20,
+            height: 20,
+            heightField: new HeightField(1, 1, [0.5]),
+            locations: [
+                new WorldLocation(
+                    { knowledgeNodeId: "ordinary", x: 10, y: 10, elevation: 0.5 },
+                    20,
+                    20
+                ),
+                new WorldLocation(
+                    { knowledgeNodeId: "focused", x: 10, y: 10, elevation: 0.5 },
+                    20,
+                    20
+                ),
+            ],
+            connections: [],
+        });
+        const value = spaciousCamera();
+        value.setPosition(10, 10);
+        value.setZoom(5);
+        const surface = new RecordingSurface();
+        const renderer = new CanvasRenderer(theme("focus", true, 10), (id) => ({
+            text: id,
+            priority: id === "ordinary" ? 100 : 1,
+            minZoom: 20,
+        }));
+
+        renderer.render(geographicWorld, value, surface, "focused");
+
+        expect(
+            surface.commands
+                .filter(({ kind }) => kind === "fillText")
+                .map(({ values }) => values[0])
+        ).toEqual(["focused"]);
+        expect(surface.commands.filter(({ kind }) => kind === "fillCircle")).toHaveLength(1);
+        expect(
+            geographicWorld.getLocations().map(({ knowledgeNodeId }) => knowledgeNodeId)
+        ).toEqual(["focused", "ordinary"]);
     });
 
     it("moves a border label to the opposite side instead of leaving the World", () => {

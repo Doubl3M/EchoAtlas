@@ -71,6 +71,17 @@ describe("Music Atlas application pipeline", () => {
         ).toEqual(["knowledgeNodeId", "x", "y", "elevation"]);
     });
 
+    it("provides kind-specific arrival zoom as application presentation policy", () => {
+        const snapshot = createMusicAtlasSnapshot(demoMusicDocumentJson, worldConfig());
+
+        expect(snapshot.arrivalZoom("music:artist:david-bowie")).toBe(20);
+        expect(snapshot.arrivalZoom("music:album:low")).toBe(16);
+        expect(snapshot.arrivalZoom("music:track:sound-and-vision")).toBe(24);
+        expect(snapshot.arrivalZoom("music:label:motown")).toBe(12);
+        expect(snapshot.arrivalZoom("music:playlist:night-drive")).toBe(14);
+        expect(snapshot.arrivalZoom("music:artist:missing")).toBeUndefined();
+    });
+
     it("is deterministic in world ordering, values and labels", () => {
         const first = createMusicAtlasSnapshot(demoMusicDocumentJson, worldConfig());
         const second = createMusicAtlasSnapshot(demoMusicDocumentJson, worldConfig());

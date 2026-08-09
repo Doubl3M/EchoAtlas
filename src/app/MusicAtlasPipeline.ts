@@ -10,8 +10,11 @@ export interface MusicAtlasSnapshot {
     readonly graph: KnowledgeGraph;
     readonly world: GeographicWorld;
     readonly labels: LabelProvider;
+    readonly arrivalZoom: ArrivalZoomProvider;
     readonly seed: number;
 }
+
+export type ArrivalZoomProvider = (knowledgeNodeId: string) => number | undefined;
 
 /** Runs the complete deterministic application pipeline from JSON V1 to geography. */
 export function createMusicAtlasSnapshot(
@@ -27,7 +30,21 @@ export function createMusicAtlasSnapshot(
     const graph = new MusicInterpreter().interpret(imported.catalog);
     const world = new WorldGenerator().generate(seed, worldConfig, graph);
     const labels = createMusicLabelProvider(imported.catalog);
-    return Object.freeze({ catalog: imported.catalog, graph, world, labels, seed });
+    const arrivalZoom = createMusicArrivalZoomProvider(imported.catalog);
+    return Object.freeze({ catalog: imported.catalog, graph, world, labels, arrivalZoom, seed });
+}
+
+/** Showcase presentation policy; values are deliberately independent from Music domain data. */
+export function createMusicArrivalZoomProvider(catalog: MusicCatalog): ArrivalZoomProvider {
+    const zoomByKnowledgeNodeId = new Map<string, number>();
+    for (const entity of catalog.getEntities()) {
+        const arrivalZoom = arrivalZoomByKind[entity.kind];
+        if (arrivalZoom !== undefined) {
+            zoomByKnowledgeNodeId.set(`music:${entity.kind}:${entity.id}`, arrivalZoom);
+        }
+    }
+    return (knowledgeNodeId: string): number | undefined =>
+        zoomByKnowledgeNodeId.get(knowledgeNodeId);
 }
 
 export function createMusicLabelProvider(catalog: MusicCatalog): LabelProvider {
@@ -65,4 +82,12 @@ const labelDetailByKind: Readonly<
     label: Object.freeze({ priority: 75, minZoom: 9 }),
     album: Object.freeze({ priority: 50, minZoom: 14 }),
     track: Object.freeze({ priority: 20, minZoom: 22 }),
+});
+
+const arrivalZoomByKind: Readonly<Partial<Record<MusicEntityKind, number>>> = Object.freeze({
+    artist: 20,
+    album: 16,
+    track: 24,
+    label: 12,
+    playlist: 14,
 });

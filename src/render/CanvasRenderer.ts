@@ -45,11 +45,12 @@ export class CanvasRenderer {
     public render(
         world: GeographicWorld,
         camera: Camera2D,
-        surface: RenderSurface
+        surface: RenderSurface,
+        focusedKnowledgeNodeId?: string
     ): RenderFrameSummary {
         this.renderBackground(surface);
         this.renderTerrain(world, camera, surface);
-        const plan = this.createRenderPlan(world, camera, surface);
+        const plan = this.createRenderPlan(world, camera, surface, focusedKnowledgeNodeId);
         this.renderConnections(world, camera, surface, plan.visibleKnowledgeNodeIds);
         this.renderLocations(world, camera, surface, plan.visibleKnowledgeNodeIds);
         this.renderLabels(plan.labels, surface);
@@ -319,9 +320,13 @@ export class CanvasRenderer {
     private createRenderPlan(
         world: GeographicWorld,
         camera: Camera2D,
-        surface: RenderSurface
+        surface: RenderSurface,
+        focusedKnowledgeNodeId: string | undefined
     ): RenderPlan {
-        if (!this.theme.label.enabled || camera.getZoom() < this.theme.label.minZoom) {
+        if (
+            !this.theme.label.enabled ||
+            (focusedKnowledgeNodeId === undefined && camera.getZoom() < this.theme.label.minZoom)
+        ) {
             return { labels: [], visibleKnowledgeNodeIds: new Set() };
         }
         const candidates: LabelCandidate[] = [];
@@ -329,13 +334,16 @@ export class CanvasRenderer {
             const descriptor =
                 this.labelProvider(location.knowledgeNodeId) ??
                 identityLabel(location.knowledgeNodeId);
-            if (camera.getZoom() < descriptor.minZoom) {
+            const focused = location.knowledgeNodeId === focusedKnowledgeNodeId;
+            if (!focused && camera.getZoom() < descriptor.minZoom) {
                 continue;
             }
             const marker = camera.worldToScreen(location.x, location.y);
             candidates.push({
                 knowledgeNodeId: location.knowledgeNodeId,
-                descriptor,
+                descriptor: focused
+                    ? Object.freeze({ ...descriptor, priority: Number.MAX_SAFE_INTEGER })
+                    : descriptor,
                 markerX: marker.x,
                 markerY: marker.y,
                 markerClearance: this.labelClearance(descriptor, camera.getZoom()),

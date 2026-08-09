@@ -115,8 +115,19 @@ test("First Navigable Map works in local headless Chrome", async () => {
         );
         assert.ok(connectionCount > 0, "The selected Artist must expose real graph connections.");
 
+        const albumConnectionIndex = await page.$$eval(
+            ".selection-panel__connection",
+            (connections) =>
+                connections.findIndex(
+                    (connection) =>
+                        connection.querySelector(".selection-panel__connection-kind")
+                            ?.textContent === "Album"
+                )
+        );
+        assert.ok(albumConnectionIndex >= 0, "The selected Artist must expose a real Album.");
         const selectedCanvas = await canvasState(page);
-        await page.click(".selection-panel__connection");
+        const artistConnections = await page.$$(".selection-panel__connection");
+        await artistConnections[albumConnectionIndex]?.click();
         await page.waitForFunction(
             (selectedId) =>
                 globalThis.document.querySelector(".selection-panel")?.dataset.selectedId !==
@@ -126,12 +137,36 @@ test("First Navigable Map works in local headless Chrome", async () => {
         );
         const secondSelection = await selectionState(page);
         assertSelectionMatchesIdentity(secondSelection);
+        assert.equal(secondSelection.entityKind, "album");
         assert.notEqual(secondSelection.selectedId, firstSelection.selectedId);
         assert.notEqual(secondSelection.title, firstSelection.title);
+        const afterFirstJourney = await waitForCanvasToSettle(page);
+        assert.notEqual(
+            afterFirstJourney.dataUrl,
+            selectedCanvas.dataUrl,
+            "Relational selection must animate the Camera to its WorldLocation."
+        );
+        assert.equal(
+            (await selectionState(page)).selectedId,
+            secondSelection.selectedId,
+            "Safe arrival framing must preserve the selected destination without assuming pixel-center placement."
+        );
+
+        const interruptedStart = afterFirstJourney.dataUrl;
+        await page.click(".selection-panel__connection");
+        await page.mouse.move(
+            afterFirstJourney.x + afterFirstJourney.cssWidth / 2,
+            afterFirstJourney.y + afterFirstJourney.cssHeight / 2
+        );
+        await page.mouse.wheel({ deltaY: -120 });
+        await renderedFrames(page);
+        const afterInterruption = await canvasState(page);
+        assert.notEqual(afterInterruption.dataUrl, interruptedStart);
+        await renderedFrameCount(page, 12);
         assert.equal(
             (await canvasState(page)).dataUrl,
-            selectedCanvas.dataUrl,
-            "Semantic panel navigation must not move or redraw the Camera."
+            afterInterruption.dataUrl,
+            "Wheel input must cancel the active Camera journey immediately."
         );
 
         await page.click(".selection-panel__close");
@@ -273,4 +308,52 @@ async function renderedFrames(page) {
                 globalThis.requestAnimationFrame(() => globalThis.requestAnimationFrame(resolve));
             })
     );
+}
+
+async function renderedFrameCount(page, count) {
+    await page.evaluate(
+        (frameCount) =>
+            new Promise((resolve) => {
+                let remaining = frameCount;
+                const frame = () => {
+                    remaining -= 1;
+                    if (remaining === 0) {
+                        resolve();
+                    } else {
+                        globalThis.requestAnimationFrame(frame);
+                    }
+                };
+                globalThis.requestAnimationFrame(frame);
+            }),
+        count
+    );
+}
+
+async function waitForCanvasToSettle(page) {
+    await page.$eval(
+        "canvas",
+        (canvas) =>
+            new Promise((resolve) => {
+                let previous = canvas.toDataURL();
+                let changed = false;
+                let stableFrames = 0;
+                const frame = () => {
+                    const current = canvas.toDataURL();
+                    if (current !== previous) {
+                        changed = true;
+                        stableFrames = 0;
+                        previous = current;
+                    } else if (changed) {
+                        stableFrames += 1;
+                    }
+                    if (changed && stableFrames >= 4) {
+                        resolve();
+                    } else {
+                        globalThis.requestAnimationFrame(frame);
+                    }
+                };
+                globalThis.requestAnimationFrame(frame);
+            })
+    );
+    return canvasState(page);
 }

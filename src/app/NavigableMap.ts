@@ -5,6 +5,7 @@ import { CanvasRenderer, CanvasRenderSurface, SeventiesTheme } from "../render";
 import { createSeventiesHomeShell } from "../ui/SeventiesHomeShell";
 import { WorldConfig, type GeographicWorld, type WorldLocation } from "../world";
 
+import { CameraJourney, planCameraArrival } from "./CameraJourney";
 import { demoMusicDocumentJson } from "./demoMusicDocument";
 import { createMusicAtlasSnapshot } from "./MusicAtlasPipeline";
 import { createMusicSelectionPanel } from "./MusicSelectionPanel";
@@ -19,6 +20,9 @@ const WHEEL_ZOOM_SENSITIVITY = 0.0015;
 const CONTROL_ZOOM_FACTOR = 1.3;
 const LOCATION_HIT_RADIUS = 11;
 const CLICK_MOVEMENT_TOLERANCE = 4;
+const CAMERA_JOURNEY_DURATION = 650;
+const CAMERA_MIN_ZOOM = 0.25;
+const CAMERA_MAX_ZOOM = 128;
 
 /** Browser adapter that binds DOM events to the generic interaction controller. */
 export function mountNavigableMap(root: HTMLElement): () => void {
@@ -31,19 +35,61 @@ export function mountNavigableMap(root: HTMLElement): () => void {
     const surface = new CanvasRenderSurface(canvas);
     const theme = new SeventiesTheme();
     const renderer = new CanvasRenderer(theme, snapshot.labels);
-    const selectionPanel = createMusicSelectionPanel(
-        snapshot.catalog,
-        createMusicSelectionRelationProvider(snapshot.catalog, snapshot.graph)
-    );
+    let focusedKnowledgeNodeId: string | undefined;
     let visibleKnowledgeNodeIds: ReadonlySet<string> = new Set();
 
     const render = (): void => {
-        const summary = renderer.render(snapshot.world, camera, surface);
+        const summary = renderer.render(snapshot.world, camera, surface, focusedKnowledgeNodeId);
         visibleKnowledgeNodeIds = new Set(summary.visibleKnowledgeNodeIds);
         canvas.dataset.visibleLabels = String(summary.visibleLabelCount);
         canvas.dataset.visibleLocations = String(summary.visibleKnowledgeNodeIds.length);
         shell.setVisibleLocationCount(summary.visibleKnowledgeNodeIds.length);
     };
+    const journey = new CameraJourney({
+        camera,
+        duration: CAMERA_JOURNEY_DURATION,
+        scheduler: {
+            request: (callback) => window.requestAnimationFrame(callback),
+            cancel: (handle) => window.cancelAnimationFrame(handle),
+        },
+        render,
+    });
+    const travelTo = (knowledgeNodeId: string): void => {
+        const location = snapshot.world.getLocationByKnowledgeNodeId(knowledgeNodeId);
+        if (location === undefined) {
+            return;
+        }
+        focusedKnowledgeNodeId = knowledgeNodeId;
+        const bounds = shell.mapViewport.getBoundingClientRect();
+        const descriptor = snapshot.labels(knowledgeNodeId);
+        const requestedZoom = Math.max(
+            theme.label.minZoom,
+            descriptor?.minZoom ?? 0,
+            snapshot.arrivalZoom(knowledgeNodeId) ?? 1
+        );
+        const targetZoom = Math.min(CAMERA_MAX_ZOOM, Math.max(CAMERA_MIN_ZOOM, requestedZoom));
+        const arrival = planCameraArrival({
+            destination: { x: location.x, y: location.y },
+            targetZoom,
+            worldWidth: WORLD_WIDTH,
+            worldHeight: WORLD_HEIGHT,
+            viewportWidth: Math.max(1, bounds.width),
+            viewportHeight: Math.max(1, bounds.height),
+        });
+        journey.start(arrival, window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+    };
+    const selectionPanel = createMusicSelectionPanel(
+        snapshot.catalog,
+        createMusicSelectionRelationProvider(snapshot.catalog, snapshot.graph),
+        {
+            onRelationSelected: travelTo,
+            onClose: () => {
+                journey.cancel();
+                focusedKnowledgeNodeId = undefined;
+                render();
+            },
+        }
+    );
     const resize = (): void => {
         const bounds = shell.mapViewport.getBoundingClientRect();
         const width = Math.max(1, bounds.width);
@@ -53,6 +99,7 @@ export function mountNavigableMap(root: HTMLElement): () => void {
         render();
     };
     const recenter = (): void => {
+        journey.cancel();
         const bounds = shell.mapViewport.getBoundingClientRect();
         const fittedZoom =
             Math.max(
@@ -64,6 +111,7 @@ export function mountNavigableMap(root: HTMLElement): () => void {
         render();
     };
     const zoomFromCenter = (factor: number): void => {
+        journey.cancel();
         const bounds = shell.mapViewport.getBoundingClientRect();
         interaction.zoomAt(bounds.width / 2, bounds.height / 2, camera.getZoom() * factor);
         render();
@@ -102,16 +150,21 @@ export function mountNavigableMap(root: HTMLElement): () => void {
             visibleKnowledgeNodeIds
         );
         if (location !== undefined) {
+            focusedKnowledgeNodeId = location.knowledgeNodeId;
             selectionPanel.show(location.knowledgeNodeId);
+            render();
         }
     };
     const removePointerInteractions = bindPointerInteractions(
         canvas,
         interaction,
         render,
-        selectLocation
+        selectLocation,
+        () => journey.cancel()
     );
-    const removeWheelInteraction = bindWheelInteraction(canvas, camera, interaction, render);
+    const removeWheelInteraction = bindWheelInteraction(canvas, camera, interaction, render, () =>
+        journey.cancel()
+    );
     resize();
     recenter();
     const resizeObserver = new ResizeObserver(resize);
@@ -120,6 +173,7 @@ export function mountNavigableMap(root: HTMLElement): () => void {
     return (): void => {
         removePointerInteractions();
         removeWheelInteraction();
+        journey.cancel();
         resizeObserver.disconnect();
     };
 }
@@ -152,9 +206,9 @@ function createCamera(viewportWidth: number, viewportHeight: number): Camera2D {
         new CameraConfig({
             viewportWidth,
             viewportHeight,
-            minZoom: 0.25,
-            maxZoom: 128,
-            initialZoom: Math.min(128, Math.max(0.25, fittedZoom)),
+            minZoom: CAMERA_MIN_ZOOM,
+            maxZoom: CAMERA_MAX_ZOOM,
+            initialZoom: Math.min(CAMERA_MAX_ZOOM, Math.max(CAMERA_MIN_ZOOM, fittedZoom)),
         })
     );
     camera.setPosition(WORLD_WIDTH / 2, WORLD_HEIGHT / 2);
@@ -165,12 +219,14 @@ function bindPointerInteractions(
     canvas: HTMLCanvasElement,
     interaction: CameraInteractionController,
     render: () => void,
-    selectLocation: (screenX: number, screenY: number) => void
+    selectLocation: (screenX: number, screenY: number) => void,
+    cancelJourney: () => void
 ): () => void {
     let startX = 0;
     let startY = 0;
     let hasMoved = false;
     const pointerDown = (event: PointerEvent): void => {
+        cancelJourney();
         canvas.setPointerCapture(event.pointerId);
         startX = event.clientX;
         startY = event.clientY;
@@ -255,10 +311,12 @@ function bindWheelInteraction(
     canvas: HTMLCanvasElement,
     camera: Camera2D,
     interaction: CameraInteractionController,
-    render: () => void
+    render: () => void,
+    cancelJourney: () => void
 ): () => void {
     const wheel = (event: WheelEvent): void => {
         event.preventDefault();
+        cancelJourney();
         const bounds = canvas.getBoundingClientRect();
         const zoom = Math.exp(-event.deltaY * WHEEL_ZOOM_SENSITIVITY);
         interaction.zoomAt(
