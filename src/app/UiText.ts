@@ -15,6 +15,7 @@ export const uiText = Object.freeze({
     visible: "Visibles",
     closeSelection: "Close selected place",
     closeSymbol: "×",
+    selectionDetails: "Music details",
     entityKinds: Object.freeze({
         artist: "Artist",
         album: "Album",
