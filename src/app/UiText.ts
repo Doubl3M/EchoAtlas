@@ -16,6 +16,9 @@ export const uiText = Object.freeze({
     closeSelection: "Close selected place",
     closeSymbol: "×",
     selectionDetails: "Music details",
+    connections: "Connexions dans l’atlas",
+    noConnections: "Aucune connexion directe",
+    moreConnections: "autres connexions",
     entityKinds: Object.freeze({
         artist: "Artist",
         album: "Album",

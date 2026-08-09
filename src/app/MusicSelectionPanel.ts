@@ -1,6 +1,12 @@
 import type { MusicCatalog, MusicEntity } from "../music";
 
 import { uiText } from "./UiText";
+import type {
+    MusicSelectionRelation,
+    MusicSelectionRelationProvider,
+} from "./MusicSelectionRelations";
+
+const CONNECTION_DISPLAY_LIMIT = 6;
 
 export interface MusicSelectionPanel {
     readonly element: HTMLElement;
@@ -9,7 +15,10 @@ export interface MusicSelectionPanel {
 }
 
 /** Browser-only editorial presentation of Music data resolved from a canonical node identity. */
-export function createMusicSelectionPanel(catalog: MusicCatalog): MusicSelectionPanel {
+export function createMusicSelectionPanel(
+    catalog: MusicCatalog,
+    relationProvider: MusicSelectionRelationProvider
+): MusicSelectionPanel {
     const entities = new Map<string, MusicEntity>(
         catalog
             .getEntities()
@@ -39,7 +48,7 @@ export function createMusicSelectionPanel(catalog: MusicCatalog): MusicSelection
             createHeader(entity),
             ...(entity.kind === "artist" ? [createCityMotif()] : []),
             createAttributes(entity),
-            createFutureSpace()
+            createConnections(relationProvider(knowledgeNodeId), show)
         );
         element.hidden = false;
     };
@@ -123,9 +132,55 @@ function createCityMotif(): HTMLElement {
     return motif;
 }
 
-function createFutureSpace(): HTMLElement {
-    const section = document.createElement("div");
-    section.className = "selection-panel__future";
-    section.setAttribute("aria-hidden", "true");
+function createConnections(
+    relations: readonly MusicSelectionRelation[],
+    select: (knowledgeNodeId: string) => void
+): HTMLElement {
+    const section = document.createElement("section");
+    section.className = "selection-panel__connections";
+    const heading = document.createElement("h3");
+    heading.textContent = uiText.connections;
+    section.append(heading);
+    if (relations.length === 0) {
+        const empty = document.createElement("p");
+        empty.className = "selection-panel__connections-empty";
+        empty.textContent = uiText.noConnections;
+        section.append(empty);
+        return section;
+    }
+
+    const list = document.createElement("ul");
+    for (const relation of relations.slice(0, CONNECTION_DISPLAY_LIMIT)) {
+        const item = document.createElement("li");
+        item.append(createConnectionButton(relation, select));
+        list.append(item);
+    }
+    section.append(list);
+    const remaining = relations.length - CONNECTION_DISPLAY_LIMIT;
+    if (remaining > 0) {
+        const more = document.createElement("p");
+        more.className = "selection-panel__connections-more";
+        more.textContent = `+${remaining} ${uiText.moreConnections}`;
+        section.append(more);
+    }
     return section;
+}
+
+function createConnectionButton(
+    relation: MusicSelectionRelation,
+    select: (knowledgeNodeId: string) => void
+): HTMLButtonElement {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "selection-panel__connection";
+    button.dataset.knowledgeNodeId = relation.knowledgeNodeId;
+    const title = document.createElement("span");
+    title.className = "selection-panel__connection-title";
+    title.textContent = relation.entity.title ?? relation.entity.name ?? relation.entity.id;
+    const kind = document.createElement("span");
+    kind.className = "selection-panel__connection-kind";
+    kind.textContent = uiText.entityKinds[relation.entity.kind];
+    button.append(title, kind);
+    button.addEventListener("click", () => select(relation.knowledgeNodeId));
+    return button;
 }
