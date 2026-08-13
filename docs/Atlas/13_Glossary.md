@@ -187,6 +187,86 @@ musicales directement.
 Snapshot géographique immutable contenant un `HeightField`, des `WorldLocation` et des
 `WorldConnection` indexés par leurs identités sémantiques.
 
+## GeographicHierarchy
+
+Snapshot immutable et sans géométrie décrivant les identités géographiques, leur containment et
+leurs sources Knowledge en ordre canonique. Cette fondation coexiste avec le `GeographicWorld`
+actuel pendant la migration et fera partie de toute future reconstruction déterministe de
+`World(T)`.
+
+## GeographicFeature
+
+Identité géographique spatiale possédant un rôle, un parent optionnel et éventuellement un
+Knowledge Node source. Les rôles runtime actuels sont `continent`, `district` et `building`. Un
+même Knowledge Node peut être la source de plusieurs features.
+
+## GeographicContent
+
+Représentation non nécessairement spatiale d'une identité Knowledge contenue dans un
+GeographicFeature. Le cas canonique visé est un Track contenu dans un Building.
+
+## GeographicFocusTarget
+
+Destination géographique générique possible pour une identité Knowledge. Elle distingue une
+feature représentant directement l'identité d'un container représentant son contenu. Une identité
+peut avoir zéro, une ou plusieurs cibles; leur ordre canonique n'exprime aucune préférence produit.
+
+## GeographicFocusResolver
+
+Service World sans géométrie qui découvre toutes les `GeographicFocusTarget` d'une identité puis
+peut en choisir une selon un contexte de containment. La proximité utilise les chemins
+hiérarchiques, jamais des coordonnées. Le flux futur est `Knowledge identity → geographic
+representation(s) → contextual geographic focus → future layout → Camera`.
+
+## GeographicLayout
+
+Snapshot spatial immutable et complet d'une `GeographicHierarchy` pour une étendue World donnée.
+Chaque feature possède exactement un placement canonique; les contenus n'en possèdent aucun. Le
+layout ne réinterprète ni Music ni Knowledge et coexiste provisoirement avec le `GeographicWorld`
+historique.
+
+## Geographic Region
+
+Placement surfacique défini par une envelope axis-aligned et un anchor logique. L'envelope sert au
+containment et au focus; elle ne signifie jamais que la future frontière rendue sera rectangulaire.
+
+## Geographic Site
+
+Placement ponctuel d'une feature dans les coordonnées logiques World. Un Site ne peut pas contenir
+d'autre feature dans le contrat actuel, mais une feature racine peut techniquement être un Site.
+
+## Geographic Spatial Focus
+
+Point logique World obtenu depuis une `GeographicFocusTarget` et un `GeographicLayout`. Une Region
+utilise son anchor et un Site sa position. Aucun zoom, viewport ou mouvement Camera n'est produit.
+
+## GeographicLayoutGenerationVersion
+
+Version de la politique transformant une `GeographicHierarchy` en `GeographicLayout`. La première
+valeur, `geographic-layout-v1`, est indépendante de `music-geography-v1`, de `world-v1-exact` et de
+la version du format JSON.
+
+## geographic-layout-v1
+
+Partition rectangulaire hiérarchique déterministe dont les Regions sont pondérées par leur nombre
+de Sites descendants, avec un minimum de `1`. Les Sites terminaux utilisent une grille intérieure.
+La seed influence l'ordre spatial par identité stable. Les rectangles sont des envelopes de
+génération, jamais une prescription de frontière rendue.
+
+## Semantic Geography
+
+Traduction géographique canonique `Genre → Continent`, `Artist → District`, `Album → Building` et
+`Track → Building Content`. Les relations musicales restent dans Knowledge; World possède le
+containment résultant. City est un niveau spatial prévu mais sa signification et sa génération
+restent non résolues; aucun rôle City runtime n'existe encore.
+
+## MusicGeographyInterpretationVersion
+
+Identité des règles applicatives qui traduisent Music et Knowledge vers la hiérarchie géographique
+générique. `music-geography-v1` interprète uniquement les relations dirigées Genre → Artist,
+Artist → Album et Album → Track. Elle est indépendante de `metadata.version`, de la version des
+règles temporelles et de `WorldGenerationVersion`.
+
 ## WorldLocation
 
 Localisation immutable correspondant à un Knowledge Node. Elle conserve son ID canonique et lui

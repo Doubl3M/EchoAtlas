@@ -44,16 +44,10 @@ Le voyageur ne doit jamais hésiter sur la nature d'un lieu.
 
 | Donnée musicale | Représentation |
 |-----------------|----------------|
-| Grande famille musicale | Continent |
-| Sous-famille musicale | Province |
-| Artiste | Ville |
+| Genre | Continent |
+| Artiste | Quartier |
 | Album | Bâtiment |
-| Album fondateur | Montagne |
-| Coup de cœur immédiat | Volcan |
-| Album oublié | Ruine |
-| Album inachevé | Marais |
-| Album rejeté | Désert |
-| Nouvelle découverte | Port |
+| Morceau | Contenu du bâtiment |
 | Playlist | Route |
 | Réécoute fréquente | Chemin pavé |
 | Collaboration | Pont |
@@ -67,31 +61,27 @@ Le voyageur ne doit jamais hésiter sur la nature d'un lieu.
 
 Les continents constituent la structure du Monde.
 
-Ils représentent les plus grandes familles musicales.
+Chaque continent représente un genre musical.
 
 Leur taille dépend de leur importance dans la vie du voyageur.
 
-Ils ne possèdent jamais le nom d'un genre musical.
-
-Leur identité est propre au Monde.
+Son identité géographique reste distincte de l'identité Knowledge qui en est la source.
 
 ---
 
-# Les provinces
+# Les cités
 
-Les provinces précisent les influences.
+La Cité est un niveau spatial prévu entre Continent et District.
 
-Elles apparaissent naturellement au sein des continents.
-
-Leurs frontières restent souples.
-
-Une œuvre peut contribuer à plusieurs provinces.
+Sa signification musicale et sa règle de génération restent non résolues. Aucune Cité ne doit être
+instanciée par convention implicite. Tant que cette décision n'existe pas, un District peut avoir
+directement un Continent comme parent.
 
 ---
 
-# Les villes
+# Les quartiers
 
-Une ville représente un artiste.
+Un quartier représente un artiste.
 
 Sa croissance dépend de la profondeur de la relation entretenue avec celui-ci.
 
@@ -121,7 +111,14 @@ Le bâtiment reflète l'histoire vécue avec l'œuvre.
 
 ---
 
-# Les montagnes
+# Métaphores cartographiques legacy
+
+Les anciennes traductions `Mountain`, `Volcano`, `Ruin`, `Marsh`, `Desert` et `Port` ne sont plus
+des identités principales concurrentes. Elles restent du langage historique à réinterpréter. Une
+future règle pourra éventuellement en faire un état ou un aspect d'un Continent, District ou
+Building, mais aucune sémantique précise n'est définie ici.
+
+# Les montagnes (legacy)
 
 Une montagne ne naît jamais instantanément.
 
@@ -133,7 +130,7 @@ Le temps est son principal matériau.
 
 ---
 
-# Les volcans
+# Les volcans (legacy)
 
 Le volcan représente l'impact immédiat.
 
@@ -149,7 +146,7 @@ Avec le temps, il peut :
 
 ---
 
-# Les ruines
+# Les ruines (legacy)
 
 Une ruine n'est jamais supprimée.
 
@@ -159,7 +156,7 @@ Elle conserve la mémoire d'une exploration passée.
 
 ---
 
-# Les marais
+# Les marais (legacy)
 
 Le marais représente une œuvre suspendue.
 
@@ -169,7 +166,7 @@ Le Monde attend.
 
 ---
 
-# Les déserts
+# Les déserts (legacy)
 
 Le désert ne signifie pas l'échec.
 

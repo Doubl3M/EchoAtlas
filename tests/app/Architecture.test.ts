@@ -9,6 +9,7 @@ import mainSource from "../../src/main.ts?raw";
 import rendererSource from "../../src/render/CanvasRenderer.ts?raw";
 import shellSource from "../../src/ui/SeventiesHomeShell.ts?raw";
 import uiTextSource from "../../src/app/UiText.ts?raw";
+import musicGeographicInterpreterSource from "../../src/app/MusicGeographicInterpreter.ts?raw";
 
 describe("First Navigable Map architecture", () => {
     it("keeps interaction independent from browser and application modules", () => {
@@ -33,6 +34,17 @@ describe("First Navigable Map architecture", () => {
 
     it("keeps render independent from Music", () => {
         expect(rendererSource).not.toMatch(/from ["']\.\.\/music/);
+    });
+
+    it("keeps Music geography interpretation in app and outside Renderer", () => {
+        const imports = [
+            ...musicGeographicInterpreterSource.matchAll(/from\s+["']([^"']+)["']/g),
+        ].map(([, path]) => path);
+        expect(imports).toContain("../knowledge");
+        expect(imports).toContain("../music");
+        expect(imports).toContain("../world");
+        expect(musicGeographicInterpreterSource).not.toMatch(/\.\.\/render|DOM|Canvas/);
+        expect(rendererSource).not.toMatch(/MusicGeographicInterpreter|MusicCatalog/);
     });
 
     it("places browser bindings in app and keeps main thin", () => {

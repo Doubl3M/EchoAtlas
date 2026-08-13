@@ -12,6 +12,16 @@ The project follows Semantic Versioning.
 
 ## Added
 
+- Canonical semantic-geography documentation and an immutable, geometry-free hierarchical World
+  foundation, with no behavior change to `world-v1-exact` or the current showcase.
+- Versioned Music Atlas interpretation from directed Knowledge relations to deterministic
+  Continents, Districts, Buildings and Building Contents.
+- Generic multi-representation geographic focus discovery and deterministic containment-context
+  selection, without coupling hierarchy semantics to Camera or Renderer.
+- Immutable complete geographic layouts with generic Region/Site containment and logical spatial
+  focus resolution, while the existing generated World remains unchanged.
+- Versioned deterministic hierarchical layout generation using structural Region weights,
+  seeded rectangular partitioning and terminal Site grids.
 - TypeScript and Vite application foundation.
 - Deterministic application and engine service lifecycle.
 - Deterministic seeds, hashing, random streams, interpolation and two-dimensional value noise.

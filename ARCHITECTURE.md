@@ -182,8 +182,9 @@ Transforms semantics into geography.
 Responsibilities:
 
 - continents
-- provinces
-- cities
+- districts
+- buildings and their contents
+- cities only after their currently unresolved generation rule is canonized
 - roads
 - rivers
 - mountains
@@ -192,6 +193,41 @@ Responsibilities:
 The World layer never reads music.
 
 It only reads semantic structures.
+
+World owns geographic containment. A geometry-free hierarchical foundation distinguishes spatial
+features from non-spatial contents while preserving their optional Knowledge identities. It does
+not encode Music kinds: product-specific semantic mappings are resolved before or through an
+explicit World interpretation policy. The current `world-v1-exact` flat generator remains active
+during this migration.
+
+Music Atlas currently owns `music-geography-v1` in the application layer. This interpretation
+uses directed relations only: Genre → Artist creates a District in a Genre Continent,
+Artist → Album creates a Building in every represented Artist District, and Album → Track creates
+Building Content in every represented Album Building. Inverse and unrelated relations have no
+implicit geographic meaning. This interpretation version is independent from both the JSON format
+version and `WorldGenerationVersion`.
+
+World provides a generic focus resolution step over this hierarchy. A Knowledge identity resolves
+to zero or more direct features or content containers; no one-to-one representation is assumed.
+When several representations exist, contextual selection compares containment ancestry rather than
+spatial coordinates. This establishes the future flow `Knowledge identity → geographic
+representation(s) → contextual geographic focus → layout → Camera`; the current showcase does not
+yet consume it.
+
+`GeographicLayout` is the separate immutable spatial snapshot of a hierarchy. Every
+`GeographicFeatureId` has exactly one placement: a Region with an axis-aligned envelope and anchor,
+or a Site with a logical World position. Region envelopes define containment and focus domains;
+they are not promises that rendered borders are rectangular. Contents have no placement of their
+own. Spatial focus resolves a geographic target to a Region anchor or Site position, without zoom,
+viewport or Camera behavior.
+
+`geographic-layout-v1` deterministically generates that layout from a hierarchy, a canonical
+Math `Seed`, and logical World dimensions. Continents and Districts map to generic Regions;
+Buildings map to Sites. Region siblings are recursively partitioned along the longest envelope
+axis using their number of descendant Sites as structural weight, with a minimum weight of one for
+empty Regions. Rectangles remain generation envelopes rather than visual borders. This version
+rejects Site roots and mixed Region/Site siblings explicitly; those are algorithm-version limits,
+not hierarchy or layout invariants.
 
 The logical World extent and terrain resolution are separate explicit configuration inputs. World
 owns the deterministic mapping from geographic coordinates to the generic terrain cell grid.
@@ -461,11 +497,11 @@ World
 
  ├── Terrain
 
- ├── Provinces
+ ├── Continents
 
- ├── Cities
+ ├── Districts
 
- └── Roads
+ └── Buildings
 ```
 
 Renderer reads.

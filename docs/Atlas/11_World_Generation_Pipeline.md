@@ -107,7 +107,7 @@ Validated Dataset
 
 Les données provenant de différentes plateformes sont harmonisées.
 
-Exemple :
+Exemple futur, une fois les règles correspondantes définies :
 
 ```
 Spotify
@@ -193,35 +193,68 @@ Exemples :
 
 Le moteur applique le langage cartographique.
 
-Exemples :
+Contrat structurel canonique :
 
 ```
-Fidélité élevée
-
-↓
-
-Mountain
-
-Découverte récente
-
-↓
-
-Port
-
-Album interrompu
-
-↓
-
-Marsh
-
-Album oublié
-
-↓
-
-Ruin
+Genre  → Continent
+Artist → District
+Album  → Building
+Track  → Building Content
 ```
 
-Le résultat est un ensemble de **concepts géographiques**, pas encore des objets spatiaux.
+City reste un niveau spatial prévu dont la règle de génération n'est pas résolue. Elle n'est pas
+instanciée implicitement. Les anciennes traductions Mountain, Port, Marsh ou Ruin sont legacy et
+devront être réinterprétées comme états ou aspects éventuels sans remplacer les identités
+structurelles.
+
+Le résultat est un ensemble de **concepts géographiques**, pas encore des objets spatiaux. Les
+relations musicales restent dans Knowledge; la politique Music Atlas qui les interprète appartient
+à l'application, tandis que le containment générique résultant appartient au World.
+
+Pour Music Atlas, la couche application applique explicitement `music-geography-v1`. Les relations
+sont dirigées : Genre → Artist crée le District, Artist → Album propage le Building dans chaque
+District représenté, puis Album → Track propage le Building Content. Les relations inverses ou
+d'autres couples de kinds sont ignorés et aucun parent géographique de repli n'est inventé.
+Cette version d'interprétation est distincte de `metadata.version`, de la version des règles
+temporelles et de `WorldConfig.generationVersion`.
+
+Une identité Knowledge peut ensuite résoudre vers zéro, une ou plusieurs représentations
+géographiques. Une feature constitue une cible directe; un contenu utilise sa feature container
+comme cible tout en conservant son identité de contenu. Le choix contextuel privilégie la branche
+de containment partageant l'ancêtre commun le plus profond, puis la distance hiérarchique et enfin
+l'identité canonique. Cette étape ne calcule ni coordonnées, ni zoom, ni mouvement Camera et n'est
+pas encore branchée au showcase.
+
+Le `GeographicLayout` constitue un snapshot spatial immutable distinct de la hierarchy. Chaque
+feature possède exactement un placement : une Region avec envelope axis-aligned et anchor, ou un
+Site avec position logique World. Les bounds d'une Region servent au containment, au focus et au
+futur culling; elles ne décrivent pas sa future frontière organique rendue. Un contenu n'a aucun
+placement propre. Le spatial focus transforme ensuite une cible en anchor de Region ou position de
+Site, sans zoom ni intégration Camera.
+
+Le pipeline préparé est donc :
+
+```text
+Knowledge
+→ Semantic Geography
+→ GeographicHierarchy
+→ Geographic Focus
+→ GeographicLayout
+→ Spatial Focus
+→ future Camera integration
+```
+
+La première politique de génération, `geographic-layout-v1`, utilise une partition rectangulaire
+hiérarchique déterministe. Les rôles Continent et District deviennent des Regions; Building devient
+un Site. La surface relative d'une Region dépend du nombre de Sites descendants, avec un poids
+minimal de `1` pour une Region vide. La seed réordonne spatialement les siblings à partir de leurs
+identités stables; elle ne modifie ni leur existence, ni leur identité, ni leur containment.
+
+Les Sites terminaux sont répartis aux centres d'une grille adaptée au ratio de leur Region. Les
+Contents ne participent ni au poids ni au placement. Cette version rejette les Site roots ainsi que
+les enfants Region et Site mélangés sous un même parent. Ces restrictions appartiennent uniquement
+à `geographic-layout-v1`, pas aux contrats génériques de hierarchy ou de layout. Les rectangles
+produits restent des envelopes de génération et ne sont pas les futures frontières visuelles.
 
 ---
 
@@ -233,9 +266,8 @@ Ordre recommandé :
 
 1. Océans
 2. Continents
-3. Provinces
+3. Districts, directement sous leur Continent tant que City reste non résolue
 4. Relief général
-5. Fleuves principaux
 
 Le paysage existe.
 
@@ -249,15 +281,12 @@ Le Monde accueille ses habitants.
 
 Ordre recommandé :
 
-1. Villes
-2. Bâtiments
-3. Ports
-4. Montagnes
-5. Volcans
-6. Ruines
-7. Marais
-8. Déserts
-9. Forêts
+1. Districts
+2. Buildings
+3. Building Contents
+
+Les futurs états et aspects cartographiques sont appliqués seulement lorsqu'un contrat distinct
+les définit.
 
 Chaque élément est positionné selon les contraintes géographiques.
 
@@ -419,6 +448,10 @@ Cette reconstruction ne consiste pas à masquer les éléments postérieurs à `
 peut être un lieu actif dans un snapshot antérieur ; une route aujourd'hui disparue peut y
 réapparaître. Les règles détaillées correspondantes ne sont pas encore implémentées.
 
+La hiérarchie géographique fait partie du snapshot reconstruit. Elle dépend uniquement des entrées
+canoniques et de leurs versions, jamais de l'heure système, d'un historique mutable ou du snapshot
+précédent. À entrées identiques, son ordre, ses identités et son containment sont identiques.
+
 ---
 
 # Pipeline complet
@@ -443,13 +476,13 @@ Chaque étape peut produire un journal.
 Exemple :
 
 ```
-Mountain created
+Continent created
 
-City expanded
+District expanded
 
 Road connected
 
-Province merged
+Building state changed
 
 Forest grew
 ```

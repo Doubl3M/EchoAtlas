@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { MusicEntityKind, MusicEntityOptions, MusicRelationOptions } from "../../src/music";
+import { musicKnowledgeNodeId, musicKnowledgeNodeKind } from "../../src/music";
 
 describe("music public API", () => {
     it("exports only the intended runtime symbols", async () => {
@@ -11,6 +12,8 @@ describe("music public API", () => {
             "MusicEntity",
             "MusicInterpreter",
             "MusicRelation",
+            "musicKnowledgeNodeId",
+            "musicKnowledgeNodeKind",
         ]);
     });
 
@@ -28,5 +31,10 @@ describe("music public API", () => {
 
         expect(entity.kind).toBe("artist");
         expect(relation.kind).toBe("performed");
+    });
+
+    it("provides the canonical Music to Knowledge identity convention", () => {
+        expect(musicKnowledgeNodeId("artist", "artist:prince")).toBe("music:artist:artist:prince");
+        expect(musicKnowledgeNodeKind("album")).toBe("music:album");
     });
 });
