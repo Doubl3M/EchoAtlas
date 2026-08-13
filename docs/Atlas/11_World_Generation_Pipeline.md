@@ -256,6 +256,25 @@ les enfants Region et Site mélangés sous un même parent. Ces restrictions app
 à `geographic-layout-v1`, pas aux contrats génériques de hierarchy ou de layout. Les rectangles
 produits restent des envelopes de génération et ne sont pas les futures frontières visuelles.
 
+Le `GeographicRegionField` matérialise ensuite une propriété raster compacte des Regions, à une
+résolution indépendante de l'étendue logique du World. `geographic-region-field-v1` attribue à
+chaque cellule la Region la plus profonde qui la contient, ou une valeur explicite « sans
+propriétaire ». Les Sites et Contents ne possèdent jamais de cellule. Les silhouettes des Regions
+racines combinent une masse centrale, des lobes reliés et un bruit basse fréquence. Elles peuvent
+ainsi être concaves et laisser des marges non uniformes sans propriétaire; celles-ci ne signifient
+pas implicitement « eau », cette interprétation restant une future décision géographique ou de
+rendu. Les enfants directs se partagent localement le territoire de leur parent selon leurs anchors
+et surfaces structurelles du Layout, avec une perturbation déterministe basse fréquence. Cette
+partition ne rend pas les bounds du `GeographicLayout` moins autoritatifs pour le containment et le
+focus.
+
+L'échantillonnage World couvre l'intervalle fermé de chaque axe : la coordonnée maximale mappe la
+dernière cellule. Une Region plus petite qu'une cellule peut ne posséder aucune cellule à faible
+résolution; son placement et son focus restent néanmoins présents dans le `GeographicLayout`.
+Comme le champ ne déplace aucun Site, la frontière raster peut, à cette étape, traverser visuellement
+un Site placé près d'une limite de Region. Ce point est une limite connue de cette fondation, pas un
+changement du containment canonique.
+
 ---
 
 # Étape 6 · World Skeleton

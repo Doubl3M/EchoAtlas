@@ -10,10 +10,13 @@ import layoutSource from "../../src/world/GeographicLayout.ts?raw";
 import spatialFocusSource from "../../src/world/GeographicSpatialFocus.ts?raw";
 import layoutGeneratorSource from "../../src/world/GeographicLayoutGenerator.ts?raw";
 import layoutGeneratorConfigSource from "../../src/world/GeographicLayoutGeneratorConfig.ts?raw";
+import regionFieldSource from "../../src/world/GeographicRegionField.ts?raw";
+import regionFieldGeneratorSource from "../../src/world/GeographicRegionFieldGenerator.ts?raw";
+import regionFieldConfigSource from "../../src/world/GeographicRegionFieldGeneratorConfig.ts?raw";
 
 describe("semantic geography architecture", () => {
     it("keeps hierarchical geography inside World and independent from Music and Render", () => {
-        const source = `${featureSource}\n${contentSource}\n${hierarchySource}\n${focusResolverSource}\n${layoutSource}\n${spatialFocusSource}\n${layoutGeneratorSource}\n${layoutGeneratorConfigSource}`;
+        const source = `${featureSource}\n${contentSource}\n${hierarchySource}\n${focusResolverSource}\n${layoutSource}\n${spatialFocusSource}\n${layoutGeneratorSource}\n${layoutGeneratorConfigSource}\n${regionFieldSource}\n${regionFieldGeneratorSource}\n${regionFieldConfigSource}`;
         expect(source).not.toMatch(/from ["'][^"']*(?:music|render)[^"']*["']/i);
         expect(source).not.toMatch(/music:|artist|album|track|playlist|label/i);
     });

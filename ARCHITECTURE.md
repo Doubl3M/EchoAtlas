@@ -229,6 +229,15 @@ empty Regions. Rectangles remain generation envelopes rather than visual borders
 rejects Site roots and mixed Region/Site siblings explicitly; those are algorithm-version limits,
 not hierarchy or layout invariants.
 
+`geographic-region-field-v1` converts the hierarchy and layout into a separate immutable raster
+of Region ownership. Each cell contains either the canonical ID of its deepest owning Region or
+an explicit no-owner value; Sites and Contents never own cells. Root silhouettes are irregular
+and may leave margins without an owner. Direct child Regions share their parent's territory through
+a deterministic weighted local partition based on their layout anchors and envelope areas, with a
+low-frequency identity-scoped perturbation. The authoritative Region envelopes in the layout do
+not become rendered borders. The field resolution is independent from the logical World extent,
+and its seed is scoped by stable feature identities rather than mutable global random state.
+
 The logical World extent and terrain resolution are separate explicit configuration inputs. World
 owns the deterministic mapping from geographic coordinates to the generic terrain cell grid.
 When Terrain is finer than the World, all cells remain renderable across the continuous visual

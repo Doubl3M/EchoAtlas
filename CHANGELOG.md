@@ -22,6 +22,8 @@ The project follows Semantic Versioning.
   focus resolution, while the existing generated World remains unchanged.
 - Versioned deterministic hierarchical layout generation using structural Region weights,
   seeded rectangular partitioning and terminal Site grids.
+- Compact deterministic geographic Region fields with deepest-owner semantics, irregular root
+  silhouettes and warped internal boundaries at an independent raster resolution.
 - TypeScript and Vite application foundation.
 - Deterministic application and engine service lifecycle.
 - Deterministic seeds, hashing, random streams, interpolation and two-dimensional value noise.

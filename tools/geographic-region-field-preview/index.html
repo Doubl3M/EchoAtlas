@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>EchoAtlas · Geographic Region Field Preview</title>
+        <link rel="stylesheet" href="./preview.css" />
+    </head>
+    <body>
+        <main>
+            <header>
+                <div>
+                    <p class="eyebrow">EchoAtlas · World diagnostic</p>
+                    <h1>Geographic Region Field</h1>
+                </div>
+                <p class="purpose">Layout structure versus raster territory ownership</p>
+            </header>
+
+            <section class="controls" aria-label="Preview controls">
+                <label
+                    >Seed
+                    <select id="seed"></select
+                ></label>
+                <label
+                    >Resolution
+                    <select id="resolution"></select
+                ></label>
+                <label><input id="bounds" type="checkbox" checked /> Bounds</label>
+                <label><input id="anchors" type="checkbox" checked /> Anchors</label>
+                <label><input id="sites" type="checkbox" checked /> Sites</label>
+                <label><input id="labels" type="checkbox" checked /> Labels</label>
+            </section>
+
+            <section class="workspace">
+                <div class="canvas-frame"><canvas id="field"></canvas></div>
+                <aside>
+                    <h2>Snapshot</h2>
+                    <dl id="metrics"></dl>
+                    <h2>Site diagnostic</h2>
+                    <div class="site-key">
+                        <span><i class="ok"></i> expected territory</span>
+                        <span><i class="mismatch"></i> ancestor / other territory</span>
+                        <span><i class="no-owner"></i> no owner</span>
+                    </div>
+                    <h2>Region families</h2>
+                    <div id="legend" class="legend"></div>
+                </aside>
+            </section>
+        </main>
+        <script type="module" src="./main.ts"></script>
+    </body>
+</html>

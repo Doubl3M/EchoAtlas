@@ -13,6 +13,9 @@ import type {
     GeographicLayoutGeneratorConfigOptions,
     GeographicPlacement,
     GeographicSpatialFocus,
+    GeographicRegionFieldGenerationVersion,
+    GeographicRegionFieldGeneratorConfigOptions,
+    GeographicRegionFieldOptions,
     GeographicRole,
     GeographicWorldOptions,
     WorldConfigOptions,
@@ -35,6 +38,9 @@ describe("world public API", () => {
             "GeographicLayout",
             "GeographicLayoutGenerator",
             "GeographicLayoutGeneratorConfig",
+            "GeographicRegionField",
+            "GeographicRegionFieldGenerator",
+            "GeographicRegionFieldGeneratorConfig",
             "GeographicWorld",
             "WorldConfig",
             "WorldConnection",
@@ -78,6 +84,9 @@ describe("world public API", () => {
         const spatialFocusKey: keyof GeographicSpatialFocus = "featureId";
         const layoutGenerationVersion: GeographicLayoutGenerationVersion = "geographic-layout-v1";
         const generatorConfigKey: keyof GeographicLayoutGeneratorConfigOptions = "seed";
+        const fieldVersion: GeographicRegionFieldGenerationVersion = "geographic-region-field-v1";
+        const fieldConfigKey: keyof GeographicRegionFieldGeneratorConfigOptions = "columns";
+        const fieldOptionsKey: keyof GeographicRegionFieldOptions = "ownerFeatureIds";
 
         expect([
             featureId,
@@ -92,6 +101,9 @@ describe("world public API", () => {
             spatialFocusKey,
             layoutGenerationVersion,
             generatorConfigKey,
+            fieldVersion,
+            fieldConfigKey,
+            fieldOptionsKey,
         ]).toEqual([
             "feature",
             "content",
@@ -112,6 +124,9 @@ describe("world public API", () => {
             "featureId",
             "geographic-layout-v1",
             "seed",
+            "geographic-region-field-v1",
+            "columns",
+            "ownerFeatureIds",
         ]);
     });
 });

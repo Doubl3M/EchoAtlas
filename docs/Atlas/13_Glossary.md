@@ -253,6 +253,25 @@ de Sites descendants, avec un minimum de `1`. Les Sites terminaux utilisent une 
 La seed influence l'ordre spatial par identité stable. Les rectangles sont des envelopes de
 génération, jamais une prescription de frontière rendue.
 
+## GeographicRegionField
+
+Raster immutable et compact associant chaque cellule soit à l'identité canonique de sa Region
+propriétaire la plus profonde, soit à la valeur explicite « sans propriétaire ». Sa résolution est
+indépendante de l'étendue logique du World. Les silhouettes racines multi-lobes et les partitions
+locales pondérées des enfants restent une politique de génération interne. Les Sites et Contents ne
+possèdent aucune cellule.
+
+## GeographicRegionFieldGenerationVersion
+
+Version de la politique transformant une `GeographicHierarchy` et son `GeographicLayout` en champ
+de propriété régional. `geographic-region-field-v1` est indépendante des versions JSON,
+d'interprétation Music, de layout et de physique du World historique.
+
+## No owner
+
+État explicite d'une cellule du `GeographicRegionField` qui n'appartient à aucune Region. Il ne
+représente pas implicitement de l'eau, un océan ou une autre sémantique géographique.
+
 ## Semantic Geography
 
 Traduction géographique canonique `Genre → Continent`, `Artist → District`, `Album → Building` et

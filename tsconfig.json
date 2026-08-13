@@ -11,5 +11,12 @@
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true
     },
-    "include": ["src", "tests", "benchmarks/**/*.ts", "vite.config.ts", "vitest.config.ts"]
+    "include": [
+        "src",
+        "tests",
+        "benchmarks/**/*.ts",
+        "tools/**/*.ts",
+        "vite.config.ts",
+        "vitest.config.ts"
+    ]
 }
