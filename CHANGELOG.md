@@ -18,6 +18,8 @@ The project follows Semantic Versioning.
   Continents, Districts, Buildings and Building Contents.
 - Generic multi-representation geographic focus discovery and deterministic containment-context
   selection, without coupling hierarchy semantics to Camera or Renderer.
+- Immutable complete geographic layouts with generic Region/Site containment and logical spatial
+  focus resolution, while the existing generated World remains unchanged.
 - TypeScript and Vite application foundation.
 - Deterministic application and engine service lifecycle.
 - Deterministic seeds, hashing, random streams, interpolation and two-dimensional value noise.

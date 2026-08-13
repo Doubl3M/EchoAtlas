@@ -218,6 +218,28 @@ peut en choisir une selon un contexte de containment. La proximité utilise les 
 hiérarchiques, jamais des coordonnées. Le flux futur est `Knowledge identity → geographic
 representation(s) → contextual geographic focus → future layout → Camera`.
 
+## GeographicLayout
+
+Snapshot spatial immutable et complet d'une `GeographicHierarchy` pour une étendue World donnée.
+Chaque feature possède exactement un placement canonique; les contenus n'en possèdent aucun. Le
+layout ne réinterprète ni Music ni Knowledge et coexiste provisoirement avec le `GeographicWorld`
+historique.
+
+## Geographic Region
+
+Placement surfacique défini par une envelope axis-aligned et un anchor logique. L'envelope sert au
+containment et au focus; elle ne signifie jamais que la future frontière rendue sera rectangulaire.
+
+## Geographic Site
+
+Placement ponctuel d'une feature dans les coordonnées logiques World. Un Site ne peut pas contenir
+d'autre feature dans le contrat actuel, mais une feature racine peut techniquement être un Site.
+
+## Geographic Spatial Focus
+
+Point logique World obtenu depuis une `GeographicFocusTarget` et un `GeographicLayout`. Une Region
+utilise son anchor et un Site sa position. Aucun zoom, viewport ou mouvement Camera n'est produit.
+
 ## Semantic Geography
 
 Traduction géographique canonique `Genre → Continent`, `Artist → District`, `Album → Building` et

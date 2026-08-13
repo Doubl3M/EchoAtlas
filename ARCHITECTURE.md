@@ -214,6 +214,13 @@ spatial coordinates. This establishes the future flow `Knowledge identity → ge
 representation(s) → contextual geographic focus → layout → Camera`; the current showcase does not
 yet consume it.
 
+`GeographicLayout` is the separate immutable spatial snapshot of a hierarchy. Every
+`GeographicFeatureId` has exactly one placement: a Region with an axis-aligned envelope and anchor,
+or a Site with a logical World position. Region envelopes define containment and focus domains;
+they are not promises that rendered borders are rectangular. Contents have no placement of their
+own. Spatial focus resolves a geographic target to a Region anchor or Site position, without zoom,
+viewport or Camera behavior.
+
 The logical World extent and terrain resolution are separate explicit configuration inputs. World
 owns the deterministic mapping from geographic coordinates to the generic terrain cell grid.
 When Terrain is finer than the World, all cells remain renderable across the continuous visual

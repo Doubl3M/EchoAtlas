@@ -225,6 +225,25 @@ de containment partageant l'ancêtre commun le plus profond, puis la distance hi
 l'identité canonique. Cette étape ne calcule ni coordonnées, ni zoom, ni mouvement Camera et n'est
 pas encore branchée au showcase.
 
+Le `GeographicLayout` constitue un snapshot spatial immutable distinct de la hierarchy. Chaque
+feature possède exactement un placement : une Region avec envelope axis-aligned et anchor, ou un
+Site avec position logique World. Les bounds d'une Region servent au containment, au focus et au
+futur culling; elles ne décrivent pas sa future frontière organique rendue. Un contenu n'a aucun
+placement propre. Le spatial focus transforme ensuite une cible en anchor de Region ou position de
+Site, sans zoom ni intégration Camera.
+
+Le pipeline préparé est donc :
+
+```text
+Knowledge
+→ Semantic Geography
+→ GeographicHierarchy
+→ Geographic Focus
+→ GeographicLayout
+→ Spatial Focus
+→ future Camera integration
+```
+
 ---
 
 # Étape 6 · World Skeleton

@@ -10,11 +10,22 @@ export type {
 } from "./GeographicFeature";
 export { GeographicHierarchy } from "./GeographicHierarchy";
 export type { GeographicHierarchyOptions } from "./GeographicHierarchy";
+export { GeographicLayout } from "./GeographicLayout";
+export type {
+    GeographicBounds,
+    GeographicLayoutOptions,
+    GeographicPlacement,
+    GeographicPoint,
+    GeographicRegionPlacement,
+    GeographicSitePlacement,
+} from "./GeographicLayout";
 export { GeographicFocusResolver } from "./GeographicFocusResolver";
 export type {
     GeographicFocusRepresentationKind,
     GeographicFocusTarget,
 } from "./GeographicFocusResolver";
+export { resolveGeographicSpatialFocus } from "./GeographicSpatialFocus";
+export type { GeographicSpatialFocus } from "./GeographicSpatialFocus";
 export { WorldConfig } from "./WorldConfig";
 export type { WorldConfigOptions } from "./WorldConfig";
 export type { WorldGenerationVersion } from "./WorldGenerationVersion";
