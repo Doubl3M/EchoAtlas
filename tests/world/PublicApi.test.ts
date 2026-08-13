@@ -6,6 +6,8 @@ import type {
     GeographicFeatureId,
     GeographicFeatureOptions,
     GeographicHierarchyOptions,
+    GeographicFocusRepresentationKind,
+    GeographicFocusTarget,
     GeographicRole,
     GeographicWorldOptions,
     WorldConfigOptions,
@@ -23,6 +25,7 @@ describe("world public API", () => {
         expect(Object.keys(publicApi).sort()).toEqual([
             "GeographicContent",
             "GeographicFeature",
+            "GeographicFocusResolver",
             "GeographicHierarchy",
             "GeographicWorld",
             "WorldConfig",
@@ -51,6 +54,12 @@ describe("world public API", () => {
             keyof GeographicContentOptions,
             keyof GeographicHierarchyOptions,
         ] = ["role", "containerFeatureId", "features"];
+        const focusKind: GeographicFocusRepresentationKind = "content-container";
+        const focusTarget: GeographicFocusTarget = {
+            knowledgeNodeId: "node",
+            featureId,
+            representationKind: focusKind,
+        };
 
         expect([
             featureId,
@@ -59,6 +68,7 @@ describe("world public API", () => {
             generationVersion,
             ...contracts,
             ...hierarchyContracts,
+            focusTarget.representationKind,
         ]).toEqual([
             "feature",
             "content",
@@ -73,6 +83,7 @@ describe("world public API", () => {
             "role",
             "containerFeatureId",
             "features",
+            "content-container",
         ]);
     });
 });

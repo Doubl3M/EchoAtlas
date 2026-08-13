@@ -218,6 +218,13 @@ d'autres couples de kinds sont ignorés et aucun parent géographique de repli n
 Cette version d'interprétation est distincte de `metadata.version`, de la version des règles
 temporelles et de `WorldConfig.generationVersion`.
 
+Une identité Knowledge peut ensuite résoudre vers zéro, une ou plusieurs représentations
+géographiques. Une feature constitue une cible directe; un contenu utilise sa feature container
+comme cible tout en conservant son identité de contenu. Le choix contextuel privilégie la branche
+de containment partageant l'ancêtre commun le plus profond, puis la distance hiérarchique et enfin
+l'identité canonique. Cette étape ne calcule ni coordonnées, ni zoom, ni mouvement Camera et n'est
+pas encore branchée au showcase.
+
 ---
 
 # Étape 6 · World Skeleton

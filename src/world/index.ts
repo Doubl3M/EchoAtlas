@@ -10,6 +10,11 @@ export type {
 } from "./GeographicFeature";
 export { GeographicHierarchy } from "./GeographicHierarchy";
 export type { GeographicHierarchyOptions } from "./GeographicHierarchy";
+export { GeographicFocusResolver } from "./GeographicFocusResolver";
+export type {
+    GeographicFocusRepresentationKind,
+    GeographicFocusTarget,
+} from "./GeographicFocusResolver";
 export { WorldConfig } from "./WorldConfig";
 export type { WorldConfigOptions } from "./WorldConfig";
 export type { WorldGenerationVersion } from "./WorldGenerationVersion";

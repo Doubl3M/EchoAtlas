@@ -205,6 +205,19 @@ même Knowledge Node peut être la source de plusieurs features.
 Représentation non nécessairement spatiale d'une identité Knowledge contenue dans un
 GeographicFeature. Le cas canonique visé est un Track contenu dans un Building.
 
+## GeographicFocusTarget
+
+Destination géographique générique possible pour une identité Knowledge. Elle distingue une
+feature représentant directement l'identité d'un container représentant son contenu. Une identité
+peut avoir zéro, une ou plusieurs cibles; leur ordre canonique n'exprime aucune préférence produit.
+
+## GeographicFocusResolver
+
+Service World sans géométrie qui découvre toutes les `GeographicFocusTarget` d'une identité puis
+peut en choisir une selon un contexte de containment. La proximité utilise les chemins
+hiérarchiques, jamais des coordonnées. Le flux futur est `Knowledge identity → geographic
+representation(s) → contextual geographic focus → future layout → Camera`.
+
 ## Semantic Geography
 
 Traduction géographique canonique `Genre → Continent`, `Artist → District`, `Album → Building` et

@@ -18,6 +18,7 @@ export class GeographicHierarchy {
     private readonly featuresById: ReadonlyMap<GeographicFeatureId, GeographicFeature>;
     private readonly contentsById: ReadonlyMap<GeographicContentId, GeographicContent>;
     private readonly featuresByKnowledgeNodeId: ReadonlyMap<string, readonly GeographicFeature[]>;
+    private readonly contentsByKnowledgeNodeId: ReadonlyMap<string, readonly GeographicContent[]>;
     private readonly childrenByParentId: ReadonlyMap<
         GeographicFeatureId,
         readonly GeographicFeature[]
@@ -39,6 +40,10 @@ export class GeographicHierarchy {
         this.featuresByKnowledgeNodeId = this.indexByOptionalKey(
             this.features,
             ({ sourceKnowledgeNodeId }) => sourceKnowledgeNodeId
+        );
+        this.contentsByKnowledgeNodeId = this.indexByKey(
+            this.contents,
+            ({ knowledgeNodeId }) => knowledgeNodeId
         );
         this.childrenByParentId = this.indexByOptionalKey(
             this.features,
@@ -70,6 +75,12 @@ export class GeographicHierarchy {
     public getFeaturesByKnowledgeNodeId(knowledgeNodeId: string): readonly GeographicFeature[] {
         return (
             this.featuresByKnowledgeNodeId.get(knowledgeNodeId) ?? GeographicHierarchy.emptyFeatures
+        );
+    }
+
+    public getContentsByKnowledgeNodeId(knowledgeNodeId: string): readonly GeographicContent[] {
+        return (
+            this.contentsByKnowledgeNodeId.get(knowledgeNodeId) ?? GeographicHierarchy.emptyContents
         );
     }
 

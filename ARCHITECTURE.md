@@ -207,6 +207,13 @@ Building Content in every represented Album Building. Inverse and unrelated rela
 implicit geographic meaning. This interpretation version is independent from both the JSON format
 version and `WorldGenerationVersion`.
 
+World provides a generic focus resolution step over this hierarchy. A Knowledge identity resolves
+to zero or more direct features or content containers; no one-to-one representation is assumed.
+When several representations exist, contextual selection compares containment ancestry rather than
+spatial coordinates. This establishes the future flow `Knowledge identity → geographic
+representation(s) → contextual geographic focus → layout → Camera`; the current showcase does not
+yet consume it.
+
 The logical World extent and terrain resolution are separate explicit configuration inputs. World
 owns the deterministic mapping from geographic coordinates to the generic terrain cell grid.
 When Terrain is finer than the World, all cells remain renderable across the continuous visual

@@ -111,6 +111,7 @@ describe("GeographicHierarchy", () => {
         expect(hierarchy.getContents()).toEqual([first, second]);
         expect(hierarchy.getContentById(first.id)).toBe(first);
         expect(hierarchy.getContentsByContainerId(building.id)).toEqual([first, second]);
+        expect(hierarchy.getContentsByKnowledgeNodeId("node:sound")).toEqual([first]);
         expect(hierarchy.getContainerForContent(second.id)).toBe(building);
     });
 
@@ -191,6 +192,7 @@ describe("GeographicHierarchy", () => {
         expect(Object.isFrozen(hierarchy.getFeaturesByKnowledgeNodeId("missing"))).toBe(true);
         expect(Object.isFrozen(hierarchy.getChildren(root.id))).toBe(true);
         expect(Object.isFrozen(hierarchy.getContentsByContainerId(child.id))).toBe(true);
+        expect(Object.isFrozen(hierarchy.getContentsByKnowledgeNodeId("missing"))).toBe(true);
         expect(Object.isFrozen(root)).toBe(true);
         expect(Object.isFrozen(item)).toBe(true);
     });
