@@ -208,7 +208,15 @@ devront être réinterprétées comme états ou aspects éventuels sans remplace
 structurelles.
 
 Le résultat est un ensemble de **concepts géographiques**, pas encore des objets spatiaux. Les
-relations musicales restent dans Knowledge; leur traduction en containment appartient au World.
+relations musicales restent dans Knowledge; la politique Music Atlas qui les interprète appartient
+à l'application, tandis que le containment générique résultant appartient au World.
+
+Pour Music Atlas, la couche application applique explicitement `music-geography-v1`. Les relations
+sont dirigées : Genre → Artist crée le District, Artist → Album propage le Building dans chaque
+District représenté, puis Album → Track propage le Building Content. Les relations inverses ou
+d'autres couples de kinds sont ignorés et aucun parent géographique de repli n'est inventé.
+Cette version d'interprétation est distincte de `metadata.version`, de la version des règles
+temporelles et de `WorldConfig.generationVersion`.
 
 ---
 

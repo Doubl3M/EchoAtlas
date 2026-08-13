@@ -212,6 +212,13 @@ Traduction géographique canonique `Genre → Continent`, `Artist → District`,
 containment résultant. City est un niveau spatial prévu mais sa signification et sa génération
 restent non résolues; aucun rôle City runtime n'existe encore.
 
+## MusicGeographyInterpretationVersion
+
+Identité des règles applicatives qui traduisent Music et Knowledge vers la hiérarchie géographique
+générique. `music-geography-v1` interprète uniquement les relations dirigées Genre → Artist,
+Artist → Album et Album → Track. Elle est indépendante de `metadata.version`, de la version des
+règles temporelles et de `WorldGenerationVersion`.
+
 ## WorldLocation
 
 Localisation immutable correspondant à un Knowledge Node. Elle conserve son ID canonique et lui

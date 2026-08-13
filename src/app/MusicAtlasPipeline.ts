@@ -1,5 +1,10 @@
 import type { KnowledgeGraph } from "../knowledge";
-import { MusicInterpreter, type MusicCatalog, type MusicEntityKind } from "../music";
+import {
+    MusicInterpreter,
+    musicKnowledgeNodeId,
+    type MusicCatalog,
+    type MusicEntityKind,
+} from "../music";
 import { MusicJsonImporter } from "../music/import";
 import type { LabelDescriptor, LabelProvider } from "../render";
 import type { GeographicWorld, WorldConfig } from "../world";
@@ -40,7 +45,7 @@ export function createMusicArrivalZoomProvider(catalog: MusicCatalog): ArrivalZo
     for (const entity of catalog.getEntities()) {
         const arrivalZoom = arrivalZoomByKind[entity.kind];
         if (arrivalZoom !== undefined) {
-            zoomByKnowledgeNodeId.set(`music:${entity.kind}:${entity.id}`, arrivalZoom);
+            zoomByKnowledgeNodeId.set(musicKnowledgeNodeId(entity.kind, entity.id), arrivalZoom);
         }
     }
     return (knowledgeNodeId: string): number | undefined =>
@@ -60,7 +65,7 @@ export function createMusicLabelProvider(catalog: MusicCatalog): LabelProvider {
             const detail = labelDetailByKind[entity.kind];
             if (detail !== undefined) {
                 labels.set(
-                    `music:${entity.kind}:${entity.id}`,
+                    musicKnowledgeNodeId(entity.kind, entity.id),
                     Object.freeze({
                         text: label,
                         ...detail,

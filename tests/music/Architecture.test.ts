@@ -15,6 +15,7 @@ describe("music architecture", () => {
             "./MusicEntity",
             "./MusicCatalog",
             "./MusicRelation",
+            "./MusicKnowledgeIdentity",
         ]);
         expect(interpreterSource).not.toMatch(
             /(?:world|terrain|camera|render|ui|document|canvas|geograph)/i

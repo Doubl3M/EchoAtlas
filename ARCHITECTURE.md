@@ -200,6 +200,13 @@ not encode Music kinds: product-specific semantic mappings are resolved before o
 explicit World interpretation policy. The current `world-v1-exact` flat generator remains active
 during this migration.
 
+Music Atlas currently owns `music-geography-v1` in the application layer. This interpretation
+uses directed relations only: Genre → Artist creates a District in a Genre Continent,
+Artist → Album creates a Building in every represented Artist District, and Album → Track creates
+Building Content in every represented Album Building. Inverse and unrelated relations have no
+implicit geographic meaning. This interpretation version is independent from both the JSON format
+version and `WorldGenerationVersion`.
+
 The logical World extent and terrain resolution are separate explicit configuration inputs. World
 owns the deterministic mapping from geographic coordinates to the generic terrain cell grid.
 When Terrain is finer than the World, all cells remain renderable across the continuous visual

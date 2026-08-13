@@ -14,6 +14,8 @@ The project follows Semantic Versioning.
 
 - Canonical semantic-geography documentation and an immutable, geometry-free hierarchical World
   foundation, with no behavior change to `world-v1-exact` or the current showcase.
+- Versioned Music Atlas interpretation from directed Knowledge relations to deterministic
+  Continents, Districts, Buildings and Building Contents.
 - TypeScript and Vite application foundation.
 - Deterministic application and engine service lifecycle.
 - Deterministic seeds, hashing, random streams, interpolation and two-dimensional value noise.

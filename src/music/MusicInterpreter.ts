@@ -1,7 +1,8 @@
 import { KnowledgeGraph, KnowledgeNode, KnowledgeRelation } from "../knowledge";
-import type { MusicEntity, MusicEntityKind } from "./MusicEntity";
+import type { MusicEntity } from "./MusicEntity";
 import type { MusicCatalog } from "./MusicCatalog";
 import type { MusicRelation } from "./MusicRelation";
+import { musicKnowledgeNodeId, musicKnowledgeNodeKind } from "./MusicKnowledgeIdentity";
 
 /** Deterministically translates musical semantics into the generic Knowledge Graph. */
 export class MusicInterpreter {
@@ -9,7 +10,11 @@ export class MusicInterpreter {
         const entitiesByKnowledgeId = this.indexEntities(catalog.getEntities());
         const nodes = [...entitiesByKnowledgeId.entries()].map(
             ([id, entity]) =>
-                new KnowledgeNode({ id, kind: `music:${entity.kind}`, weight: entity.weight })
+                new KnowledgeNode({
+                    id,
+                    kind: musicKnowledgeNodeKind(entity.kind),
+                    weight: entity.weight,
+                })
         );
         const relations = catalog
             .getRelations()
@@ -21,7 +26,7 @@ export class MusicInterpreter {
     private indexEntities(entities: readonly MusicEntity[]): ReadonlyMap<string, MusicEntity> {
         const index = new Map<string, MusicEntity>();
         for (const entity of entities) {
-            const knowledgeId = this.entityKnowledgeId(entity.kind, entity.id);
+            const knowledgeId = musicKnowledgeNodeId(entity.kind, entity.id);
             index.set(knowledgeId, entity);
         }
         return index;
@@ -31,8 +36,8 @@ export class MusicInterpreter {
         relation: MusicRelation,
         entities: ReadonlyMap<string, MusicEntity>
     ): KnowledgeRelation {
-        const sourceId = this.entityKnowledgeId(relation.sourceKind, relation.sourceId);
-        const targetId = this.entityKnowledgeId(relation.targetKind, relation.targetId);
+        const sourceId = musicKnowledgeNodeId(relation.sourceKind, relation.sourceId);
+        const targetId = musicKnowledgeNodeId(relation.targetKind, relation.targetId);
         if (!entities.has(sourceId)) {
             throw new Error(
                 `Unknown music relation source: ${relation.sourceKind}:${relation.sourceId}`
@@ -51,9 +56,5 @@ export class MusicInterpreter {
             kind: `music:${relation.kind}`,
             weight: relation.weight,
         });
-    }
-
-    private entityKnowledgeId(kind: MusicEntityKind, id: string): string {
-        return `music:${kind}:${id}`;
     }
 }
