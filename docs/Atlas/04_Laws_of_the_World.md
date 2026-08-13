@@ -104,6 +104,14 @@ un même symbole ne peut représenter deux concepts différents.
 
 Le langage cartographique reste stable.
 
+L'identité structurelle et l'état restent distincts. Genre, Artist, Album et Track se traduisent
+respectivement en Continent, District, Building et Building Content. Une métaphore temporelle
+future telle qu'une ruine ne remplace pas cette identité principale; elle devra être définie comme
+un état ou un aspect compatible.
+
+Le containment géographique appartient au World. Les relations musicales qui le rendent possible
+restent dans le Knowledge Graph.
+
 ---
 
 # Article VI · Les relations priment sur les objets

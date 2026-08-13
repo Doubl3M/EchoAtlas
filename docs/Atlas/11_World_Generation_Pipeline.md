@@ -107,7 +107,7 @@ Validated Dataset
 
 Les données provenant de différentes plateformes sont harmonisées.
 
-Exemple :
+Exemple futur, une fois les règles correspondantes définies :
 
 ```
 Spotify
@@ -193,35 +193,22 @@ Exemples :
 
 Le moteur applique le langage cartographique.
 
-Exemples :
+Contrat structurel canonique :
 
 ```
-Fidélité élevée
-
-↓
-
-Mountain
-
-Découverte récente
-
-↓
-
-Port
-
-Album interrompu
-
-↓
-
-Marsh
-
-Album oublié
-
-↓
-
-Ruin
+Genre  → Continent
+Artist → District
+Album  → Building
+Track  → Building Content
 ```
 
-Le résultat est un ensemble de **concepts géographiques**, pas encore des objets spatiaux.
+City reste un niveau spatial prévu dont la règle de génération n'est pas résolue. Elle n'est pas
+instanciée implicitement. Les anciennes traductions Mountain, Port, Marsh ou Ruin sont legacy et
+devront être réinterprétées comme états ou aspects éventuels sans remplacer les identités
+structurelles.
+
+Le résultat est un ensemble de **concepts géographiques**, pas encore des objets spatiaux. Les
+relations musicales restent dans Knowledge; leur traduction en containment appartient au World.
 
 ---
 
@@ -233,9 +220,8 @@ Ordre recommandé :
 
 1. Océans
 2. Continents
-3. Provinces
+3. Districts, directement sous leur Continent tant que City reste non résolue
 4. Relief général
-5. Fleuves principaux
 
 Le paysage existe.
 
@@ -249,15 +235,12 @@ Le Monde accueille ses habitants.
 
 Ordre recommandé :
 
-1. Villes
-2. Bâtiments
-3. Ports
-4. Montagnes
-5. Volcans
-6. Ruines
-7. Marais
-8. Déserts
-9. Forêts
+1. Districts
+2. Buildings
+3. Building Contents
+
+Les futurs états et aspects cartographiques sont appliqués seulement lorsqu'un contrat distinct
+les définit.
 
 Chaque élément est positionné selon les contraintes géographiques.
 
@@ -419,6 +402,10 @@ Cette reconstruction ne consiste pas à masquer les éléments postérieurs à `
 peut être un lieu actif dans un snapshot antérieur ; une route aujourd'hui disparue peut y
 réapparaître. Les règles détaillées correspondantes ne sont pas encore implémentées.
 
+La hiérarchie géographique fait partie du snapshot reconstruit. Elle dépend uniquement des entrées
+canoniques et de leurs versions, jamais de l'heure système, d'un historique mutable ou du snapshot
+précédent. À entrées identiques, son ordre, ses identités et son containment sont identiques.
+
 ---
 
 # Pipeline complet
@@ -443,13 +430,13 @@ Chaque étape peut produire un journal.
 Exemple :
 
 ```
-Mountain created
+Continent created
 
-City expanded
+District expanded
 
 Road connected
 
-Province merged
+Building state changed
 
 Forest grew
 ```

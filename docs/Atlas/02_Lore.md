@@ -58,9 +58,10 @@ D'autres restent éternellement nouvelles.
 
 Les continents sont les plus anciennes terres connues.
 
-Ils ne représentent pas des genres musicaux.
+Chaque continent représente désormais un genre musical canonique.
 
-Ils incarnent les grandes familles d'émotions qui traversent une vie musicale.
+Sa forme et son étendue racontent la place de ce genre dans une vie musicale sans changer son
+identité.
 
 Leur véritable nom est oublié depuis longtemps.
 
@@ -72,13 +73,14 @@ On y revient parce qu'une partie de soi y réside encore.
 
 ---
 
-# Les Provinces
+# Les Cités
 
-Les provinces apparaissent lorsque plusieurs œuvres suivent naturellement un même chemin.
+La Cité demeure un niveau spatial prévu entre le continent et les quartiers.
 
-Certaines restent discrètes.
+Sa signification musicale et sa règle de génération ne sont pas encore définies.
 
-D'autres grandissent jusqu'à devenir de véritables royaumes.
+Tant que cette règle n'est pas résolue, le Monde n'invente aucune Cité et peut relier directement
+un continent à ses quartiers.
 
 Leurs frontières ne sont jamais parfaitement nettes.
 
@@ -92,9 +94,9 @@ Comme les influences musicales elles-mêmes.
 
 ---
 
-# Les Villes
+# Les Quartiers
 
-Une ville naît lorsqu'un artiste revient suffisamment souvent pour qu'un foyer puisse être bâti.
+Un quartier représente un artiste.
 
 Au début, il ne s'agit que de quelques maisons.
 
@@ -106,13 +108,13 @@ Des monuments.
 
 Plus les années passent,
 
-plus la ville grandit.
+plus le quartier grandit.
 
-Certaines deviennent des capitales.
+Certains deviennent des centres familiers.
 
-D'autres demeurent de petits villages où l'on aime revenir sans raison particulière.
+D'autres demeurent des rues discrètes où l'on aime revenir sans raison particulière.
 
-Aucune ville n'est abandonnée brutalement.
+Aucun quartier n'est abandonné brutalement.
 
 Même désertée, elle conserve ses fondations.
 

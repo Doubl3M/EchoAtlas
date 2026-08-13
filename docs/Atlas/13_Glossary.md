@@ -187,6 +187,31 @@ musicales directement.
 Snapshot géographique immutable contenant un `HeightField`, des `WorldLocation` et des
 `WorldConnection` indexés par leurs identités sémantiques.
 
+## GeographicHierarchy
+
+Snapshot immutable et sans géométrie décrivant les identités géographiques, leur containment et
+leurs sources Knowledge en ordre canonique. Cette fondation coexiste avec le `GeographicWorld`
+actuel pendant la migration et fera partie de toute future reconstruction déterministe de
+`World(T)`.
+
+## GeographicFeature
+
+Identité géographique spatiale possédant un rôle, un parent optionnel et éventuellement un
+Knowledge Node source. Les rôles runtime actuels sont `continent`, `district` et `building`. Un
+même Knowledge Node peut être la source de plusieurs features.
+
+## GeographicContent
+
+Représentation non nécessairement spatiale d'une identité Knowledge contenue dans un
+GeographicFeature. Le cas canonique visé est un Track contenu dans un Building.
+
+## Semantic Geography
+
+Traduction géographique canonique `Genre → Continent`, `Artist → District`, `Album → Building` et
+`Track → Building Content`. Les relations musicales restent dans Knowledge; World possède le
+containment résultant. City est un niveau spatial prévu mais sa signification et sa génération
+restent non résolues; aucun rôle City runtime n'existe encore.
+
 ## WorldLocation
 
 Localisation immutable correspondant à un Knowledge Node. Elle conserve son ID canonique et lui

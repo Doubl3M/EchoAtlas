@@ -182,8 +182,9 @@ Transforms semantics into geography.
 Responsibilities:
 
 - continents
-- provinces
-- cities
+- districts
+- buildings and their contents
+- cities only after their currently unresolved generation rule is canonized
 - roads
 - rivers
 - mountains
@@ -192,6 +193,12 @@ Responsibilities:
 The World layer never reads music.
 
 It only reads semantic structures.
+
+World owns geographic containment. A geometry-free hierarchical foundation distinguishes spatial
+features from non-spatial contents while preserving their optional Knowledge identities. It does
+not encode Music kinds: product-specific semantic mappings are resolved before or through an
+explicit World interpretation policy. The current `world-v1-exact` flat generator remains active
+during this migration.
 
 The logical World extent and terrain resolution are separate explicit configuration inputs. World
 owns the deterministic mapping from geographic coordinates to the generic terrain cell grid.
@@ -461,11 +468,11 @@ World
 
  ├── Terrain
 
- ├── Provinces
+ ├── Continents
 
- ├── Cities
+ ├── Districts
 
- └── Roads
+ └── Buildings
 ```
 
 Renderer reads.

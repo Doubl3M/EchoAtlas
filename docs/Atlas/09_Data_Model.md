@@ -31,24 +31,12 @@ Le Monde est organisé sous la forme d'un graphe d'objets.
 World
 │
 ├── Continents
-│     ├── Provinces
-│     │      ├── Cities
-│     │      │      ├── Buildings
-│     │      │      └── Connections
-│     │      │
-│     │      ├── Mountains
-│     │      ├── Volcanoes
-│     │      ├── Ruins
-│     │      ├── Marshes
-│     │      ├── Ports
-│     │      ├── Forests
-│     │      ├── Rivers
-│     │      ├── Roads
-│     │      ├── Bridges
-│     │      └── Crossroads
-│     │
-│     └── Metadata
+│     ├── Cities (niveau prévu, règle non résolue, non instancié)
+│     └── Districts
+│            └── Buildings
+│                   └── Building Contents
 │
+├── Connections
 └── Global Metadata
 ```
 
@@ -195,14 +183,14 @@ Elles ne participent jamais au rendu.
 
 # Continent
 
-Le continent représente une grande famille musicale.
+Le continent représente un Genre.
 
 ## Possède
 
 - identifiant
 - nom
 - géométrie
-- provinces
+- enfants géographiques
 - surface
 - couleur
 - statistiques
@@ -218,53 +206,46 @@ Continent
 
 ↓
 
-Province
+City éventuelle ou District
 ```
 
 ## Invariants
 
-Une province appartient toujours à un seul continent.
-
----
-
-# Province
-
-La province représente une famille d'influences.
-
-Elle organise les villes.
-
-## Possède
-
-- nom
-- frontière
-- villes
-- relief
-- climat
-- statistiques
+La géométrie et le containment appartiennent au World; la relation musicale source reste dans le
+Knowledge Graph.
 
 ---
 
 # City
 
-Une ville représente un artiste.
+City est un niveau spatial prévu entre Continent et District.
+
+Sa signification musicale et sa règle de génération sont non résolues. Aucune City n'est
+instanciée tant que cette règle n'est pas canonisée. Un District peut donc transitoirement avoir un
+Continent comme parent.
+
+# District
+
+Le District représente un Artist.
+
+---
 
 ## Possède
 
-- nom
-- coordonnées
-- population symbolique
+- identifiant géographique stable
+- Artist source éventuel
+- parent géographique
 - bâtiments
-- importance
 - connexions
 
 ## Relations
 
 ```
-Province
+Continent ou future City
 
 ↓
 
-City
+District
 
 ↓
 
@@ -292,9 +273,27 @@ Leur architecture dépend de leur importance.
 
 ---
 
+# Building Content
+
+Un Building Content représente un Track contenu dans un Building sans lui imposer une position
+mondiale autonome.
+
+Il conserve l'identité du Knowledge Node source et l'identité du Building qui le contient.
+
+---
+
+# Métaphores legacy et futurs états
+
+Mountain, Volcano, Port, Ruin, Marsh et Desert ne sont plus des identités principales concurrentes
+de Continent, District ou Building. Ces anciennes traductions restent à réinterpréter. Un Album
+oublié pourrait par exemple devenir ultérieurement un `Building(state = ruined)`, et un Artist
+inactif un `District(state = ruined)`, mais aucun modèle d'état n'est défini ou implémenté ici.
+
+---
+
 # Mountain
 
-Une montagne représente une œuvre fondatrice.
+Cette ancienne traduction est legacy et ne définit plus l'identité d'une œuvre.
 
 ## Attributs
 
@@ -327,7 +326,7 @@ Le volcan peut devenir montagne.
 
 # Port
 
-Le port représente une découverte.
+Cette ancienne traduction est legacy et ne définit plus l'identité d'une découverte.
 
 ## Attributs
 
@@ -342,7 +341,8 @@ Un port peut devenir une ville importante.
 
 # Ruin
 
-Une ruine représente un album oublié.
+Cette ancienne traduction est legacy; une ruine éventuelle devra être un état compatible avec
+l'identité structurelle du lieu.
 
 ## Attributs
 
@@ -529,11 +529,11 @@ Album
 
 Album
 
-Province
+Continent
 
 ↓
 
-Province
+District
 ```
 
 Toutes les connexions sont orientées.
@@ -549,13 +549,13 @@ Exemple :
 ```
 world-1
 
-continent-4
+continent:genre:rock
 
-city-19
+district:artist:bowie
 
-album-284
+building:album:low
 
-mountain-8
+content:track:sound-and-vision
 ```
 
 Les identifiants ne changent jamais.
@@ -593,11 +593,13 @@ World
 
 └── Continents
 
-     └── Provinces
+     ├── Cities (niveau prévu, non instancié sans règle)
 
-           └── Cities
+     └── Districts
 
-                 └── Buildings
+           └── Buildings
+
+                 └── Building Contents
 ```
 
 Les objets secondaires se connectent ensuite :
