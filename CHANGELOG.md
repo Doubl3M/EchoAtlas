@@ -20,6 +20,8 @@ The project follows Semantic Versioning.
   selection, without coupling hierarchy semantics to Camera or Renderer.
 - Immutable complete geographic layouts with generic Region/Site containment and logical spatial
   focus resolution, while the existing generated World remains unchanged.
+- Versioned deterministic hierarchical layout generation using structural Region weights,
+  seeded rectangular partitioning and terminal Site grids.
 - TypeScript and Vite application foundation.
 - Deterministic application and engine service lifecycle.
 - Deterministic seeds, hashing, random streams, interpolation and two-dimensional value noise.

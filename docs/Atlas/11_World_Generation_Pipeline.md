@@ -244,6 +244,18 @@ Knowledge
 → future Camera integration
 ```
 
+La première politique de génération, `geographic-layout-v1`, utilise une partition rectangulaire
+hiérarchique déterministe. Les rôles Continent et District deviennent des Regions; Building devient
+un Site. La surface relative d'une Region dépend du nombre de Sites descendants, avec un poids
+minimal de `1` pour une Region vide. La seed réordonne spatialement les siblings à partir de leurs
+identités stables; elle ne modifie ni leur existence, ni leur identité, ni leur containment.
+
+Les Sites terminaux sont répartis aux centres d'une grille adaptée au ratio de leur Region. Les
+Contents ne participent ni au poids ni au placement. Cette version rejette les Site roots ainsi que
+les enfants Region et Site mélangés sous un même parent. Ces restrictions appartiennent uniquement
+à `geographic-layout-v1`, pas aux contrats génériques de hierarchy ou de layout. Les rectangles
+produits restent des envelopes de génération et ne sont pas les futures frontières visuelles.
+
 ---
 
 # Étape 6 · World Skeleton

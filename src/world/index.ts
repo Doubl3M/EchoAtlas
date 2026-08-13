@@ -26,6 +26,10 @@ export type {
 } from "./GeographicFocusResolver";
 export { resolveGeographicSpatialFocus } from "./GeographicSpatialFocus";
 export type { GeographicSpatialFocus } from "./GeographicSpatialFocus";
+export { GeographicLayoutGenerator } from "./GeographicLayoutGenerator";
+export { GeographicLayoutGeneratorConfig } from "./GeographicLayoutGeneratorConfig";
+export type { GeographicLayoutGeneratorConfigOptions } from "./GeographicLayoutGeneratorConfig";
+export type { GeographicLayoutGenerationVersion } from "./GeographicLayoutGenerationVersion";
 export { WorldConfig } from "./WorldConfig";
 export type { WorldConfigOptions } from "./WorldConfig";
 export type { WorldGenerationVersion } from "./WorldGenerationVersion";

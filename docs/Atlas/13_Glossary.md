@@ -240,6 +240,19 @@ d'autre feature dans le contrat actuel, mais une feature racine peut techniqueme
 Point logique World obtenu depuis une `GeographicFocusTarget` et un `GeographicLayout`. Une Region
 utilise son anchor et un Site sa position. Aucun zoom, viewport ou mouvement Camera n'est produit.
 
+## GeographicLayoutGenerationVersion
+
+Version de la politique transformant une `GeographicHierarchy` en `GeographicLayout`. La première
+valeur, `geographic-layout-v1`, est indépendante de `music-geography-v1`, de `world-v1-exact` et de
+la version du format JSON.
+
+## geographic-layout-v1
+
+Partition rectangulaire hiérarchique déterministe dont les Regions sont pondérées par leur nombre
+de Sites descendants, avec un minimum de `1`. Les Sites terminaux utilisent une grille intérieure.
+La seed influence l'ordre spatial par identité stable. Les rectangles sont des envelopes de
+génération, jamais une prescription de frontière rendue.
+
 ## Semantic Geography
 
 Traduction géographique canonique `Genre → Continent`, `Artist → District`, `Album → Building` et

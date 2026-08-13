@@ -221,6 +221,14 @@ they are not promises that rendered borders are rectangular. Contents have no pl
 own. Spatial focus resolves a geographic target to a Region anchor or Site position, without zoom,
 viewport or Camera behavior.
 
+`geographic-layout-v1` deterministically generates that layout from a hierarchy, a canonical
+Math `Seed`, and logical World dimensions. Continents and Districts map to generic Regions;
+Buildings map to Sites. Region siblings are recursively partitioned along the longest envelope
+axis using their number of descendant Sites as structural weight, with a minimum weight of one for
+empty Regions. Rectangles remain generation envelopes rather than visual borders. This version
+rejects Site roots and mixed Region/Site siblings explicitly; those are algorithm-version limits,
+not hierarchy or layout invariants.
+
 The logical World extent and terrain resolution are separate explicit configuration inputs. World
 owns the deterministic mapping from geographic coordinates to the generic terrain cell grid.
 When Terrain is finer than the World, all cells remain renderable across the continuous visual

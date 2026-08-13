@@ -9,6 +9,8 @@ import type {
     GeographicFocusRepresentationKind,
     GeographicFocusTarget,
     GeographicLayoutOptions,
+    GeographicLayoutGenerationVersion,
+    GeographicLayoutGeneratorConfigOptions,
     GeographicPlacement,
     GeographicSpatialFocus,
     GeographicRole,
@@ -31,6 +33,8 @@ describe("world public API", () => {
             "GeographicFocusResolver",
             "GeographicHierarchy",
             "GeographicLayout",
+            "GeographicLayoutGenerator",
+            "GeographicLayoutGeneratorConfig",
             "GeographicWorld",
             "WorldConfig",
             "WorldConnection",
@@ -72,6 +76,8 @@ describe("world public API", () => {
         };
         const layoutKey: keyof GeographicLayoutOptions = "hierarchy";
         const spatialFocusKey: keyof GeographicSpatialFocus = "featureId";
+        const layoutGenerationVersion: GeographicLayoutGenerationVersion = "geographic-layout-v1";
+        const generatorConfigKey: keyof GeographicLayoutGeneratorConfigOptions = "seed";
 
         expect([
             featureId,
@@ -84,6 +90,8 @@ describe("world public API", () => {
             placement.kind,
             layoutKey,
             spatialFocusKey,
+            layoutGenerationVersion,
+            generatorConfigKey,
         ]).toEqual([
             "feature",
             "content",
@@ -102,6 +110,8 @@ describe("world public API", () => {
             "site",
             "hierarchy",
             "featureId",
+            "geographic-layout-v1",
+            "seed",
         ]);
     });
 });
