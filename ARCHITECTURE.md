@@ -585,6 +585,9 @@ target. JSON V1 still imports no Genre; the showcase composes it with a separate
 Music catalog declaring five Genres and their `includes` relations. No tag, name or attribute is
 analyzed. The temporal runtime now generates the canonical hierarchy, layout and Appearance from
 that complete catalog while the established flat World remains a Renderer compatibility path.
+The isolated semantic preview is development tooling only. Its SVG envelopes and composition make
+the hierarchy inspectable; they are not a public Render API or a prescribed future appearance for
+Continents and Districts.
 
 The browser showcase now exercises this boundary through the application layer:
 

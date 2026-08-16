@@ -519,6 +519,11 @@ historique, alimenté par un adaptateur qui exclut les seuls Genres demo, demeur
 compatibilité du Canvas principal; `GeographicHierarchy` avec `GeographicLayout` constitue le
 chemin géographique canonique futur avec son `GeographicAppearanceSnapshot`.
 
+Un preview isolé consomme ce second chemin comme outil de développement. Ses enveloppes SVG et sa
+composition rectangulaire servent à inspecter le containment et ne prescrivent ni les futures
+frontières, ni la future apparence artistique des Continents ou Districts. Son renderer et ses
+diagnostics restent hors des API publiques du produit.
+
 La navigation temporelle reconstruit un snapshot historique complet :
 
 ```
