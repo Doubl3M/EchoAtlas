@@ -99,6 +99,20 @@ physique géographique observable ; sa valeur actuelle est `world-v1-exact`. Ell
 `metadata.version`, qui versionne uniquement le format JSON importé. Tout futur format de projet
 capable de reconstruire un Monde historique devra conserver cette configuration World.
 
+## Current Broadcast
+
+Le `CurrentBroadcast` décrit les écoutes représentées comme courantes dans l'expérience. Il reste
+hors de `World(T)` et ne reçoit aucun instant historique implicite : changer `T` reconstruit le
+Monde temporel sans rembobiner le broadcast courant.
+
+Chaque entrée possède une identité locale au broadcast, un titre de morceau, un nom d'artiste et
+une provenance explicite. Une identité Music existante peut être référencée facultativement, mais
+une entrée reste valide sans `MusicEntity`, `KnowledgeNode`, `GeographicFeature` ou
+`WorldLocation`. L'ordre fourni est significatif et n'est pas trié. Représenter ou sélectionner une
+entrée ne l'adopte pas : cela ne modifie ni le catalogue ni le Monde et ne crée aucun Listening
+Event. Une future écoute acceptée dans le Listening History passera par une action explicite
+séparée.
+
 La fidélité historique ne consiste pas à masquer les éléments apparus après `T`. L'état complet est
 reconstruit depuis l'historique disponible à cette date. Ainsi, selon de futures règles produit, un
 artiste sans écoute pendant six mois pourra devenir une ruine et une route inutilisée pendant un an

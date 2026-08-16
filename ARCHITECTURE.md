@@ -574,6 +574,20 @@ boundary, Renderer independence and reproducibility for a given `World(T)`. Exac
 the current algorithm are regression references for that implementation, not a permanent public
 contract.
 
+## Current broadcast
+
+The current broadcast is application-owned experience state and is explicitly outside `World(T)`.
+Historical navigation changes only the temporal Atlas snapshot; it does not rewind or reconstruct
+the broadcast. Conversely, changing the current broadcast does not modify `MusicCatalog`, the
+Knowledge Graph, geographic hierarchy or generated World.
+
+A broadcast entry is an autonomous display description with a broadcast-local stable identity,
+track title, artist display name and explicit provenance. An optional Music identity may link a
+known entry, but neither Music nor geographic adoption is required. Broadcast order is preserved
+as supplied rather than canonically sorted. Representation never creates a `MusicEntity`,
+`KnowledgeNode`, `GeographicFeature`, `WorldLocation`, `WorldConnection` or implicit Listening
+Event. A future accepted listening event requires a separate explicit workflow.
+
 ---
 
 # Public API

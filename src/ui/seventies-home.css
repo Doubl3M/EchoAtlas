@@ -205,6 +205,108 @@ button {
     cursor: grabbing;
 }
 
+.broadcast-landmark {
+    position: absolute;
+    z-index: 3;
+    width: 5.2rem;
+    height: 7.2rem;
+    padding: 0;
+    color: var(--atlas-ink);
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    filter: drop-shadow(0.16rem 0.22rem 0 rgb(70 46 31 / 22%));
+    transform: translate(-50%, -58%);
+}
+
+.broadcast-landmark:focus-visible {
+    border-radius: 50%;
+    outline: 3px solid var(--atlas-paper-light);
+    outline-offset: 3px;
+}
+
+.broadcast-landmark__antenna,
+.broadcast-landmark__tower {
+    position: absolute;
+    left: 50%;
+    display: block;
+    transform: translateX(-50%);
+}
+
+.broadcast-landmark__antenna {
+    top: 0.3rem;
+    width: 0.16rem;
+    height: 2.15rem;
+    background: var(--atlas-plum);
+    border-radius: 50% 50% 0 0;
+}
+
+.broadcast-landmark__antenna::before,
+.broadcast-landmark__antenna::after {
+    position: absolute;
+    top: 0.2rem;
+    left: 50%;
+    width: 2.4rem;
+    height: 1.45rem;
+    border: 0.16rem solid var(--atlas-orange);
+    border-top-color: transparent;
+    border-bottom-color: transparent;
+    border-radius: 50%;
+    content: "";
+    transform: translateX(-50%);
+}
+
+.broadcast-landmark__antenna::after {
+    top: -0.15rem;
+    width: 3.45rem;
+    height: 2.1rem;
+    border-color: transparent var(--atlas-ochre);
+    opacity: 0.75;
+}
+
+.broadcast-landmark__tower {
+    top: 2rem;
+    width: 2.9rem;
+    height: 3.9rem;
+    background:
+        linear-gradient(75deg, transparent 46%, var(--atlas-brown) 47% 53%, transparent 54%),
+        linear-gradient(-75deg, transparent 46%, var(--atlas-brown) 47% 53%, transparent 54%);
+    border-top: 0.75rem solid var(--atlas-orange);
+    clip-path: polygon(25% 0, 75% 0, 94% 100%, 6% 100%);
+}
+
+.broadcast-landmark__tower::before {
+    position: absolute;
+    top: -1.05rem;
+    left: 50%;
+    width: 3.8rem;
+    height: 0.85rem;
+    background: var(--atlas-paper-light);
+    border: 0.16rem solid var(--atlas-brown);
+    border-radius: 50%;
+    box-shadow: inset 0 -0.2rem var(--atlas-ochre);
+    content: "";
+    transform: translateX(-50%);
+}
+
+.broadcast-landmark__label {
+    position: absolute;
+    right: 50%;
+    bottom: 0;
+    padding: 0.25rem 0.45rem;
+    color: var(--atlas-paper-light);
+    white-space: nowrap;
+    background: var(--atlas-plum);
+    border: 1px solid var(--atlas-brown);
+    border-radius: 0.15rem 0.55rem 0.15rem 0.45rem;
+    font-family: var(--atlas-sans);
+    font-size: 0.57rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transform: translateX(50%) rotate(-1deg);
+}
+
 .atlas-map__controls {
     position: absolute;
     z-index: 3;
@@ -591,6 +693,132 @@ button {
     width: 20%;
     height: 38%;
     background: var(--atlas-teal);
+}
+
+.selection-panel--broadcast {
+    background:
+        radial-gradient(circle at 75% 12%, rgb(200 144 62 / 24%), transparent 25%),
+        repeating-linear-gradient(96deg, rgb(70 51 35 / 2.5%) 0 1px, transparent 1px 5px),
+        var(--atlas-paper-light);
+}
+
+.broadcast-panel__description {
+    margin-top: 0.6rem !important;
+    color: var(--atlas-brown);
+    font-size: 0.92rem;
+    font-style: italic;
+}
+
+.broadcast-panel__signal {
+    position: relative;
+    height: 4.6rem;
+    margin: 0.8rem 0 1.1rem;
+    overflow: hidden;
+    border-top: 1px solid rgb(105 62 80 / 22%);
+    border-bottom: 1px solid rgb(105 62 80 / 22%);
+}
+
+.broadcast-panel__signal::before {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0.28rem;
+    height: 3.2rem;
+    background: var(--atlas-plum);
+    content: "";
+    transform: translateX(-50%);
+}
+
+.broadcast-panel__signal span {
+    position: absolute;
+    top: 0.55rem;
+    left: 50%;
+    width: 4.5rem;
+    height: 2.6rem;
+    border: 0.22rem solid transparent;
+    border-right-color: var(--atlas-orange);
+    border-left-color: var(--atlas-orange);
+    border-radius: 50%;
+    transform: translateX(-50%);
+}
+
+.broadcast-panel__signal span:last-child {
+    top: 0.15rem;
+    width: 7rem;
+    height: 3.4rem;
+    border-right-color: var(--atlas-ochre);
+    border-left-color: var(--atlas-ochre);
+    opacity: 0.65;
+}
+
+.broadcast-panel__playlist h3 {
+    margin: 0 0 0.8rem;
+    color: var(--atlas-orange);
+    font-size: 1rem;
+    font-style: italic;
+    font-weight: 600;
+}
+
+.broadcast-panel__playlist ol {
+    display: grid;
+    gap: 0.48rem;
+    margin: 0;
+    padding: 0;
+    counter-reset: broadcast-entry;
+    list-style: none;
+}
+
+.broadcast-panel__playlist li {
+    position: relative;
+    display: grid;
+    gap: 0.18rem;
+    padding: 0.62rem 0.7rem 0.58rem 2.5rem;
+    background: rgb(242 232 201 / 52%);
+    border: 1px solid rgb(118 80 55 / 28%);
+    border-radius: 0.2rem 0.65rem 0.18rem 0.5rem;
+    counter-increment: broadcast-entry;
+}
+
+.broadcast-panel__playlist li::before {
+    position: absolute;
+    top: 0.7rem;
+    left: 0.72rem;
+    color: var(--atlas-orange);
+    content: counter(broadcast-entry, decimal-leading-zero);
+    font-family: var(--atlas-sans);
+    font-size: 0.66rem;
+    font-weight: 700;
+}
+
+.broadcast-panel__playlist li[aria-current="true"] {
+    background: rgb(200 144 62 / 19%);
+    border-color: var(--atlas-orange);
+    box-shadow: inset 0.25rem 0 var(--atlas-orange);
+}
+
+.broadcast-panel__playlist strong {
+    font-size: 0.88rem;
+}
+
+.broadcast-panel__playlist span {
+    color: var(--atlas-brown);
+    font-family: var(--atlas-sans);
+    font-size: 0.7rem;
+}
+
+.broadcast-panel__playlist em {
+    justify-self: start;
+    margin-top: 0.22rem;
+    padding: 0.16rem 0.34rem;
+    color: var(--atlas-paper-light);
+    background: var(--atlas-plum);
+    border-radius: 0.4rem;
+    font-family: var(--atlas-sans);
+    font-size: 0.54rem;
+    font-style: normal;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
 }
 
 @media (max-width: 760px) {

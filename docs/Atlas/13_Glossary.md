@@ -90,6 +90,13 @@ construit ni Knowledge Graph ni World.
 Erreur d'import stable indiquant une catégorie `syntax` ou `validation`, un chemin JSON et une
 raison indépendante de l'interface utilisateur.
 
+## Current Broadcast
+
+Snapshot ordonné de l'état de diffusion courant, possédé par l'application et explicitement hors de
+`World(T)`. Ses entrées peuvent référencer facultativement une identité Music, mais restent
+affichables sans catalogue, Knowledge Graph ou géographie. Une diffusion n'est jamais une adoption
+ni un Listening Event implicite.
+
 ## Listening History
 
 Historique temporel distinct de `MusicCatalog`, composé conceptuellement de Listening Events. Il

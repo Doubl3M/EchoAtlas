@@ -145,6 +145,15 @@ qui décrit les écoutes musicales et alimente la navigation temporelle critique
 
 # Data / Application
 
+## Transmissions sponsorisées de Radio Pirate
+
+- **Principe :** un label ou un musicien pourra acheter une chance d'être entendu, jamais une
+  parcelle de terrain dans l'Atlas.
+- **Contraintes :** toute transmission sponsorisée devra porter une provenance explicite et rester
+  distincte d'une écoute personnelle. Sa diffusion seule ne pourra créer ou influencer directement
+  aucun Continent, District, Building, importance géographique ou ancienneté historique.
+- **Statut :** évolution commerciale future; aucun sponsoring, paiement ou ciblage engagé.
+
 ## Interface multilingue et localisation
 
 - **Constat / besoin :** les textes de l'interface devront pouvoir être traduits indépendamment
