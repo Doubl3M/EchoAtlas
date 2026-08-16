@@ -116,6 +116,23 @@ qui décrit les écoutes musicales et alimente la navigation temporelle critique
 
 # Music Domain
 
+## City évolutive fondée par l'utilisateur
+
+- **Constat / besoin :** dans la hiérarchie `Continent = Genre`, `District = Artist`,
+  `Building = Album` et `Track = Building Content`, une City peut devenir une scène live évolutive
+  liée à des Districts choisis dans un même Continent. Elle n'apparaît pas automatiquement avec le
+  Continent : l'utilisateur la fonde ou l'active explicitement à un instant `T`, y rattache les
+  Districts débloqués qu'il choisit, puis peut l'agrandir au fil des écoutes et de l'exploration.
+  Elle peut accueillir plus tard des vidéos ou lives liés aux artistes de ses Districts afin de
+  renforcer l'exploration géographique, sans devenir une page ou une grille vidéo générique.
+- **Temporalité :** avant `T`, la City n'existe pas; à partir de `T`, elle est fondée; dans les
+  snapshots ultérieurs, elle peut accueillir de nouveaux Districts apparus après sa création. La
+  reconstruction historique devra conserver exactement cette chronologie explicite.
+- **Contraintes :** une City peut émerger dans un Continent encore sauvage aux Districts dispersés;
+  elle n'absorbe jamais automatiquement tous ses Districts. Aucun rôle, runtime, règle World ou
+  migration City n'est engagé par cette entrée.
+- **Statut :** concept produit validé, réalisation future non planifiée.
+
 ## Genre et compilation dans une future version JSON
 
 - **Constat / besoin :** Music supporte ces kinds, mais JSON V1 ne définit aucune collection ni
