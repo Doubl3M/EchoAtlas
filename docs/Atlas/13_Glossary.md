@@ -99,15 +99,17 @@ ni un Listening Event implicite.
 
 ## Listening History
 
-Historique temporel distinct de `MusicCatalog`, composé conceptuellement de Listening Events. Il
-décrit l'histoire musicale de l'utilisateur et alimente la Temporal Navigation. Sa reconstruction
-reste déterministe à partir d'entrées explicites, sans notion implicite de « maintenant ».
+Suite canonique immutable de `ListeningEvent`, distincte de `MusicCatalog`. Elle est ordonnée par
+instant croissant puis ID lexical, indépendamment de l'ordre d'entrée. `History(T)` contient tous
+les événements dont `occurredAt <= T`; cette coupe inclusive est reconstruite directement, sans
+notion implicite de « maintenant » ni dépendance à une consultation antérieure.
 
 ## Listening Event
 
-Événement explicite appartenant au Listening History et représentant un fait d'écoute dans le
-temps. Il ne devient ni une propriété structurelle de `MusicCatalog`, ni un événement analytics de
-navigation.
+Fait d'écoute explicite et immutable possédant un ID stable, un `occurredAt` en millisecondes Unix
+sous forme d'entier sûr et une identité Music canonique `(kind, ID)`. Il peut référencer une identité
+absente du catalogue courant. Il ne devient ni une propriété structurelle de `MusicCatalog`, ni un
+événement analytics de navigation.
 
 ## Temporal Navigation
 

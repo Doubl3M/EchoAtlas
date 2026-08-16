@@ -423,6 +423,18 @@ Aucune dépendance circulaire.
 
 # Reconstruction temporelle
 
+Le domaine Music fournit un `ListeningHistory` immutable, trié canoniquement une fois à sa
+construction. Chaque événement associe un ID propre, une identité Music `(kind, ID)` et un
+`occurredAt` en millisecondes Unix sûres. La coupe historique est inclusive :
+
+```text
+History(T) = events where occurredAt <= T
+```
+
+Une coupe est toujours calculée depuis l'historique complet et jamais depuis la coupe précédente.
+Une identité absente du catalogue reste un fait valide; sa résolution ou son exclusion du futur
+snapshot musical appartient à l'étape de projection temporelle, pas à l'historique.
+
 La navigation temporelle reconstruit un snapshot historique complet :
 
 ```

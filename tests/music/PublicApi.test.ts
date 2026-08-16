@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import type { MusicEntityKind, MusicEntityOptions, MusicRelationOptions } from "../../src/music";
+import type {
+    ListeningEventOptions,
+    MusicEntityKind,
+    MusicEntityOptions,
+    MusicRelationOptions,
+} from "../../src/music";
 import { musicKnowledgeNodeId, musicKnowledgeNodeKind } from "../../src/music";
 
 describe("music public API", () => {
@@ -8,6 +13,8 @@ describe("music public API", () => {
         const publicApi = await import("../../src/music");
 
         expect(Object.keys(publicApi).sort()).toEqual([
+            "ListeningEvent",
+            "ListeningHistory",
             "MusicCatalog",
             "MusicEntity",
             "MusicInterpreter",
@@ -28,9 +35,16 @@ describe("music public API", () => {
             targetKind: "album",
             kind: "performed",
         };
+        const listeningEvent: ListeningEventOptions = {
+            id: "listen-1",
+            occurredAt: 1,
+            musicEntityKind: "track",
+            musicEntityId: "track-a",
+        };
 
         expect(entity.kind).toBe("artist");
         expect(relation.kind).toBe("performed");
+        expect(listeningEvent.occurredAt).toBe(1);
     });
 
     it("provides the canonical Music to Knowledge identity convention", () => {

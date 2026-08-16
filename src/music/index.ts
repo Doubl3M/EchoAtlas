@@ -5,3 +5,5 @@ export { MusicInterpreter } from "./MusicInterpreter";
 export { musicKnowledgeNodeId, musicKnowledgeNodeKind } from "./MusicKnowledgeIdentity";
 export { MusicRelation } from "./MusicRelation";
 export type { MusicRelationOptions } from "./MusicRelation";
+export { ListeningEvent, ListeningHistory } from "./listening";
+export type { ListeningEventOptions } from "./listening";

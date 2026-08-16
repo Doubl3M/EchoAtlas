@@ -536,6 +536,17 @@ Changing operating system must never change the world.
 
 ## Temporal snapshots
 
+`ListeningHistory` belongs to Music and is an immutable canonical sequence of explicit listening
+facts. Each `ListeningEvent` carries its own stable ID, an explicit safe Unix epoch millisecond and
+a canonical Music identity `(kind, ID)`. Input order has no meaning: events are ordered by
+`occurredAt`, then by an explicit lexical comparison of event IDs. Equal timestamps represent
+distinct facts when their IDs differ.
+
+`History(T)` contains exactly events where `occurredAt <= T`. It is reconstructed directly from
+the immutable history and never from a previous temporal snapshot. Neither the catalog nor the
+system clock is required to construct the history; an event may therefore reference a Music
+identity absent from the current catalog, for later resolution by temporal projection.
+
 A temporal world is defined conceptually by:
 
 ```text

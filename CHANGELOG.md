@@ -12,6 +12,8 @@ The project follows Semantic Versioning.
 
 ## Added
 
+- Immutable canonical listening events and indexed listening histories with explicit inclusive
+  temporal queries, independent from the current catalog, system time and Radio Pirate.
 - Application-owned current broadcast snapshots and a clickable seventies Radio Pirate landmark,
   with standalone playlist entries that remain independent from Music adoption and `World(T)`.
 - Canonical semantic-geography documentation and an immutable, geometry-free hierarchical World
