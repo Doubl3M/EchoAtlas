@@ -1,4 +1,5 @@
 export { MusicCatalog } from "./MusicCatalog";
+export { composeMusicCatalogs } from "./composeMusicCatalogs";
 export { MusicActivity, MusicActivityProjector, MusicActivitySnapshot } from "./activity";
 export type {
     MusicActivityOptions,

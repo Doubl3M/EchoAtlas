@@ -175,6 +175,17 @@ Version de la politique applicative traduisant Activity Music en Appearance Worl
 `music-geographic-appearance-v1`, applique `ruined` à tous les Districts canoniques d'un Artist
 inactive. Elle est distincte des versions Presence, Activity, Geography, Layout et World.
 
+## Showcase Semantic Music Extension
+
+Source Music locale et explicitement déclarée, composée avec le document JSON V1 uniquement pour
+la démonstration navigateur. Elle fournit les Genre et relations `includes` que JSON V1 ne sait pas
+importer. Elle n'analyse ni tags, ni noms, ni attributs et ne constitue pas une taxonomie musicale
+universelle.
+
+La fixture déclare exactement Rock → Fleetwood Mac et David Bowie ; Electronic → Kraftwerk, Brian
+Eno et David Bowie ; Soul → Stevie Wonder et Gil Scott-Heron ; Folk → Joni Mitchell ; Afrobeat →
+Fela Kuti. Cette table est une décision de démonstration, pas une taxonomie canonique.
+
 ## World(T)
 
 Snapshot géographique à l'instant explicite `T`, déterminé par `MusicCatalog`, le Listening History

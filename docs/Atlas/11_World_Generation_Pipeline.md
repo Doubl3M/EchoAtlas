@@ -1,8 +1,8 @@
 # 11 · World Generation Pipeline
 
-> *Le Monde n'apparaît pas d'un seul geste.*
+> _Le Monde n'apparaît pas d'un seul geste._
 >
-> *Il se construit par transformations successives.*
+> _Il se construit par transformations successives._
 
 ---
 
@@ -487,10 +487,11 @@ représentations de rôle District deviennent `ruined`. Un Artist actif, une fea
 ou une activité d'un autre kind ne produit aucune entrée. Le snapshot est sparse : absence signifie
 `normal`. Une réactivation reconstruit un nouveau snapshot normal sans muter le précédent.
 
-Cette fondation ne branche ni le générateur World legacy ni le Renderer. En particulier, le
-landmark Artist → City du showcase n'est pas utilisé comme cible : la cible canonique est le
-District de la hiérarchie sémantique. Le runtime calcule néanmoins le snapshot Appearance ; il
-reste vide dans la fixture JSON V1 actuelle, faute de Genre et donc de District.
+Le landmark Artist → City du showcase n'est pas utilisé comme cible : la cible canonique est le
+District de la hiérarchie sémantique. JSON V1 reste inchangé et n'importe aucun Genre. Une extension
+Music de démonstration séparée déclare explicitement les Genres et associations nécessaires au
+showcase, sans aucune inférence. Le runtime peut ainsi calculer de vrais Continents, Districts,
+Buildings, Contents, placements et apparences temporelles.
 
 Le showcase exécute désormais réellement la reconstruction suivante pour chaque jalon temporel
 sélectionné :
@@ -512,6 +513,11 @@ ne signifie jamais « District ruined ».
 La couche application repart toujours du catalogue complet et de l'historique immutable. Elle
 conserve la Camera courante, remplace les snapshots dérivés et laisse le `CurrentBroadcast` hors de
 ce pipeline.
+
+Pendant la migration, deux sorties coexistent sans fusion artificielle : le `GeographicWorld`
+historique, alimenté par un adaptateur qui exclut les seuls Genres demo, demeure le chemin de
+compatibilité du Canvas principal; `GeographicHierarchy` avec `GeographicLayout` constitue le
+chemin géographique canonique futur avec son `GeographicAppearanceSnapshot`.
 
 La navigation temporelle reconstruit un snapshot historique complet :
 
@@ -640,6 +646,6 @@ Jamais de la complexité inutile.
 
 ---
 
-> *Le Monde n'apparaît pas lorsqu'il est dessiné.*
+> _Le Monde n'apparaît pas lorsqu'il est dessiné._
 
-> *Il apparaît lorsque toutes les transformations ont trouvé leur place.*
+> _Il apparaît lorsque toutes les transformations ont trouvé leur place._

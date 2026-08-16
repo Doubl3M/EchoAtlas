@@ -37,6 +37,7 @@ describe("music public API", () => {
             "MusicRelation",
             "TemporalMusicProjector",
             "TemporalMusicSnapshot",
+            "composeMusicCatalogs",
             "getStructuralMusicRelationKindV1",
             "isStructuralMusicRelationV1",
             "musicKnowledgeNodeId",
