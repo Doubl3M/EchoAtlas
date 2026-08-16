@@ -1,23 +1,23 @@
-import { hashString, hashToFloat, mixUint32 } from "../../src/engine/math";
+import { hashString, hashToFloat, mixUint32 } from "../../engine/math";
 
 import type {
-    SemanticBridgeBuilding,
-    SemanticBridgeContinent,
-    SemanticBridgeDistrict,
-    SemanticBridgeSnapshot,
-} from "./SemanticBridgeModel";
+    StableDemoBuilding,
+    StableDemoContinent,
+    StableDemoDistrict,
+    StableDemoSnapshot,
+} from "./StableDemoModel";
 
-export interface SemanticBridgeRenderOptions {
-    readonly snapshot: SemanticBridgeSnapshot;
+export interface StableDemoRenderOptions {
+    readonly snapshot: StableDemoSnapshot;
     readonly width: number;
     readonly height: number;
     readonly selectedFeatureId?: string;
     readonly onSelect: (featureId: string, knowledgeNodeId: string) => void;
 }
 
-/** Dev-only illustrated translation of canonical semantic geography. */
-export class SemanticBridgeRenderer {
-    public render(svg: SVGSVGElement, options: SemanticBridgeRenderOptions): void {
+/** Demo-owned illustrated translation of canonical semantic geography. */
+export class StableDemoRenderer {
+    public render(svg: SVGSVGElement, options: StableDemoRenderOptions): void {
         svg.replaceChildren();
         svg.setAttribute("viewBox", `0 0 ${options.width} ${options.height}`);
         svg.append(textureDefinitions(), paper(options.width, options.height), mapTexture(options));
@@ -28,14 +28,14 @@ export class SemanticBridgeRenderer {
 
     private continent(
         svg: SVGSVGElement,
-        continent: SemanticBridgeContinent,
-        options: SemanticBridgeRenderOptions
+        continent: StableDemoContinent,
+        options: StableDemoRenderOptions
     ): void {
         const group = svgElement("g");
         group.classList.add("bridge-continent");
         group.dataset.genre = continent.name;
         group.dataset.featureId = continent.feature.id;
-        select(group, continent.feature, options);
+        select(group, continent.feature, continent.name, options);
         const shape = svgElement("path");
         shape.classList.add("bridge-continent__land", paletteClass(continent.feature.id));
         shape.setAttribute("d", organicPath(continent.bounds, continent.feature.id, 12, 0.1));
@@ -53,8 +53,8 @@ export class SemanticBridgeRenderer {
 
     private district(
         parent: SVGGElement,
-        district: SemanticBridgeDistrict,
-        options: SemanticBridgeRenderOptions
+        district: StableDemoDistrict,
+        options: StableDemoRenderOptions
     ): void {
         const group = svgElement("g");
         group.classList.add("bridge-district");
@@ -64,7 +64,7 @@ export class SemanticBridgeRenderer {
         }
         group.dataset.featureId = district.feature.id;
         group.dataset.ruined = String(district.isRuined);
-        select(group, district.feature, options);
+        select(group, district.feature, district.name, options);
         const shape = svgElement("path");
         shape.classList.add("bridge-district__ground");
         shape.setAttribute(
@@ -89,8 +89,8 @@ export class SemanticBridgeRenderer {
 
     private building(
         parent: SVGGElement,
-        building: SemanticBridgeBuilding,
-        options: SemanticBridgeRenderOptions
+        building: StableDemoBuilding,
+        options: StableDemoRenderOptions
     ): void {
         const group = svgElement("g");
         group.classList.add("bridge-building");
@@ -99,7 +99,7 @@ export class SemanticBridgeRenderer {
         }
         group.dataset.featureId = building.feature.id;
         group.dataset.trackCount = String(building.tracks.length);
-        select(group, building.feature, options);
+        select(group, building.feature, building.title, options);
         const { x, y } = building.position;
         const silhouette = svgElement("path");
         silhouette.classList.add("bridge-building__shape");
@@ -114,7 +114,7 @@ export class SemanticBridgeRenderer {
     }
 }
 
-function districtMotif(district: SemanticBridgeDistrict): SVGGElement {
+function districtMotif(district: StableDemoDistrict): SVGGElement {
     const group = svgElement("g");
     group.classList.add("bridge-district__motif");
     const hash = hashString(district.feature.id);
@@ -219,13 +219,26 @@ function inset(
 function select(
     element: SVGElement,
     feature: { readonly id: string; readonly sourceKnowledgeNodeId?: string },
-    options: SemanticBridgeRenderOptions
+    label: string,
+    options: StableDemoRenderOptions
 ): void {
     if (feature.sourceKnowledgeNodeId === undefined) return;
     element.classList.add("bridge-selectable");
-    element.addEventListener("click", (event) => {
+    element.dataset.knowledgeNodeId = feature.sourceKnowledgeNodeId;
+    element.setAttribute("role", "button");
+    element.setAttribute("tabindex", "0");
+    element.setAttribute("aria-label", label);
+    const activate = (event: Event): void => {
         event.stopPropagation();
         options.onSelect(feature.id, feature.sourceKnowledgeNodeId ?? "");
+    };
+    element.addEventListener("click", activate);
+    element.addEventListener("keydown", (event) => {
+        if (!(event instanceof KeyboardEvent) || (event.key !== "Enter" && event.key !== " ")) {
+            return;
+        }
+        event.preventDefault();
+        activate(event);
     });
 }
 
@@ -261,9 +274,7 @@ function textureDefinitions(): SVGDefsElement {
     return definitions;
 }
 
-function mapTexture(
-    options: Pick<SemanticBridgeRenderOptions, "width" | "height">
-): SVGRectElement {
+function mapTexture(options: Pick<StableDemoRenderOptions, "width" | "height">): SVGRectElement {
     const element = svgElement("rect");
     element.classList.add("bridge-map-texture");
     element.setAttribute("width", String(options.width));

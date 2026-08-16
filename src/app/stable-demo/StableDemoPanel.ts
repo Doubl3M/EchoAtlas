@@ -1,24 +1,24 @@
-import type { MusicEntity } from "../../src/music";
-import { GeographicFocusResolver } from "../../src/world";
-import { formatHistoricalDate } from "../../src/app/HistoricalTimelineControl";
-import type { TemporalMusicAtlasState } from "../../src/app/TemporalMusicAtlas";
-import { uiText } from "../../src/app/UiText";
+import type { MusicEntity } from "../../music";
+import { GeographicFocusResolver } from "../../world";
+import { formatHistoricalDate } from "../HistoricalTimelineControl";
+import type { TemporalMusicAtlasState } from "../TemporalMusicAtlas";
+import { uiText } from "../UiText";
 
-import type { SemanticBridgeBuilding, SemanticBridgeSnapshot } from "./SemanticBridgeModel";
-import { getEntityByKnowledgeNodeId } from "./SemanticBridgeModel";
-import { semanticBridgeText } from "./SemanticBridgeText";
+import type { StableDemoBuilding, StableDemoSnapshot } from "./StableDemoModel";
+import { getEntityByKnowledgeNodeId } from "./StableDemoModel";
+import { stableDemoText } from "./StableDemoText";
 
-export interface SemanticBridgePanel {
+export interface StableDemoPanel {
     readonly element: HTMLElement;
     show(knowledgeNodeId: string, selectedFeatureId: string): void;
     hide(): void;
 }
 
-export function createSemanticBridgePanel(
-    getSnapshot: () => SemanticBridgeSnapshot,
+export function createStableDemoPanel(
+    getSnapshot: () => StableDemoSnapshot,
     getState: () => TemporalMusicAtlasState,
     onClose: () => void
-): SemanticBridgePanel {
+): StableDemoPanel {
     const element = document.createElement("aside");
     element.className = "bridge-panel selection-panel";
     element.hidden = true;
@@ -33,7 +33,7 @@ export function createSemanticBridgePanel(
         const close = document.createElement("button");
         close.type = "button";
         close.className = "selection-panel__close";
-        close.setAttribute("aria-label", semanticBridgeText.close);
+        close.setAttribute("aria-label", stableDemoText.close);
         close.textContent = "×";
         close.addEventListener("click", () => {
             hide();
@@ -65,6 +65,7 @@ export function createSemanticBridgePanel(
         element.hidden = false;
         element.dataset.selectedKnowledgeNodeId = knowledgeNodeId;
         element.dataset.selectedFeatureId = selectedFeatureId;
+        element.dataset.selectedEntityKind = entity.kind;
     };
     return Object.freeze({ element, show, hide });
 }
@@ -85,7 +86,7 @@ function header(entity: MusicEntity): HTMLElement {
     element.className = "selection-panel__header bridge-panel__header";
     const kind = document.createElement("p");
     kind.className = "selection-panel__kind";
-    kind.textContent = semanticBridgeText.kinds[entity.kind];
+    kind.textContent = stableDemoText.kinds[entity.kind];
     const title = document.createElement("h2");
     title.textContent = entity.name ?? entity.title ?? entity.id;
     element.append(kind, title);
@@ -96,13 +97,13 @@ function details(entity: MusicEntity): HTMLElement {
     const element = document.createElement("div");
     element.className = "bridge-panel__details";
     const geography = document.createElement("p");
-    geography.textContent = semanticBridgeText.geography[entity.kind];
+    geography.textContent = stableDemoText.geography[entity.kind];
     element.append(geography);
     const values: readonly (readonly [string, string | number | undefined])[] = [
-        [semanticBridgeText.country, entity.country],
-        [semanticBridgeText.formed, entity.formed],
-        [semanticBridgeText.year, entity.year],
-        [semanticBridgeText.duration, entity.duration],
+        [stableDemoText.country, entity.country],
+        [stableDemoText.formed, entity.formed],
+        [stableDemoText.year, entity.year],
+        [stableDemoText.duration, entity.duration],
     ];
     const list = document.createElement("dl");
     for (const [label, value] of values) {
@@ -120,15 +121,15 @@ function details(entity: MusicEntity): HTMLElement {
 function representationNote(count: number): HTMLElement {
     const note = document.createElement("p");
     note.className = "bridge-panel__representations";
-    note.textContent = `${semanticBridgeText.presentIn} ${count} ${semanticBridgeText.territories}`;
+    note.textContent = `${stableDemoText.presentIn} ${count} ${stableDemoText.territories}`;
     return note;
 }
 
-function trackList(building: SemanticBridgeBuilding): HTMLElement {
+function trackList(building: StableDemoBuilding): HTMLElement {
     const section = document.createElement("section");
     section.className = "bridge-panel__tracks";
     const heading = document.createElement("h3");
-    heading.textContent = semanticBridgeText.insideBuilding;
+    heading.textContent = stableDemoText.insideBuilding;
     const list = document.createElement("ol");
     for (const track of building.tracks) {
         const item = document.createElement("li");

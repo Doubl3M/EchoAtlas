@@ -1,4 +1,4 @@
-export const semanticBridgeText = Object.freeze({
+export const stableDemoText = Object.freeze({
     brandSubtitle: "Cartographie musicale",
     intro: "Les territoires de la musique se révèlent au fil de tes écoutes.",
     explorer: "Explorer",

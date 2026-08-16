@@ -1,19 +1,19 @@
-import { createCurrentBroadcastPanel } from "../../src/app/CurrentBroadcastPanel";
-import { createDemoCurrentBroadcast } from "../../src/app/demoCurrentBroadcast";
-import { createDemoTemporalMusicAtlas } from "../../src/app/demoTemporalMusicAtlas";
-import { createDemoWorldConfig } from "../../src/app/demoWorldConfig";
-import { formatHistoricalDate } from "../../src/app/HistoricalTimelineControl";
-import type { TemporalMusicAtlasState } from "../../src/app/TemporalMusicAtlas";
-import "../../src/ui/seventies-home.css";
+import { createCurrentBroadcastPanel } from "../CurrentBroadcastPanel";
+import { createDemoCurrentBroadcast } from "../demoCurrentBroadcast";
+import { createDemoTemporalMusicAtlas } from "../demoTemporalMusicAtlas";
+import { createDemoWorldConfig } from "../demoWorldConfig";
+import { formatHistoricalDate } from "../HistoricalTimelineControl";
+import type { TemporalMusicAtlasState } from "../TemporalMusicAtlas";
+import "../../ui/seventies-home.css";
 
-import { projectSemanticBridge, type SemanticBridgeSnapshot } from "./SemanticBridgeModel";
-import { createSemanticBridgePanel } from "./SemanticBridgePanel";
-import { SemanticBridgeRenderer } from "./SemanticBridgeRenderer";
-import { semanticBridgeText } from "./SemanticBridgeText";
-import "./seventies-semantic-demo.css";
+import { projectStableDemo, type StableDemoSnapshot } from "./StableDemoModel";
+import { createStableDemoPanel } from "./StableDemoPanel";
+import { StableDemoRenderer } from "./StableDemoRenderer";
+import { stableDemoText } from "./StableDemoText";
+import "./stable-demo.css";
 
-const root = document.querySelector<HTMLElement>("#seventies-semantic-demo");
-if (root === null) throw new Error("Seventies semantic demo root was not found.");
+const root = document.querySelector<HTMLElement>("#echoatlas-demo");
+if (root === null) throw new Error("EchoAtlas demo root was not found.");
 
 const atlas = createDemoTemporalMusicAtlas(createDemoWorldConfig());
 const milestones = atlas.getMilestones();
@@ -28,8 +28,9 @@ let selectedAt =
     milestones[0];
 if (selectedAt === undefined) throw new Error("Semantic demo milestone is unavailable.");
 let state: TemporalMusicAtlasState = atlas.project(selectedAt);
-let presentation: SemanticBridgeSnapshot = projectSemanticBridge(state);
+let presentation: StableDemoSnapshot = projectStableDemo(state);
 let selectedFeatureId: string | undefined;
+let selectedKnowledgeNodeId: string | undefined;
 
 const shell = document.createElement("div");
 shell.className = "semantic-atlas-shell";
@@ -41,20 +42,21 @@ const map = document.createElement("section");
 map.className = "semantic-atlas-map";
 const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
 svg.setAttribute("role", "img");
-svg.setAttribute("aria-label", "Atlas musical sémantique EchoAtlas");
+svg.setAttribute("aria-label", "Carte musicale EchoAtlas");
 const radio = createRadioLandmark();
 map.append(svg, radio);
 const timeline = document.createElement("nav");
 timeline.className = "semantic-atlas-timeline";
-timeline.setAttribute("aria-label", semanticBridgeText.history);
+timeline.setAttribute("aria-label", stableDemoText.history);
 const footer = document.createElement("footer");
 footer.className = "semantic-atlas-footer";
 
-const musicPanel = createSemanticBridgePanel(
+const musicPanel = createStableDemoPanel(
     () => presentation,
     () => state,
     () => {
         selectedFeatureId = undefined;
+        selectedKnowledgeNodeId = undefined;
         renderMap();
     }
 );
@@ -64,7 +66,7 @@ exploration.append(map, musicPanel.element, broadcastPanel.element);
 shell.append(header, rail, exploration, timeline, footer);
 root.replaceChildren(shell);
 
-const renderer = new SemanticBridgeRenderer();
+const renderer = new StableDemoRenderer();
 render();
 applyInitialSelection();
 
@@ -75,6 +77,12 @@ function render(): void {
 }
 
 function renderMap(): void {
+    map.dataset.continentCount = String(presentation.continents.length);
+    map.dataset.districtCount = String(presentation.districts.length);
+    map.dataset.buildingCount = String(presentation.buildings.length);
+    map.dataset.ruinedDistrictCount = String(
+        presentation.districts.filter(({ isRuined }) => isRuined).length
+    );
     renderer.render(svg, {
         snapshot: presentation,
         width: state.layout.width,
@@ -82,6 +90,7 @@ function renderMap(): void {
         selectedFeatureId,
         onSelect: (featureId, knowledgeNodeId) => {
             selectedFeatureId = featureId;
+            selectedKnowledgeNodeId = knowledgeNodeId;
             broadcastPanel.hide();
             musicPanel.show(knowledgeNodeId, featureId);
             renderMap();
@@ -91,12 +100,13 @@ function renderMap(): void {
 
 function renderTimeline(): void {
     timeline.replaceChildren();
+    timeline.dataset.selectedAt = String(selectedAt);
     milestones.forEach((at, index) => {
         const button = document.createElement("button");
         button.type = "button";
         button.className = at === selectedAt ? "is-selected" : "";
         button.dataset.milestoneIndex = String(index);
-        button.innerHTML = `<i aria-hidden="true"></i><span>${semanticBridgeText.era} ${index + 1}</span><strong>${index === milestones.length - 1 ? semanticBridgeText.present : formatHistoricalDate(at)}</strong><small>${formatHistoricalDate(at)}</small>`;
+        button.innerHTML = `<i aria-hidden="true"></i><span>${stableDemoText.era} ${index + 1}</span><strong>${index === milestones.length - 1 ? stableDemoText.present : formatHistoricalDate(at)}</strong><small>${formatHistoricalDate(at)}</small>`;
         button.addEventListener("click", () => changeTime(at));
         timeline.append(button);
     });
@@ -105,13 +115,17 @@ function renderTimeline(): void {
 function changeTime(at: number): void {
     selectedAt = at;
     state = atlas.project(at);
-    presentation = projectSemanticBridge(state);
+    presentation = projectStableDemo(state);
     if (
         selectedFeatureId !== undefined &&
         state.hierarchy.getFeatureById(selectedFeatureId) === undefined
     ) {
         selectedFeatureId = undefined;
+        selectedKnowledgeNodeId = undefined;
         musicPanel.hide();
+    }
+    if (selectedFeatureId !== undefined && selectedKnowledgeNodeId !== undefined) {
+        musicPanel.show(selectedKnowledgeNodeId, selectedFeatureId);
     }
     render();
 }
@@ -124,15 +138,15 @@ function renderFooter(): void {
 function createHeader(): HTMLElement {
     const element = document.createElement("header");
     element.className = "semantic-atlas-header";
-    element.innerHTML = `<div class="semantic-atlas-brand"><span aria-hidden="true">✺</span><div><h1>EchoAtlas</h1><p>${semanticBridgeText.brandSubtitle}</p></div></div><p>${semanticBridgeText.intro}</p><span class="semantic-atlas-compass" aria-hidden="true">✣</span>`;
+    element.innerHTML = `<div class="semantic-atlas-brand"><span aria-hidden="true">✺</span><div><h1>EchoAtlas</h1><p>${stableDemoText.brandSubtitle}</p></div></div><p>${stableDemoText.intro}</p><span class="semantic-atlas-compass" aria-hidden="true">✣</span>`;
     return element;
 }
 
 function createRail(): HTMLElement {
     const element = document.createElement("nav");
     element.className = "semantic-atlas-rail";
-    element.setAttribute("aria-label", semanticBridgeText.explorer);
-    element.innerHTML = `<span aria-hidden="true">⌾</span><strong>${semanticBridgeText.explorer}</strong>`;
+    element.setAttribute("aria-label", stableDemoText.explorer);
+    element.innerHTML = `<span aria-hidden="true">⌾</span><strong>${stableDemoText.explorer}</strong>`;
     return element;
 }
 
@@ -141,11 +155,12 @@ function createRadioLandmark(): HTMLButtonElement {
     button.type = "button";
     button.className = "semantic-radio-landmark";
     button.dataset.landmarkKind = "current-broadcast";
-    button.setAttribute("aria-label", semanticBridgeText.pirateRadio);
-    button.innerHTML = `<span class="semantic-radio-landmark__tower" aria-hidden="true"><i></i><b></b><em></em></span><span class="semantic-radio-landmark__waves" aria-hidden="true"></span><strong>${semanticBridgeText.pirateRadio}</strong><small>${semanticBridgeText.radioHelp}</small>`;
+    button.setAttribute("aria-label", stableDemoText.pirateRadio);
+    button.innerHTML = `<span class="semantic-radio-landmark__tower" aria-hidden="true"><i></i><b></b><em></em></span><span class="semantic-radio-landmark__waves" aria-hidden="true"></span><strong>${stableDemoText.pirateRadio}</strong><small>${stableDemoText.radioHelp}</small>`;
     button.addEventListener("click", () => {
         musicPanel.hide();
         selectedFeatureId = undefined;
+        selectedKnowledgeNodeId = undefined;
         renderMap();
         broadcastPanel.show();
     });
@@ -166,6 +181,7 @@ function applyInitialSelection(): void {
         state.hierarchy.getFeaturesByKnowledgeNodeId(requested)[0];
     if (feature?.sourceKnowledgeNodeId === undefined) return;
     selectedFeatureId = feature.id;
+    selectedKnowledgeNodeId = feature.sourceKnowledgeNodeId;
     musicPanel.show(feature.sourceKnowledgeNodeId, feature.id);
     renderMap();
 }

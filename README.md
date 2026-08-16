@@ -63,3 +63,16 @@ C'est un atlas.
 *"Le Monde ne demande pas à être compris.*
 
 *Il demande à être parcouru."*
+
+---
+
+## Stable Demo
+
+Run `npm run dev`, then open `http://127.0.0.1:5173/demo.html` to explore the stable
+EchoAtlas demonstration. It exercises the real temporal and semantic runtime: Genres become
+Continents, Artists become Districts, Albums become Buildings, and Tracks remain inside their
+Building. The timeline also demonstrates presence, inactivity, ruins, and reactivation while the
+Radio Pirate broadcast remains anchored in the present.
+
+The illustrated geography is still evolving. Its Genres and ListeningHistory are explicit demo
+fixtures, not inferred catalog data or a universal taxonomy.

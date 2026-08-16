@@ -6,7 +6,7 @@ export default defineConfig({
             input: {
                 main: "index.html",
                 semanticPreview: "semantic-preview.html",
-                seventiesSemanticDemo: "seventies-semantic-demo.html",
+                stableDemo: "demo.html",
             },
         },
     },

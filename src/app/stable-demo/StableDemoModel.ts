@@ -1,41 +1,42 @@
-import type { TemporalMusicAtlasState } from "../../src/app/TemporalMusicAtlas";
-import { musicKnowledgeNodeId, type MusicCatalog, type MusicEntity } from "../../src/music";
-import type { GeographicBounds, GeographicFeature, GeographicPoint } from "../../src/world";
+import { musicKnowledgeNodeId, type MusicCatalog, type MusicEntity } from "../../music";
+import type { GeographicBounds, GeographicFeature, GeographicPoint } from "../../world";
 
-export interface SemanticBridgeContinent {
+import type { TemporalMusicAtlasState } from "../TemporalMusicAtlas";
+
+export interface StableDemoContinent {
     readonly feature: GeographicFeature;
     readonly name: string;
     readonly bounds: GeographicBounds;
 }
 
-export interface SemanticBridgeDistrict {
+export interface StableDemoDistrict {
     readonly feature: GeographicFeature;
     readonly name: string;
     readonly bounds: GeographicBounds;
     readonly isRuined: boolean;
 }
 
-export interface SemanticBridgeBuilding {
+export interface StableDemoBuilding {
     readonly feature: GeographicFeature;
     readonly title: string;
     readonly position: GeographicPoint;
     readonly tracks: readonly MusicEntity[];
 }
 
-export interface SemanticBridgeSnapshot {
+export interface StableDemoSnapshot {
     readonly catalog: MusicCatalog;
-    readonly continents: readonly SemanticBridgeContinent[];
-    readonly districts: readonly SemanticBridgeDistrict[];
-    readonly buildings: readonly SemanticBridgeBuilding[];
+    readonly continents: readonly StableDemoContinent[];
+    readonly districts: readonly StableDemoDistrict[];
+    readonly buildings: readonly StableDemoBuilding[];
 }
 
 /** Presentation-only projection; canonical identity, containment and positions remain untouched. */
-export function projectSemanticBridge(state: TemporalMusicAtlasState): SemanticBridgeSnapshot {
+export function projectStableDemo(state: TemporalMusicAtlasState): StableDemoSnapshot {
     const catalog = state.presence?.getCatalog() ?? state.catalog;
     const entities = indexEntities(catalog);
-    const continents: SemanticBridgeContinent[] = [];
-    const districts: SemanticBridgeDistrict[] = [];
-    const buildings: SemanticBridgeBuilding[] = [];
+    const continents: StableDemoContinent[] = [];
+    const districts: StableDemoDistrict[] = [];
+    const buildings: StableDemoBuilding[] = [];
 
     for (const feature of state.hierarchy.getFeatures()) {
         const entity = entityForFeature(feature, entities);

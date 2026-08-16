@@ -12,6 +12,9 @@ The project follows Semantic Versioning.
 
 ## Added
 
+- A stable product demonstration of the real temporal semantic atlas, including historical
+  District appearance, multi-Genre representations, Album contents and the present-day Radio
+  Pirate broadcast, while keeping the illustrated geography explicitly evolutive.
 - A development-only semantic geography explorer for inspecting temporal Hierarchy, Layout,
   Appearance and focus resolution without defining the future cartographic art direction.
 - An explicit demo-only Genre catalog, deterministic catalog composition, and temporal semantic

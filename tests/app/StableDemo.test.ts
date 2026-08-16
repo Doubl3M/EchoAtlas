@@ -5,12 +5,12 @@ import { demoHistoricalTimes } from "../../src/app/demoListeningHistory";
 import { createDemoTemporalMusicAtlas } from "../../src/app/demoTemporalMusicAtlas";
 import { createDemoWorldConfig } from "../../src/app/demoWorldConfig";
 import { musicKnowledgeNodeId } from "../../src/music";
-import { projectSemanticBridge } from "../../tools/seventies-semantic-demo/SemanticBridgeModel";
+import { projectStableDemo } from "../../src/app/stable-demo/StableDemoModel";
 
-describe("Seventies semantic bridge", () => {
+describe("Stable EchoAtlas demo", () => {
     it("projects only canonical Continents, Districts and Buildings as map features", () => {
         const state = atlas().project(demoHistoricalTimes.latest);
-        const bridge = projectSemanticBridge(state);
+        const bridge = projectStableDemo(state);
 
         expect(bridge.continents).toHaveLength(5);
         expect(bridge.districts).toHaveLength(9);
@@ -25,7 +25,7 @@ describe("Seventies semantic bridge", () => {
     });
 
     it("uses real Building Contents for the Low panel", () => {
-        const bridge = projectSemanticBridge(atlas().project(demoHistoricalTimes.latest));
+        const bridge = projectStableDemo(atlas().project(demoHistoricalTimes.latest));
         const lowBuildings = bridge.buildings.filter(
             ({ feature }) => feature.sourceKnowledgeNodeId === musicKnowledgeNodeId("album", "low")
         );
@@ -38,8 +38,8 @@ describe("Seventies semantic bridge", () => {
     });
 
     it("shows Bowie in two Districts and derives ruined state from Appearance", () => {
-        const inactive = projectSemanticBridge(atlas().project(demoHistoricalTimes.crossings));
-        const reactivated = projectSemanticBridge(atlas().project(demoHistoricalTimes.expansion));
+        const inactive = projectStableDemo(atlas().project(demoHistoricalTimes.crossings));
+        const reactivated = projectStableDemo(atlas().project(demoHistoricalTimes.expansion));
         const bowieId = musicKnowledgeNodeId("artist", "david-bowie");
         const inactiveDistricts = inactive.districts.filter(
             ({ feature }) => feature.sourceKnowledgeNodeId === bowieId
@@ -62,7 +62,7 @@ describe("Seventies semantic bridge", () => {
         const before = broadcast.getEntries();
 
         for (const milestone of temporalAtlas.getMilestones()) {
-            projectSemanticBridge(temporalAtlas.project(milestone));
+            projectStableDemo(temporalAtlas.project(milestone));
         }
 
         expect(broadcast.getEntries()).toEqual(before);
