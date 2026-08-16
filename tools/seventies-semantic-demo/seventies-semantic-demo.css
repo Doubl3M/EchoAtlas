@@ -1,0 +1,648 @@
+:root {
+    --bridge-paper: #e8d7a5;
+    --bridge-paper-light: #f3e6bf;
+    --bridge-ink: #3f2b22;
+    --bridge-brown: #765037;
+    --bridge-orange: #c85d2e;
+    --bridge-plum: #713b59;
+    --bridge-olive: #747342;
+    --bridge-teal: #477f75;
+    --bridge-gold: #d89b3d;
+}
+
+html,
+body,
+#seventies-semantic-demo {
+    width: 100%;
+    min-width: 0;
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    overflow: hidden;
+    color: var(--bridge-ink);
+    background: #9c7548;
+}
+
+.semantic-atlas-shell {
+    display: grid;
+    grid-template: auto minmax(0, 1fr) auto / 5.4rem minmax(0, 1fr);
+    gap: 0.62rem;
+    width: 100%;
+    height: 100%;
+    padding: 0.55rem;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 18% 9%, rgb(255 244 198 / 30%), transparent 24%),
+        repeating-linear-gradient(5deg, rgb(84 53 31 / 4%) 0 1px, transparent 1px 6px),
+        var(--bridge-paper);
+    box-shadow:
+        inset 0 0 0 3px var(--bridge-brown),
+        inset 0 0 2.5rem rgb(78 47 26 / 22%);
+}
+
+.semantic-atlas-header {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: auto minmax(18rem, 1fr) auto;
+    align-items: center;
+    min-height: 5rem;
+    padding: 0.35rem 1.15rem;
+    border: 1px solid var(--bridge-brown);
+    border-radius: 1rem 0.35rem 1rem 0.3rem;
+    box-shadow: inset 0 0 0 3px rgb(255 246 215 / 55%);
+}
+
+.semantic-atlas-header > p {
+    max-width: 34rem;
+    margin: 0 auto;
+    font-family: Georgia, serif;
+    font-size: clamp(1rem, 1.7vw, 1.45rem);
+    font-weight: 700;
+    line-height: 1.25;
+}
+
+.semantic-atlas-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+}
+
+.semantic-atlas-brand > span {
+    display: grid;
+    place-items: center;
+    width: 3.7rem;
+    height: 3.7rem;
+    color: #f3c147;
+    background: var(--bridge-orange);
+    border: 2px solid var(--bridge-brown);
+    border-radius: 48% 42% 51% 39%;
+    font-size: 2.7rem;
+    line-height: 1;
+    transform: rotate(-8deg);
+}
+
+.semantic-atlas-brand h1 {
+    margin: 0;
+    color: #5b3428;
+    font-family: Georgia, serif;
+    font-size: clamp(2rem, 3vw, 3rem);
+    line-height: 0.9;
+    letter-spacing: -0.07em;
+    text-shadow: 0.08rem 0.08rem 0 #d39a50;
+}
+
+.semantic-atlas-brand p {
+    margin: 0.3rem 0 0;
+    font-size: 0.66rem;
+    font-weight: 800;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+}
+
+.semantic-atlas-compass {
+    color: var(--bridge-plum);
+    font-size: 2.8rem;
+}
+
+.semantic-atlas-rail {
+    grid-row: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.45rem;
+    padding: 1rem 0.35rem;
+    background: rgb(244 226 174 / 75%);
+    border: 1px solid var(--bridge-brown);
+    border-radius: 0.8rem 0.25rem 0.7rem 0.2rem;
+    box-shadow: inset 0 0 0 3px rgb(255 247 220 / 45%);
+}
+
+.semantic-atlas-rail span {
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    color: var(--bridge-paper-light);
+    background: var(--bridge-plum);
+    border: 2px solid var(--bridge-brown);
+    border-radius: 50% 43% 47% 41%;
+    font-size: 1.8rem;
+}
+
+.semantic-atlas-rail strong {
+    font-size: 0.64rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    writing-mode: vertical-rl;
+}
+
+.semantic-atlas-exploration {
+    grid-column: 2;
+    grid-row: 2;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.62rem;
+    min-width: 0;
+    min-height: 0;
+}
+
+.semantic-atlas-exploration:has(.selection-panel:not([hidden])) {
+    grid-template-columns: minmax(0, 2.15fr) minmax(20rem, 1fr);
+}
+
+.semantic-atlas-map {
+    position: relative;
+    min-width: 0;
+    min-height: 0;
+    padding: 0.35rem;
+    overflow: hidden;
+    background: var(--bridge-paper-light);
+    border: 1px solid var(--bridge-brown);
+    border-radius: 1rem 0.3rem 0.85rem 0.25rem;
+    box-shadow:
+        0.2rem 0.28rem 0 rgb(68 42 28 / 18%),
+        inset 0 0 0 3px rgb(255 248 221 / 70%),
+        inset 0 0 0 5px rgb(94 60 38 / 16%);
+}
+
+.semantic-atlas-map svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #4c8a82;
+    border: 1px solid rgb(74 46 31 / 70%);
+    border-radius: 0.72rem 0.2rem 0.62rem 0.17rem;
+}
+
+.bridge-paper {
+    fill: #4c8a82;
+}
+
+.bridge-map-texture {
+    fill: url("#bridge-map-texture");
+    opacity: 0.48;
+    pointer-events: none;
+}
+
+.bridge-map-texture__line {
+    fill: none;
+    stroke: #d7c991;
+    stroke-width: 0.08;
+}
+
+.bridge-map-texture__mark {
+    fill: #315f5b;
+}
+
+.bridge-continent__land {
+    stroke: #523824;
+    stroke-width: 0.35;
+    paint-order: stroke fill;
+    filter: drop-shadow(0.4px 0.55px 0 rgb(45 33 23 / 35%));
+}
+
+.bridge-palette-0 {
+    fill: #bc6b42;
+}
+.bridge-palette-1 {
+    fill: #8a8c50;
+}
+.bridge-palette-2 {
+    fill: #d0a24e;
+}
+.bridge-palette-3 {
+    fill: #a96f68;
+}
+.bridge-palette-4 {
+    fill: #6e9273;
+}
+
+.bridge-continent__title {
+    fill: #472d24;
+    font-family: Georgia, serif;
+    font-size: 2.1px;
+    font-weight: 900;
+    letter-spacing: 0.08px;
+    paint-order: stroke;
+    stroke: #efdcaa;
+    stroke-width: 0.5px;
+}
+
+.bridge-district__ground {
+    fill: #e5c98b;
+    fill-opacity: 0.86;
+    stroke: #75462f;
+    stroke-dasharray: 0.7 0.25;
+    stroke-width: 0.24;
+}
+
+.bridge-district__motif {
+    fill: #a65335;
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.bridge-district__decoration {
+    stroke: #67442f;
+    stroke-width: 0.11;
+}
+
+.bridge-district__street {
+    fill: none;
+    stroke: #8d6843;
+    stroke-dasharray: 0.35 0.22;
+    stroke-width: 0.16;
+}
+
+.bridge-district__title {
+    fill: #542d27;
+    font-family: Georgia, serif;
+    font-size: 1.15px;
+    font-weight: 800;
+    paint-order: stroke;
+    stroke: #f0dbac;
+    stroke-width: 0.28px;
+}
+
+.bridge-district--ruined .bridge-district__ground {
+    fill: #a89b75;
+    stroke: #625b3a;
+    stroke-dasharray: 0.3 0.35;
+}
+
+.bridge-district--ruined .bridge-district__motif {
+    fill: #596846;
+    opacity: 0.75;
+    transform: rotate(-2deg);
+    transform-box: fill-box;
+    transform-origin: center;
+}
+
+.bridge-district--ruined .bridge-district__decoration:nth-of-type(3n) {
+    opacity: 0.25;
+}
+
+.bridge-district--ruined .bridge-district__title {
+    fill: #5b5237;
+    text-decoration: underline wavy rgb(92 101 65 / 70%);
+}
+
+.bridge-building__shape {
+    fill: #9f492f;
+    stroke: #4f3026;
+    stroke-width: 0.3;
+    filter: drop-shadow(0.25px 0.35px 0 rgb(55 34 24 / 35%));
+}
+
+.bridge-building__title {
+    fill: #3d2c25;
+    font-family: Georgia, serif;
+    font-size: 0.92px;
+    font-weight: 700;
+    text-anchor: middle;
+    paint-order: stroke;
+    stroke: #efdca9;
+    stroke-width: 0.22px;
+}
+
+.bridge-selectable {
+    cursor: pointer;
+}
+
+.bridge-selectable:hover > path,
+.bridge-selectable:hover > .bridge-building__shape,
+.bridge-feature--selected > path,
+.bridge-feature--selected > .bridge-building__shape {
+    stroke: #d88343;
+    stroke-width: 0.48;
+    filter: drop-shadow(0 0 0.18px #f2dda6);
+}
+
+.semantic-radio-landmark {
+    position: absolute;
+    right: 1.3rem;
+    bottom: 1.1rem;
+    z-index: 4;
+    display: grid;
+    grid-template-columns: 3.2rem 1fr;
+    align-items: center;
+    gap: 0 0.55rem;
+    width: 13rem;
+    min-height: 7.5rem;
+    padding: 0.45rem 0.65rem 0.5rem;
+    color: var(--bridge-ink);
+    background: linear-gradient(170deg, #e5bc67, #c96e42);
+    border: 2px solid var(--bridge-brown);
+    border-radius: 2.8rem 0.45rem 1rem 0.35rem;
+    box-shadow:
+        0.2rem 0.3rem 0 rgb(51 29 25 / 24%),
+        inset 0 0 0 3px rgb(255 235 172 / 35%);
+    cursor: pointer;
+}
+
+.semantic-radio-landmark__tower {
+    position: relative;
+    grid-row: 1 / 3;
+    align-self: end;
+    width: 3rem;
+    height: 6.3rem;
+}
+
+.semantic-radio-landmark__tower::before,
+.semantic-radio-landmark__tower::after {
+    position: absolute;
+    left: 1.43rem;
+    width: 0.16rem;
+    background: var(--bridge-plum);
+    content: "";
+}
+
+.semantic-radio-landmark__tower::before {
+    top: 0.35rem;
+    height: 1.4rem;
+}
+
+.semantic-radio-landmark__tower::after {
+    top: 2.2rem;
+    height: 3.7rem;
+    transform: skew(-7deg);
+}
+
+.semantic-radio-landmark__tower i {
+    position: absolute;
+    top: 1.5rem;
+    left: 0.42rem;
+    width: 2.2rem;
+    height: 0.8rem;
+    background: var(--bridge-plum);
+    border: 0.15rem solid #51314b;
+    border-radius: 50%;
+}
+
+.semantic-radio-landmark__tower b {
+    position: absolute;
+    bottom: 0.25rem;
+    left: 0.45rem;
+    width: 2.2rem;
+    height: 0.45rem;
+    background: var(--bridge-brown);
+    border-radius: 50%;
+}
+
+.semantic-radio-landmark__tower em {
+    position: absolute;
+    top: 0;
+    left: 1.28rem;
+    width: 0.45rem;
+    height: 0.45rem;
+    background: #f2d165;
+    border: 0.12rem solid var(--bridge-plum);
+    border-radius: 50%;
+}
+
+.semantic-radio-landmark__waves {
+    position: absolute;
+    top: 0.55rem;
+    left: 0.4rem;
+    width: 4.9rem;
+    height: 2rem;
+    border: 0.13rem solid transparent;
+    border-top-color: rgb(113 59 89 / 65%);
+    border-radius: 50%;
+}
+
+.semantic-radio-landmark strong,
+.semantic-radio-landmark small {
+    text-align: left;
+}
+
+.semantic-radio-landmark strong {
+    align-self: end;
+    color: var(--bridge-plum);
+    font-family: Georgia, serif;
+    font-size: 1.05rem;
+}
+
+.semantic-radio-landmark small {
+    align-self: start;
+    font-size: 0.67rem;
+    opacity: 0.8;
+}
+
+.bridge-panel {
+    position: relative;
+    min-width: 0;
+    height: auto;
+    max-height: none;
+    overflow: auto;
+    background:
+        repeating-linear-gradient(4deg, rgb(88 53 32 / 3%) 0 1px, transparent 1px 6px),
+        var(--bridge-paper-light);
+}
+
+.bridge-panel__header h2 {
+    color: var(--bridge-plum);
+    font-size: clamp(2rem, 3vw, 3.5rem);
+}
+
+.bridge-panel__details {
+    padding: 0.7rem;
+    border-block: 1px solid rgb(118 80 55 / 35%);
+}
+
+.bridge-panel__details > p {
+    font-family: Georgia, serif;
+    font-style: italic;
+}
+
+.bridge-panel__details dl {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.25rem 0.6rem;
+}
+
+.bridge-panel__details dt {
+    color: var(--bridge-orange);
+    font-weight: 800;
+}
+
+.bridge-panel__details dd {
+    margin: 0;
+}
+
+.bridge-panel__representations {
+    margin: 1rem 0.7rem;
+    padding: 0.65rem;
+    color: var(--bridge-paper-light);
+    background: var(--bridge-plum);
+    border-radius: 0.7rem 0.2rem 0.65rem 0.18rem;
+    font-family: Georgia, serif;
+    font-weight: 700;
+}
+
+.bridge-panel__activity {
+    display: grid;
+    gap: 0.25rem;
+    margin: 1rem 0.7rem;
+    padding: 0.8rem;
+    color: #4d4835;
+    background: #c8bb86;
+    border: 1px dashed #68704c;
+    border-radius: 0.7rem 0.18rem 0.65rem 0.16rem;
+}
+
+.bridge-panel__activity strong {
+    color: #5f6547;
+    font-family: Georgia, serif;
+    font-size: 1.05rem;
+}
+
+.bridge-panel__tracks {
+    margin: 1rem 0.7rem;
+}
+
+.bridge-panel__tracks h3 {
+    color: var(--bridge-orange);
+    font-family: Georgia, serif;
+    font-size: 1.2rem;
+}
+
+.bridge-panel__tracks ol {
+    padding: 0;
+    list-style: none;
+}
+
+.bridge-panel__tracks li {
+    display: grid;
+    grid-template-columns: 1.5rem 1fr;
+    gap: 0.5rem;
+    padding: 0.45rem 0;
+    border-bottom: 1px solid rgb(118 80 55 / 25%);
+}
+
+.semantic-atlas-timeline {
+    position: relative;
+    grid-column: 2;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.45rem;
+}
+
+.semantic-atlas-timeline::before {
+    position: absolute;
+    top: 0.78rem;
+    right: 4%;
+    left: 4%;
+    z-index: 0;
+    height: 0.12rem;
+    background: var(--bridge-brown);
+    content: "";
+}
+
+.semantic-atlas-timeline button {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: 0.1rem;
+    padding: 0.32rem 0.5rem 0.45rem;
+    color: var(--bridge-ink);
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+}
+
+.semantic-atlas-timeline button i {
+    justify-self: center;
+    width: 1.1rem;
+    height: 1.1rem;
+    background: var(--bridge-paper-light);
+    border: 0.18rem solid var(--bridge-brown);
+    border-radius: 50%;
+}
+
+.semantic-atlas-timeline button.is-selected {
+    color: var(--bridge-plum);
+    background: rgb(242 222 169 / 78%);
+    border-radius: 0.5rem 0.15rem 0.45rem 0.12rem;
+}
+
+.semantic-atlas-timeline button.is-selected i {
+    background: var(--bridge-orange);
+    box-shadow: 0 0 0 0.2rem rgb(216 155 61 / 35%);
+}
+
+.semantic-atlas-timeline span {
+    font-size: 0.6rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.semantic-atlas-timeline small {
+    font-size: 0.62rem;
+    opacity: 0.75;
+}
+
+.semantic-atlas-footer {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 2.2rem;
+    min-height: 3.4rem;
+    padding: 0.35rem 1rem;
+    border: 1px solid var(--bridge-brown);
+    border-radius: 0.8rem 0.25rem 0.75rem 0.2rem;
+}
+
+.semantic-atlas-footer p {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+    margin: 0;
+}
+
+.semantic-atlas-footer strong {
+    color: var(--bridge-plum);
+    font-family: Georgia, serif;
+    font-size: 1.4rem;
+}
+
+.semantic-atlas-footer span {
+    font-size: 0.65rem;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.semantic-atlas-footer blockquote {
+    margin: 0 0 0 auto;
+    color: var(--bridge-plum);
+    font-family: Georgia, serif;
+    font-style: italic;
+}
+
+@media (max-width: 900px) {
+    .semantic-atlas-shell {
+        grid-template-columns: 4.2rem minmax(0, 1fr);
+    }
+
+    .semantic-atlas-header > p,
+    .semantic-atlas-compass,
+    .semantic-atlas-footer blockquote {
+        display: none;
+    }
+
+    .semantic-atlas-exploration:has(.selection-panel:not([hidden])) {
+        grid-template-columns: 1fr;
+    }
+
+    .semantic-atlas-exploration > .selection-panel:not([hidden]) {
+        position: absolute;
+        inset: 6rem 0.8rem 4.5rem auto;
+        z-index: 10;
+        width: min(25rem, calc(100vw - 6rem));
+    }
+}
