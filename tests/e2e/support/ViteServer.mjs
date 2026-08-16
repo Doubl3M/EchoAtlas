@@ -3,8 +3,7 @@ import process from "node:process";
 import { setTimeout as delay } from "node:timers/promises";
 
 const HOST = "127.0.0.1";
-const PORT = 4175;
-const SERVER_URL = `http://${HOST}:${PORT}/`;
+const DEFAULT_PORT = 4175;
 const MAX_READY_ATTEMPTS = 100;
 const READY_RETRY_DELAY_MS = 50;
 const STOP_TIMEOUT_MS = 2_000;
@@ -13,9 +12,14 @@ export class ViteServer {
     #output = "";
     #process;
     #exit;
+    #port;
+
+    constructor(port = DEFAULT_PORT) {
+        this.#port = port;
+    }
 
     get url() {
-        return SERVER_URL;
+        return `http://${HOST}:${this.#port}/`;
     }
 
     async start() {
@@ -30,7 +34,7 @@ export class ViteServer {
                 "--host",
                 HOST,
                 "--port",
-                String(PORT),
+                String(this.#port),
                 "--strictPort",
             ],
             { cwd: process.cwd(), stdio: ["ignore", "pipe", "pipe"] }
@@ -46,7 +50,7 @@ export class ViteServer {
                 throw new Error(`Vite exited before becoming ready.\n${this.#output}`);
             }
             try {
-                const response = await globalThis.fetch(SERVER_URL);
+                const response = await globalThis.fetch(this.url);
                 if (response.ok) {
                     return;
                 }

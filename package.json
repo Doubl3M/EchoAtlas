@@ -15,7 +15,7 @@
         "format:check": "prettier --check \"src/**/*.{ts,css}\" \"tests/**/*.{ts,mjs}\" \"tools/**/*.{ts,css}\" \"benchmarks/**/*.{ts,mjs}\" \"*.{json,js,ts,html}\"",
         "test": "vitest",
         "test:run": "vitest run",
-        "test:e2e": "node --test tests/e2e/first-navigable-map.test.mjs",
+        "test:e2e": "node --test --test-concurrency=1 tests/e2e/first-navigable-map.test.mjs tests/e2e/stable-demo.test.mjs",
         "benchmark": "node --expose-gc benchmarks/run.mjs",
         "benchmark:world-terrain": "node --expose-gc benchmarks/world-terrain.mjs",
         "benchmark:world-scaling": "node benchmarks/world-scaling.mjs",
