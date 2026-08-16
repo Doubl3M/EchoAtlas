@@ -9,6 +9,11 @@ import type {
     TemporalMusicProjectionInput,
     TemporalMusicProjectorOptions,
     TemporalMusicRulesVersion,
+    MusicActivityOptions,
+    MusicActivityProjectionInput,
+    MusicActivityProjectorOptions,
+    MusicActivityRulesVersion,
+    MusicActivityState,
 } from "../../src/music";
 import {
     musicKnowledgeNodeId,
@@ -23,6 +28,9 @@ describe("music public API", () => {
         expect(Object.keys(publicApi).sort()).toEqual([
             "ListeningEvent",
             "ListeningHistory",
+            "MusicActivity",
+            "MusicActivityProjector",
+            "MusicActivitySnapshot",
             "MusicCatalog",
             "MusicEntity",
             "MusicInterpreter",
@@ -62,6 +70,18 @@ describe("music public API", () => {
         const rulesVersion: TemporalMusicRulesVersion = "temporal-music-presence-v1";
         const projectorOptions: TemporalMusicProjectorOptions = { rulesVersion };
         const projectionInput = {} as TemporalMusicProjectionInput;
+        const activityRulesVersion: MusicActivityRulesVersion = "music-activity-v1";
+        const activityOptions: MusicActivityOptions = {
+            musicEntityKind: "artist",
+            musicEntityId: "artist-a",
+            lastActivityAt: 1,
+            state: "active",
+        };
+        const activityState: MusicActivityState = "inactive";
+        const activityProjectorOptions: MusicActivityProjectorOptions = {
+            rulesVersion: activityRulesVersion,
+        };
+        const activityProjectionInput = {} as MusicActivityProjectionInput;
 
         expect(entity.kind).toBe("artist");
         expect(relation.kind).toBe("performed");
@@ -69,6 +89,10 @@ describe("music public API", () => {
         expect(structuralRelation.relationKind).toBe("contains");
         expect(projectorOptions.rulesVersion).toBe(rulesVersion);
         expect(projectionInput).toEqual({});
+        expect(activityOptions.state).toBe("active");
+        expect(activityState).toBe("inactive");
+        expect(activityProjectorOptions.rulesVersion).toBe(activityRulesVersion);
+        expect(activityProjectionInput).toEqual({});
     });
 
     it("provides the canonical Music to Knowledge identity convention", () => {

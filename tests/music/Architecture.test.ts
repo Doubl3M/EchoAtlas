@@ -6,6 +6,7 @@ import interpreterSource from "../../src/music/MusicInterpreter.ts?raw";
 import listeningEventSource from "../../src/music/listening/ListeningEvent.ts?raw";
 import listeningHistorySource from "../../src/music/listening/ListeningHistory.ts?raw";
 import temporalProjectorSource from "../../src/music/temporal/TemporalMusicProjector.ts?raw";
+import activityProjectorSource from "../../src/music/activity/MusicActivityProjector.ts?raw";
 
 describe("music architecture", () => {
     it("keeps MusicInterpreter dependencies within music and knowledge", () => {
@@ -54,5 +55,24 @@ describe("temporal Music architecture", () => {
         );
         expect(temporalProjectorSource).not.toContain("CurrentBroadcast");
         expect(temporalProjectorSource).not.toMatch(/Date\.now|new Date/);
+    });
+});
+
+describe("Music activity architecture", () => {
+    it("depends only on Music and never on appearance, geography or CurrentBroadcast", () => {
+        const imports = [...activityProjectorSource.matchAll(/from\s+["']([^"']+)["']/g)].map(
+            ([, path]) => path
+        );
+
+        expect(imports.every((path) => path.startsWith("."))).toBe(true);
+        expect(imports).not.toEqual(
+            expect.arrayContaining([
+                expect.stringMatching(
+                    /(?:knowledge|world|terrain|camera|render|ui|app|CurrentBroadcast|geograph|appearance)/i
+                ),
+            ])
+        );
+        expect(activityProjectorSource).not.toContain("CurrentBroadcast");
+        expect(activityProjectorSource).not.toMatch(/Date\.now|new Date/);
     });
 });

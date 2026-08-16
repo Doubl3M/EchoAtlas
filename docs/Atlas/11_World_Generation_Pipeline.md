@@ -451,8 +451,28 @@ Playlist et Compilation restent limités à une présence directe. Le catalogue 
 conserve toutes les relations originales dont les deux endpoints sont présents, structurelles ou
 non, sans en synthétiser.
 
-Cette étape répond uniquement à l'existence. Les futurs états d'activité et leur apparence
-géographique ou visuelle sont des transformations distinctes.
+Cette étape répond uniquement à l'existence. La projection indépendante
+`music-activity-v1` calcule en parallèle le dernier instant d'activité résolu pour chaque identité
+directement écoutée ou renouvelée par un descendant structurel :
+
+```text
+ListeningHistory + MusicCatalog + T
+→ Presence(T)
+
+ListeningHistory + MusicCatalog + T
+→ Activity(T)
+
+Presence(T) + Activity(T) + représentation géographique
+→ future Appearance(T)
+```
+
+Le maximum des timestamps se propage exactement de Track vers Album, Artist et Genre, puis d'Album
+vers Artist et Genre, et d'Artist vers Genre. Tous les parents structurels valides reçoivent ce
+maximum. Label, Playlist et Compilation restent directs. Seuls les Artists sont classés : `active`
+avant 180 jours exacts d'inactivité et `inactive` à partir de cette frontière, soit
+15 552 000 000 ms. Il s'agit de l'approximation produit V1 de six mois, et non d'une durée
+calendaire. `inactive` ne signifie jamais `absent`. Activity ne produit encore aucune apparence
+géographique ou visuelle.
 
 Le showcase exécute désormais réellement la reconstruction suivante pour chaque jalon temporel
 sélectionné :

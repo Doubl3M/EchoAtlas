@@ -12,6 +12,8 @@ The project follows Semantic Versioning.
 
 ## Added
 
+- Versioned deterministic Music activity snapshots with direct and structural-ancestor recency,
+  plus the explicit 180-day Artist active/inactive boundary.
 - Interactive historical showcase reconstruction from an explicit `ListeningHistory` milestone,
   with deterministic `Presence(T)`, Knowledge Graph, World and Music labels while the current
   Radio Pirate broadcast remains independent.

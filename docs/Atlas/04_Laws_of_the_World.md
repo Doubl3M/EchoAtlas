@@ -109,6 +109,9 @@ respectivement en Continent, District, Building et Building Content. Une métaph
 future telle qu'une ruine ne remplace pas cette identité principale; elle devra être définie comme
 un état ou un aspect compatible.
 
+Presence, Activity et Appearance sont trois contrats distincts. Un Artist peut être présent et
+`inactive` sans que cette classification Music décide à elle seule de son apparence géographique.
+
 Le containment géographique appartient au World. Les relations musicales qui le rendent possible
 restent dans le Knowledge Graph.
 

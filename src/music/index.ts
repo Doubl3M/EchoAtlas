@@ -1,4 +1,12 @@
 export { MusicCatalog } from "./MusicCatalog";
+export { MusicActivity, MusicActivityProjector, MusicActivitySnapshot } from "./activity";
+export type {
+    MusicActivityOptions,
+    MusicActivityProjectionInput,
+    MusicActivityProjectorOptions,
+    MusicActivityRulesVersion,
+    MusicActivityState,
+} from "./activity";
 export { MusicEntity } from "./MusicEntity";
 export type { MusicEntityKind, MusicEntityOptions } from "./MusicEntity";
 export { MusicInterpreter } from "./MusicInterpreter";

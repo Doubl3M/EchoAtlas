@@ -554,9 +554,23 @@ Genre `includes` Artist, Artist `performed` Album and Album `contains` Track. La
 Compilation can be directly present but have no inherited structural presence in V1. The temporal
 catalog retains every original relation whose two endpoints are present and invents none.
 
-Presence answers which identities exist at `T`. Activity will later describe states such as
-recency or abandonment. Appearance remains a separate geographic/rendering concern. These three
-contracts are not interchangeable.
+Presence answers which identities exist at `T`. `music-activity-v1` independently measures the
+latest resolved activity at or before `T`. Direct Track, Album and Artist activity propagates to
+all canonical structural ancestors; Label, Playlist and Compilation activity remains direct.
+Only Artist activity is classified in V1: it is inactive after exactly 180 days without activity,
+including at that boundary. This is the V1 product approximation of six months, not a calendar
+duration. Other kinds expose only `lastActivityAt`.
+Appearance remains a separate geographic/rendering concern. These three contracts are not
+interchangeable: an inactive Artist is still present whenever Presence(T) contains it.
+
+```text
+ListeningHistory → Presence(T)
+ListeningHistory → Activity(T)
+Presence(T) + Activity(T) → future Appearance(T)
+```
+
+Activity reconstruction has no system clock, previous-snapshot input, CurrentBroadcast input,
+World dependency or rendering effect.
 
 The browser showcase now exercises this boundary through the application layer:
 
