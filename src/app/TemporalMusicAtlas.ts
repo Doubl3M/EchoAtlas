@@ -1,6 +1,7 @@
 import {
     MusicActivityProjector,
     MusicCatalog,
+    MusicInterpreter,
     TemporalMusicProjector,
     type ListeningHistory,
     type MusicActivityRulesVersion,
@@ -8,7 +9,14 @@ import {
     type TemporalMusicSnapshot,
     type TemporalMusicRulesVersion,
 } from "../music";
-import { GeographicAppearanceSnapshot, GeographicHierarchy, type WorldConfig } from "../world";
+import {
+    GeographicAppearanceSnapshot,
+    GeographicHierarchy,
+    GeographicLayout,
+    GeographicLayoutGenerator,
+    type GeographicLayoutGeneratorConfig,
+    type WorldConfig,
+} from "../world";
 
 import { createMusicAtlasSnapshotFromCatalog, type MusicAtlasSnapshot } from "./MusicAtlasPipeline";
 import { MusicGeographicAppearanceInterpreter } from "./MusicGeographicAppearanceInterpreter";
@@ -21,6 +29,7 @@ export interface TemporalMusicAtlasOptions {
     readonly worldConfig: WorldConfig;
     readonly rulesVersion: TemporalMusicRulesVersion;
     readonly activityRulesVersion: MusicActivityRulesVersion;
+    readonly geographicLayoutConfig: GeographicLayoutGeneratorConfig;
 }
 
 export interface TemporalMusicAtlasState extends MusicAtlasSnapshot {
@@ -28,6 +37,7 @@ export interface TemporalMusicAtlasState extends MusicAtlasSnapshot {
     readonly presence: TemporalMusicSnapshot | undefined;
     readonly activity: MusicActivitySnapshot | undefined;
     readonly hierarchy: GeographicHierarchy;
+    readonly layout: GeographicLayout;
     readonly appearance: GeographicAppearanceSnapshot;
 }
 
@@ -39,6 +49,7 @@ export class TemporalMusicAtlas {
     private readonly worldConfig: WorldConfig;
     private readonly projector: TemporalMusicProjector;
     private readonly activityProjector: MusicActivityProjector;
+    private readonly geographicLayoutGenerator: GeographicLayoutGenerator;
     private readonly milestones: readonly number[];
 
     public constructor(options: TemporalMusicAtlasOptions) {
@@ -50,6 +61,9 @@ export class TemporalMusicAtlas {
         this.activityProjector = new MusicActivityProjector({
             rulesVersion: options.activityRulesVersion,
         });
+        this.geographicLayoutGenerator = new GeographicLayoutGenerator(
+            options.geographicLayoutConfig
+        );
         this.milestones = Object.freeze([
             ...new Set(options.listeningHistory.getEvents().map(({ occurredAt }) => occurredAt)),
         ]);
@@ -76,7 +90,7 @@ export class TemporalMusicAtlas {
             at,
         });
         const atlas = createMusicAtlasSnapshotFromCatalog(
-            presence.getCatalog(),
+            createLegacyRenderCatalog(presence.getCatalog()),
             this.seed,
             this.worldConfig,
             activity
@@ -91,12 +105,14 @@ export class TemporalMusicAtlas {
             this.worldConfig
         );
         const hierarchy = new GeographicHierarchy({ features: [], contents: [] });
+        const layout = this.geographicLayoutGenerator.generate(hierarchy);
         return Object.freeze({
             ...atlas,
             selectedHistoricalTime: undefined,
             presence: undefined,
             activity: undefined,
             hierarchy,
+            layout,
             appearance: new GeographicAppearanceSnapshot({ hierarchy, appearances: [] }),
         });
     }
@@ -108,8 +124,8 @@ export class TemporalMusicAtlas {
         atlas: MusicAtlasSnapshot
     ): TemporalMusicAtlasState {
         const hierarchy = new MusicGeographicInterpreter().interpret({
-            catalog: atlas.catalog,
-            knowledgeGraph: atlas.graph,
+            catalog: presence.getCatalog(),
+            knowledgeGraph: new MusicInterpreter().interpret(presence.getCatalog()),
             version: "music-geography-v1",
         });
         const appearance = new MusicGeographicAppearanceInterpreter().interpret({
@@ -117,13 +133,27 @@ export class TemporalMusicAtlas {
             hierarchy,
             version: "music-geographic-appearance-v1",
         });
+        const layout = this.geographicLayoutGenerator.generate(hierarchy);
         return Object.freeze({
             ...atlas,
             selectedHistoricalTime,
             presence,
             activity,
             hierarchy,
+            layout,
             appearance,
         });
     }
+}
+
+/** Keeps the established Canvas path free of semantic hierarchy nodes during the migration. */
+function createLegacyRenderCatalog(catalog: MusicCatalog): MusicCatalog {
+    return new MusicCatalog(
+        catalog.getEntities().filter(({ kind }) => kind !== "genre"),
+        catalog
+            .getRelations()
+            .filter(
+                ({ sourceKind, targetKind }) => sourceKind !== "genre" && targetKind !== "genre"
+            )
+    );
 }

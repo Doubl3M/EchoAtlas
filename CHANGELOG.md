@@ -12,6 +12,10 @@ The project follows Semantic Versioning.
 
 ## Added
 
+- A development-only semantic geography explorer for inspecting temporal Hierarchy, Layout,
+  Appearance and focus resolution without defining the future cartographic art direction.
+- An explicit demo-only Genre catalog, deterministic catalog composition, and temporal semantic
+  Hierarchy, Layout and Appearance snapshots in the application runtime.
 - Generic sparse geographic appearance snapshots and a versioned Music policy mapping inactive
   Artists to every canonical District representation as `ruined`, without renderer integration.
 - Versioned deterministic Music activity snapshots with direct and structural-ancestor recency,

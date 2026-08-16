@@ -1,0 +1,318 @@
+:root {
+    font-family: Georgia, "Times New Roman", serif;
+    color: #443126;
+    background: #c9874d;
+}
+
+* {
+    box-sizing: border-box;
+}
+body {
+    margin: 0;
+    min-width: 960px;
+    min-height: 100vh;
+    background: radial-gradient(circle at 50% 0, #e7b969, #9b553c 75%);
+}
+button {
+    font: inherit;
+}
+
+.semantic-preview-shell {
+    min-height: 100vh;
+    padding: 14px;
+    background: repeating-linear-gradient(92deg, rgb(255 245 211 / 4%) 0 2px, transparent 2px 7px);
+}
+
+.semantic-preview-header,
+.semantic-preview-timeline,
+.semantic-preview-main,
+.semantic-preview-footer {
+    max-width: 1500px;
+    margin-inline: auto;
+}
+
+.semantic-preview-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 18px;
+    border: 3px double #6f3d32;
+    border-radius: 18px 18px 4px 4px;
+    background: #f0dfb8;
+    box-shadow: 0 4px 0 rgb(83 50 36 / 35%);
+}
+.semantic-preview-header > div {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.semantic-preview-header > div > span {
+    display: grid;
+    place-items: center;
+    width: 46px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    color: #f5df9f;
+    background: #b95638;
+    font-size: 24px;
+}
+.semantic-preview-header h1 {
+    margin: 0;
+    color: #6d3650;
+    font-size: 36px;
+    line-height: 0.9;
+}
+.semantic-preview-header p {
+    max-width: 560px;
+    margin: 3px 0 0;
+    font-style: italic;
+}
+.semantic-preview-header > p {
+    font-size: 15px;
+    text-align: right;
+}
+
+.semantic-preview-timeline {
+    display: flex;
+    gap: 8px;
+    align-items: stretch;
+    padding: 10px 12px;
+    background: #6c384e;
+}
+.semantic-preview-timeline button {
+    flex: 1;
+    padding: 7px 12px;
+    border: 1px solid #d8a955;
+    border-radius: 4px 12px;
+    color: #f3dfb2;
+    background: transparent;
+    cursor: pointer;
+}
+.semantic-preview-timeline button span,
+.semantic-preview-timeline button strong {
+    display: block;
+}
+.semantic-preview-timeline button span {
+    text-transform: uppercase;
+    font-size: 9px;
+    letter-spacing: 0.14em;
+}
+.semantic-preview-timeline button.is-selected {
+    color: #513026;
+    background: #e0aa50;
+}
+.semantic-preview-debug {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding-inline: 8px;
+    color: #f3dfb2;
+    font-size: 11px;
+}
+
+.semantic-preview-main {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 310px;
+    min-height: 680px;
+    border-inline: 3px double #633b31;
+    background: #ead6a8;
+}
+.semantic-preview-map {
+    padding: 10px;
+    background: #c9884f;
+}
+.semantic-preview-map svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 3px double #5e4032;
+    border-radius: 14px;
+    background: #ead9b4;
+    filter: drop-shadow(0 3px 2px rgb(50 30 22 / 30%));
+}
+.semantic-paper {
+    fill: #dfc999;
+}
+.semantic-continent__shape {
+    fill: #b4a46d;
+    stroke: #6a5538;
+    stroke-width: 0.45;
+    filter: drop-shadow(0.5px 0.7px 0.2px rgb(75 44 29 / 40%));
+}
+.semantic-continent:nth-of-type(3n) .semantic-continent__shape {
+    fill: #7f9a84;
+}
+.semantic-continent:nth-of-type(3n + 1) .semantic-continent__shape {
+    fill: #c88c54;
+}
+.semantic-continent__label {
+    fill: #5d3044;
+    font-weight: 800;
+    font-size: 2.35px;
+    letter-spacing: 0.18px;
+    text-transform: uppercase;
+    paint-order: stroke;
+    stroke: #ead8aa;
+    stroke-width: 0.5px;
+}
+.semantic-district__shape {
+    fill: rgb(239 207 143 / 70%);
+    stroke: #85543d;
+    stroke-width: 0.28;
+    stroke-dasharray: 0.4 0.18;
+}
+.semantic-district__label {
+    fill: #53392e;
+    font-size: 1.45px;
+    font-style: italic;
+    font-weight: 700;
+    paint-order: stroke;
+    stroke: #ead8aa;
+    stroke-width: 0.35px;
+}
+.semantic-district--ruined .semantic-district__shape {
+    fill: #9a9870;
+    stroke: #596646;
+    stroke-dasharray: 0.22 0.18;
+}
+.semantic-district--ruined .semantic-district__label {
+    fill: #5c5a40;
+    text-decoration: underline wavy #788057;
+}
+.semantic-district--ruined::after {
+    content: "";
+}
+.semantic-building__shape {
+    fill: #bf633e;
+    stroke: #52362c;
+    stroke-width: 0.22;
+}
+.semantic-building__label {
+    fill: #4e3329;
+    font-size: 0.85px;
+    text-anchor: middle;
+    paint-order: stroke;
+    stroke: #ead8aa;
+    stroke-width: 0.24px;
+}
+.semantic-content {
+    fill: #f0cf80;
+    stroke: #5c3c31;
+    stroke-width: 0.12;
+}
+.semantic-selectable {
+    cursor: pointer;
+}
+.semantic-selected .semantic-district__shape,
+.semantic-selected.semantic-district .semantic-district__shape,
+.semantic-selected .semantic-building__shape,
+.semantic-selected.semantic-building .semantic-building__shape {
+    stroke: #6b2848;
+    stroke-width: 0.7;
+}
+.semantic-selected.semantic-continent > .semantic-continent__shape {
+    stroke: #6b2848;
+    stroke-width: 0.8;
+}
+.semantic-selected.semantic-content {
+    fill: #6b2848;
+    stroke: #f5de9f;
+    stroke-width: 0.22;
+}
+.semantic-debug-bounds {
+    fill: none;
+    stroke: #533cff;
+    stroke-width: 0.14;
+    stroke-dasharray: 0.7 0.3;
+    pointer-events: none;
+}
+
+.semantic-preview-panel {
+    padding: 24px 20px;
+    border-left: 3px double #7a4c37;
+    background: linear-gradient(90deg, #e8d2a5, #f4e5c3);
+}
+.semantic-preview-panel__eyebrow {
+    margin: 0;
+    color: #b45335;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+}
+.semantic-preview-panel h2 {
+    margin: 5px 0 18px;
+    color: #6e3651;
+    font-size: 32px;
+    line-height: 0.95;
+}
+.semantic-preview-panel__quick {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #b58a5e;
+}
+.semantic-preview-panel__quick button {
+    padding: 4px 8px;
+    border: 1px solid #9a6647;
+    border-radius: 9px 3px;
+    color: #5b382b;
+    background: #ecd29a;
+    cursor: pointer;
+    font-size: 11px;
+}
+.semantic-preview-panel__summary {
+    font-style: italic;
+}
+.semantic-preview-panel__representations {
+    display: grid;
+    gap: 8px;
+    padding: 0;
+    list-style: none;
+}
+.semantic-preview-panel__representations li {
+    display: grid;
+    gap: 2px;
+    padding: 9px 10px;
+    border: 1px solid #b98959;
+    border-left: 4px solid #bf633e;
+    border-radius: 3px 12px;
+    background: rgb(255 244 211 / 45%);
+}
+.semantic-preview-panel__representations strong {
+    color: #a24e35;
+    text-transform: uppercase;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+}
+.semantic-preview-panel__representations span {
+    font-size: 13px;
+}
+.semantic-preview-panel__representations small {
+    color: #755c47;
+}
+
+.semantic-preview-footer {
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 16px;
+    border: 3px double #62382f;
+    border-radius: 4px 4px 16px 16px;
+    color: #f2ddb0;
+    background: #6c384e;
+}
+.semantic-preview-footer p {
+    display: flex;
+    align-items: baseline;
+    gap: 7px;
+    margin: 0;
+}
+.semantic-preview-footer strong {
+    font-size: 22px;
+}
+.semantic-preview-footer span {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}

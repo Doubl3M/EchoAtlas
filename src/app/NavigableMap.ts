@@ -1,10 +1,8 @@
 import { Camera2D, CameraConfig } from "../engine/camera";
 import { CameraInteractionController } from "../engine/interaction";
-import { TerrainConfig } from "../engine/terrain";
-import { MusicJsonImporter } from "../music/import";
 import { CanvasRenderer, CanvasRenderSurface, SeventiesTheme } from "../render";
 import { createSeventiesHomeShell } from "../ui/SeventiesHomeShell";
-import { WorldConfig, type GeographicWorld, type WorldLocation } from "../world";
+import { type GeographicWorld, type WorldLocation } from "../world";
 
 import { CameraJourney, planCameraArrival } from "./CameraJourney";
 import {
@@ -13,18 +11,16 @@ import {
 } from "./CurrentBroadcastLandmark";
 import { createCurrentBroadcastPanel } from "./CurrentBroadcastPanel";
 import { createDemoCurrentBroadcast } from "./demoCurrentBroadcast";
-import { createDemoListeningHistory } from "./demoListeningHistory";
-import { demoMusicDocumentJson } from "./demoMusicDocument";
+import { createDemoTemporalMusicAtlas } from "./demoTemporalMusicAtlas";
+import { createDemoWorldConfig, DEMO_WORLD_HEIGHT, DEMO_WORLD_WIDTH } from "./demoWorldConfig";
 import { createHistoricalTimelineControl } from "./HistoricalTimelineControl";
 import { createMusicSelectionPanel } from "./MusicSelectionPanel";
 import { createMusicSelectionRelationProvider } from "./MusicSelectionRelations";
-import { TemporalMusicAtlas, type TemporalMusicAtlasState } from "./TemporalMusicAtlas";
+import type { TemporalMusicAtlasState } from "./TemporalMusicAtlas";
 import { uiText } from "./UiText";
 
-const WORLD_WIDTH = 96;
-const WORLD_HEIGHT = 64;
-const TERRAIN_WIDTH = 192;
-const TERRAIN_HEIGHT = 128;
+const WORLD_WIDTH = DEMO_WORLD_WIDTH;
+const WORLD_HEIGHT = DEMO_WORLD_HEIGHT;
 const WHEEL_ZOOM_SENSITIVITY = 0.0015;
 const CONTROL_ZOOM_FACTOR = 1.3;
 const LOCATION_HIT_RADIUS = 11;
@@ -35,21 +31,8 @@ const CAMERA_MAX_ZOOM = 128;
 
 /** Browser adapter that binds DOM events to the generic interaction controller. */
 export function mountNavigableMap(root: HTMLElement): () => void {
-    const worldConfig = createWorldConfig();
-    const imported = new MusicJsonImporter().parse(demoMusicDocumentJson);
-    const seed = imported.metadata.seed;
-    if (seed === undefined) {
-        throw new Error("The navigable map document must provide metadata.seed.");
-    }
-    const listeningHistory = createDemoListeningHistory();
-    const temporalAtlas = new TemporalMusicAtlas({
-        catalog: imported.catalog,
-        listeningHistory,
-        seed,
-        worldConfig,
-        rulesVersion: "temporal-music-presence-v1",
-        activityRulesVersion: "music-activity-v1",
-    });
+    const worldConfig = createDemoWorldConfig();
+    const temporalAtlas = createDemoTemporalMusicAtlas(worldConfig);
     const milestones = temporalAtlas.getMilestones();
     let selectedHistoricalTime = temporalAtlas.getInitialHistoricalTime();
     let snapshot: TemporalMusicAtlasState =
@@ -264,28 +247,6 @@ export function mountNavigableMap(root: HTMLElement): () => void {
         journey.cancel();
         resizeObserver.disconnect();
     };
-}
-
-function createWorldConfig(): WorldConfig {
-    const terrain = new TerrainConfig({
-        width: TERRAIN_WIDTH,
-        height: TERRAIN_HEIGHT,
-        baseFrequency: 0.022,
-        octaves: 5,
-        persistence: 0.58,
-        lacunarity: 2,
-        offsetX: -18,
-        offsetY: -11,
-    });
-    return new WorldConfig({
-        generationVersion: "world-v1-exact",
-        width: WORLD_WIDTH,
-        height: WORLD_HEIGHT,
-        placementIterations: 32,
-        attractionStrength: 0.018,
-        repulsionStrength: 0.42,
-        terrain,
-    });
 }
 
 function createCamera(viewportWidth: number, viewportHeight: number): Camera2D {

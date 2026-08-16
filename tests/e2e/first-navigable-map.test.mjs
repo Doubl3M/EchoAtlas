@@ -389,6 +389,73 @@ test("First Navigable Map works in local headless Chrome", async () => {
             "Resize must produce a new frame."
         );
 
+        const previewResponse = await page.goto(`${server.url}semantic-preview.html`, {
+            waitUntil: "networkidle0",
+        });
+        assert.equal(previewResponse?.status(), 200);
+        await page.waitForSelector(".semantic-preview-map svg");
+        assert.equal(
+            await page.$$(".semantic-preview-timeline button").then((items) => items.length),
+            4
+        );
+        assert.equal(await semanticMetric(page, "Continents"), 5);
+        assert.equal(await semanticMetric(page, "Quartiers"), 9);
+        assert.equal(await semanticMetric(page, "Bâtiments"), 11);
+        assert.equal(await semanticMetric(page, "Pistes intérieures"), 22);
+
+        await page.click(".semantic-preview-panel__quick button:nth-child(3)");
+        assert.equal(
+            await page.$eval(
+                ".semantic-preview-panel",
+                (element) => element.dataset.selectedKnowledgeNodeId
+            ),
+            "music:artist:david-bowie"
+        );
+        assert.equal(
+            await page
+                .$$(".semantic-preview-panel__representations li")
+                .then((items) => items.length),
+            2,
+            "Bowie must expose two District representations."
+        );
+        await page.click(".semantic-preview-panel__quick button:nth-child(4)");
+        assert.equal(
+            await page
+                .$$(".semantic-preview-panel__representations li")
+                .then((items) => items.length),
+            2,
+            "Low must expose one Building per Bowie District."
+        );
+        await page.click(".semantic-preview-panel__quick button:nth-child(5)");
+        assert.equal(
+            await page.$$eval(".semantic-preview-panel__representations li strong", (items) =>
+                items.every((item) => item.textContent === "contenu du bâtiment")
+            ),
+            true
+        );
+
+        await page.click('.semantic-preview-timeline button[data-milestone-index="1"]');
+        assert.ok((await semanticMetric(page, "Quartiers en sommeil")) > 0);
+        assert.equal(
+            await page.$$eval(
+                '[data-knowledge-node-id="music:artist:david-bowie"]',
+                (items) =>
+                    items.length === 2 &&
+                    items.every((item) => item.classList.contains("semantic-district--ruined"))
+            ),
+            true
+        );
+        await page.click('.semantic-preview-timeline button[data-milestone-index="2"]');
+        assert.equal(
+            await page.$$eval(
+                '[data-knowledge-node-id="music:artist:david-bowie"]',
+                (items) =>
+                    items.length === 2 &&
+                    items.every((item) => !item.classList.contains("semantic-district--ruined"))
+            ),
+            true
+        );
+
         assert.deepEqual(pageErrors, []);
         assert.deepEqual(consoleErrors, []);
         assert.deepEqual(externalRequests, []);
@@ -527,6 +594,19 @@ async function broadcastState(page) {
             text: item.textContent,
             current: item.getAttribute("aria-current"),
         }))
+    );
+}
+
+async function semanticMetric(page, label) {
+    return page.$eval(
+        ".semantic-preview-footer",
+        (footer, metricLabel) => {
+            const metric = [...footer.querySelectorAll("p")].find(
+                (item) => item.dataset.metric === metricLabel
+            );
+            return Number(metric?.dataset.value ?? Number.NaN);
+        },
+        label
     );
 }
 

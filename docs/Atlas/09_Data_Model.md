@@ -1,8 +1,8 @@
 # 09 · Data Model
 
-> *Le Monde est composé d'objets.*
+> _Le Monde est composé d'objets._
 >
-> *Les objets racontent une histoire.*
+> _Les objets racontent une histoire._
 
 ---
 
@@ -146,12 +146,19 @@ La couche application applique `music-geographic-appearance-v1` : un Artist `ina
 `ruined` chacun des Districts issus de son Knowledge Node canonique. Un Artist actif ne crée aucune
 entrée, y compris après réactivation. Aucun autre kind Music ne possède de règle Appearance V1.
 L'actuel landmark Canvas Artist → City est une compatibilité visuelle legacy du showcase et n'est
-pas une cible canonique de cette politique. Le runtime calcule Appearance, mais le document JSON V1
-de démonstration ne contient aucun Genre et ne peut donc produire aucun District canonique.
+pas une cible canonique de cette politique. JSON V1 ne contient toujours aucun Genre. Pour la seule
+démonstration, l'application compose le catalogue importé avec une source Music séparée qui déclare
+explicitement cinq Genres et neuf relations `includes`; aucune donnée n'est déduite des tags, noms,
+pays ou autres attributs.
+
+Cette fixture showcase déclare manuellement et uniquement : Rock → Fleetwood Mac, David Bowie ;
+Electronic → Kraftwerk, Brian Eno, David Bowie ; Soul → Stevie Wonder, Gil Scott-Heron ; Folk →
+Joni Mitchell ; Afrobeat → Fela Kuti. Ces associations ne constituent ni une inférence, ni une
+taxonomie universelle EchoAtlas, ni une extension du format JSON V1.
 
 Dans le showcase navigateur, la couche application choisit un jalon historique explicite puis
-reconstruit `Presence(T)` et `Activity(T)`, puis le Knowledge Graph, le World, la hiérarchie,
-Appearance et les libellés Music depuis le catalogue et l'historique complets et immutables. Un
+reconstruit `Presence(T)` et `Activity(T)`, puis le Knowledge Graph, le World legacy, la hiérarchie,
+le layout et Appearance depuis le catalogue et l'historique complets et immutables. Un
 bridge applicatif temporaire patine uniquement le label d'un Artist inactive ; il ne transforme
 jamais la City legacy en District ruiné. Changer de jalon ne modifie ni les sources, ni la Camera,
 ni le `CurrentBroadcast`, qui reste un état d'expérience distinct.
@@ -764,6 +771,6 @@ Il implémente ceux définis ici.
 
 ---
 
-> *Le Monde n'est pas un ensemble de classes.*
+> _Le Monde n'est pas un ensemble de classes._
 
-> *Les classes ne sont que la traduction informatique du Monde.*
+> _Les classes ne sont que la traduction informatique du Monde._
