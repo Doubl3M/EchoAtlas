@@ -3,6 +3,7 @@
 import { describe, expect, it } from "vitest";
 
 import cameraJourneySource from "../../src/app/CameraJourney.ts?raw";
+import currentBroadcastSource from "../../src/app/CurrentBroadcast.ts?raw";
 import interactionSource from "../../src/engine/interaction/CameraInteractionController.ts?raw";
 import navigableMapSource from "../../src/app/NavigableMap.ts?raw";
 import mainSource from "../../src/main.ts?raw";
@@ -30,6 +31,12 @@ describe("First Navigable Map architecture", () => {
         expect(imports).toEqual(["../engine/camera"]);
         expect(cameraJourneySource).not.toMatch(/analytics|tracking/i);
         expect(navigableMapSource).toContain("requestAnimationFrame");
+    });
+
+    it("keeps current broadcast outside Music, Knowledge, World and historical generation", () => {
+        expect(currentBroadcastSource).not.toMatch(/from\s+["']/);
+        expect(navigableMapSource).toContain("createDemoCurrentBroadcast");
+        expect(rendererSource).not.toMatch(/CurrentBroadcast|Radio Pirate|PirateRadio/);
     });
 
     it("keeps render independent from Music", () => {

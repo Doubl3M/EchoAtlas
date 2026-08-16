@@ -11,6 +11,7 @@ const CONNECTION_DISPLAY_LIMIT = 6;
 export interface MusicSelectionPanel {
     readonly element: HTMLElement;
     show(knowledgeNodeId: string): void;
+    hide(): void;
     close(): void;
 }
 
@@ -36,11 +37,14 @@ export function createMusicSelectionPanel(
     element.setAttribute("aria-labelledby", "selection-panel-title");
 
     const closeButton = createCloseButton(() => close());
-    const close = (): void => {
+    const hide = (): void => {
         element.hidden = true;
         delete element.dataset.selectedId;
         delete element.dataset.entityKind;
         element.replaceChildren(closeButton);
+    };
+    const close = (): void => {
+        hide();
         actions.onClose();
     };
     const selectRelation = (knowledgeNodeId: string): void => {
@@ -63,7 +67,7 @@ export function createMusicSelectionPanel(
         );
         element.hidden = false;
     };
-    return Object.freeze({ element, show, close });
+    return Object.freeze({ element, show, hide, close });
 }
 
 function createCloseButton(close: () => void): HTMLButtonElement {

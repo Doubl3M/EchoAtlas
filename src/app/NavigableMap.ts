@@ -6,6 +6,12 @@ import { createSeventiesHomeShell } from "../ui/SeventiesHomeShell";
 import { WorldConfig, type GeographicWorld, type WorldLocation } from "../world";
 
 import { CameraJourney, planCameraArrival } from "./CameraJourney";
+import {
+    createCurrentBroadcastLandmark,
+    planCurrentBroadcastLandmark,
+} from "./CurrentBroadcastLandmark";
+import { createCurrentBroadcastPanel } from "./CurrentBroadcastPanel";
+import { createDemoCurrentBroadcast } from "./demoCurrentBroadcast";
 import { demoMusicDocumentJson } from "./demoMusicDocument";
 import { createMusicAtlasSnapshot } from "./MusicAtlasPipeline";
 import { createMusicSelectionPanel } from "./MusicSelectionPanel";
@@ -35,6 +41,14 @@ export function mountNavigableMap(root: HTMLElement): () => void {
     const surface = new CanvasRenderSurface(canvas);
     const theme = new SeventiesTheme();
     const renderer = new CanvasRenderer(theme, snapshot.labels);
+    const currentBroadcast = createDemoCurrentBroadcast();
+    let openCurrentBroadcast = (): void => undefined;
+    const broadcastLandmark = createCurrentBroadcastLandmark({
+        position: planCurrentBroadcastLandmark(WORLD_WIDTH, WORLD_HEIGHT),
+        accessibleLabel: uiText.pirateRadioLandmark,
+        visibleLabel: uiText.pirateRadio,
+        onSelect: () => openCurrentBroadcast(),
+    });
     let focusedKnowledgeNodeId: string | undefined;
     let visibleKnowledgeNodeIds: ReadonlySet<string> = new Set();
 
@@ -44,6 +58,7 @@ export function mountNavigableMap(root: HTMLElement): () => void {
         canvas.dataset.visibleLabels = String(summary.visibleLabelCount);
         canvas.dataset.visibleLocations = String(summary.visibleKnowledgeNodeIds.length);
         shell.setVisibleLocationCount(summary.visibleKnowledgeNodeIds.length);
+        broadcastLandmark.update(camera);
     };
     const journey = new CameraJourney({
         camera,
@@ -90,6 +105,14 @@ export function mountNavigableMap(root: HTMLElement): () => void {
             },
         }
     );
+    const broadcastPanel = createCurrentBroadcastPanel(currentBroadcast, () => render());
+    openCurrentBroadcast = (): void => {
+        journey.cancel();
+        focusedKnowledgeNodeId = undefined;
+        selectionPanel.hide();
+        broadcastPanel.show();
+        render();
+    };
     const resize = (): void => {
         const bounds = shell.mapViewport.getBoundingClientRect();
         const width = Math.max(1, bounds.width);
@@ -118,7 +141,8 @@ export function mountNavigableMap(root: HTMLElement): () => void {
     };
     const shell = createSeventiesHomeShell({
         canvas,
-        selectionPanel: selectionPanel.element,
+        selectionPanels: [selectionPanel.element, broadcastPanel.element],
+        mapOverlays: [broadcastLandmark.element],
         text: uiText,
         locationCount: snapshot.world.getLocations().length,
         relationCount: snapshot.world.getConnections().length,
@@ -151,6 +175,7 @@ export function mountNavigableMap(root: HTMLElement): () => void {
         );
         if (location !== undefined) {
             focusedKnowledgeNodeId = location.knowledgeNodeId;
+            broadcastPanel.hide();
             selectionPanel.show(location.knowledgeNodeId);
             render();
         }

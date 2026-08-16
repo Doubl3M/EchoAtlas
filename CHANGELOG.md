@@ -12,6 +12,8 @@ The project follows Semantic Versioning.
 
 ## Added
 
+- Application-owned current broadcast snapshots and a clickable seventies Radio Pirate landmark,
+  with standalone playlist entries that remain independent from Music adoption and `World(T)`.
 - Canonical semantic-geography documentation and an immutable, geometry-free hierarchical World
   foundation, with no behavior change to `world-v1-exact` or the current showcase.
 - Versioned Music Atlas interpretation from directed Knowledge relations to deterministic

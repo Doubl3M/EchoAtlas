@@ -86,6 +86,50 @@ test("First Navigable Map works in local headless Chrome", async () => {
             "Every initial marker must have an accepted label."
         );
 
+        const broadcastLandmark = await page.$eval(".broadcast-landmark", (element) => {
+            const bounds = element.getBoundingClientRect();
+            return {
+                visible: bounds.width > 0 && bounds.height > 0,
+                kind: element.dataset.landmarkKind,
+            };
+        });
+        assert.deepEqual(broadcastLandmark, { visible: true, kind: "current-broadcast" });
+        await page.click(".broadcast-landmark");
+        await page.waitForFunction(() => {
+            const panel = globalThis.document.querySelector(".selection-panel--broadcast");
+            return panel !== null && !panel.hidden;
+        });
+        assert.equal(
+            await page.$eval(".selection-panel--broadcast h2", (element) => element.textContent),
+            "Radio Pirate"
+        );
+        assert.equal(
+            await page.$eval(".broadcast-panel__description", (element) => element.textContent),
+            "Écoutes du moment"
+        );
+        assert.equal(
+            await page.$$(".broadcast-panel__playlist li").then((items) => items.length),
+            6
+        );
+        assert.equal(
+            await page.$eval(".broadcast-panel__playlist", (element) =>
+                element.textContent?.includes("Signals Beyond the Atlas")
+            ),
+            true,
+            "A broadcast entry outside the Music catalog must remain visible."
+        );
+        assert.equal(
+            await page
+                .$$(".broadcast-panel__playlist li[aria-current='true']")
+                .then((items) => items.length),
+            1
+        );
+        await page.click(".selection-panel--broadcast .selection-panel__close");
+        await page.waitForFunction(() => {
+            const panel = globalThis.document.querySelector(".selection-panel--broadcast");
+            return panel !== null && panel.hidden;
+        });
+
         assert.equal(
             await clickFirstLocation(page, initial),
             true,

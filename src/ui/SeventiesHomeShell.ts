@@ -15,7 +15,8 @@ export interface SeventiesHomeShellText {
 
 export interface SeventiesHomeShellOptions {
     readonly canvas: HTMLCanvasElement;
-    readonly selectionPanel: HTMLElement;
+    readonly selectionPanels: readonly HTMLElement[];
+    readonly mapOverlays?: readonly HTMLElement[];
     readonly text: SeventiesHomeShellText;
     readonly locationCount: number;
     readonly relationCount: number;
@@ -40,7 +41,7 @@ export function createSeventiesHomeShell(options: SeventiesHomeShellOptions): Se
     const journey = createJourney(options);
     const exploration = document.createElement("main");
     exploration.className = "atlas-exploration";
-    exploration.append(map.frame, options.selectionPanel);
+    exploration.append(map.frame, ...options.selectionPanels);
     element.append(brand, navigation, exploration, journey.element);
 
     return Object.freeze({
@@ -103,7 +104,7 @@ function createMap(options: SeventiesHomeShellOptions): {
     const help = document.createElement("p");
     help.className = "atlas-map__help";
     help.textContent = options.text.navigationHelp;
-    viewport.append(options.canvas, controls, help);
+    viewport.append(options.canvas, ...(options.mapOverlays ?? []), controls, help);
     frame.append(viewport);
     return { frame, viewport };
 }
