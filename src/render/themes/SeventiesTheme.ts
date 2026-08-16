@@ -101,6 +101,12 @@ export class SeventiesTheme implements VisualTheme {
         haloColor: "#ead9b4",
         haloWidth: 3.5,
         collisionPadding: 5,
+        weathered: Object.freeze({
+            color: "#766554",
+            font: "italic 600 12.5px Georgia, 'Times New Roman', serif",
+            haloColor: "#dfcda7",
+            haloWidth: 3,
+        }),
     });
 
     public constructor() {

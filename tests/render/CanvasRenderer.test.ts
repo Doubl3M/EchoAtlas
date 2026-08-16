@@ -188,6 +188,12 @@ function theme(prefix = "theme", labels = true, labelMinZoom = 0): VisualTheme {
             haloColor: `${prefix}-halo`,
             haloWidth: 0,
             collisionPadding: 2,
+            weathered: Object.freeze({
+                color: `${prefix}-weathered-label`,
+                font: "italic 12px serif",
+                haloColor: `${prefix}-weathered-halo`,
+                haloWidth: 1,
+            }),
         }),
     });
 }
@@ -866,6 +872,42 @@ describe("CanvasRenderer", () => {
         const text = surface.commands.find(({ kind }) => kind === "fillText");
         expect(text).toBeDefined();
         expect(text?.values[1]).toBeLessThan(82);
+    });
+
+    it("renders a generic weathered label without changing its City geometry", () => {
+        const geographicWorld = new GeographicWorld({
+            width: 10,
+            height: 10,
+            heightField: new HeightField(1, 1, [0.5]),
+            locations: [
+                new WorldLocation(
+                    { knowledgeNodeId: "artist", x: 5, y: 5, elevation: 0.5 },
+                    10,
+                    10
+                ),
+            ],
+            connections: [],
+        });
+        const normal = new RecordingSurface();
+        const weathered = new RecordingSurface();
+        const descriptor = { text: "Art", priority: 1, minZoom: 0, landmarkKind: "city" as const };
+
+        new CanvasRenderer(theme(), () => descriptor).render(
+            geographicWorld,
+            spaciousCamera(),
+            normal
+        );
+        new CanvasRenderer(theme(), () => ({
+            ...descriptor,
+            presentationTone: "weathered",
+        })).render(geographicWorld, spaciousCamera(), weathered);
+
+        expect(weathered.commands.filter(({ kind }) => kind !== "fillText")).toEqual(
+            normal.commands.filter(({ kind }) => kind !== "fillText")
+        );
+        expect(weathered.commands.find(({ kind }) => kind === "fillText")?.values.slice(3)).toEqual(
+            ["theme-weathered-label", "italic 12px serif", "theme-weathered-halo", 1]
+        );
     });
 
     it("renders a route only when both endpoint labels are retained", () => {

@@ -12,6 +12,10 @@ The project follows Semantic Versioning.
 
 ## Added
 
+- Generic sparse geographic appearance snapshots and a versioned Music policy mapping inactive
+  Artists to every canonical District representation as `ruined`, without renderer integration.
+- Versioned deterministic Music activity snapshots with direct and structural-ancestor recency,
+  plus the explicit 180-day Artist active/inactive boundary.
 - Interactive historical showcase reconstruction from an explicit `ListeningHistory` milestone,
   with deterministic `Presence(T)`, Knowledge Graph, World and Music labels while the current
   Radio Pirate broadcast remains independent.
@@ -50,6 +54,9 @@ The project follows Semantic Versioning.
 
 ## Changed
 
+- The historical showcase now reconstructs Presence and Activity together at each explicit
+  milestone, calculates canonical Geographic Appearance when representable, and uses a temporary
+  generic weathered-label bridge for inactive Artists without changing legacy City geometry.
 - Music geography now requires exact V1 structural relation triplets, and the showcase uses the
   canonical Artist `performed` Album relation kind without changing its graph structure.
 - Relational atlas navigation now performs a safely framed, kind-scaled, cancellable and

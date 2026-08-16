@@ -451,8 +451,46 @@ Playlist et Compilation restent limités à une présence directe. Le catalogue 
 conserve toutes les relations originales dont les deux endpoints sont présents, structurelles ou
 non, sans en synthétiser.
 
-Cette étape répond uniquement à l'existence. Les futurs états d'activité et leur apparence
-géographique ou visuelle sont des transformations distinctes.
+Cette étape répond uniquement à l'existence. La projection indépendante
+`music-activity-v1` calcule en parallèle le dernier instant d'activité résolu pour chaque identité
+directement écoutée ou renouvelée par un descendant structurel :
+
+```text
+ListeningHistory + MusicCatalog + T
+→ Presence(T)
+
+ListeningHistory + MusicCatalog + T
+→ Activity(T)
+
+Presence(T) + Activity(T) + représentation géographique
+→ future Appearance(T)
+```
+
+Le maximum des timestamps se propage exactement de Track vers Album, Artist et Genre, puis d'Album
+vers Artist et Genre, et d'Artist vers Genre. Tous les parents structurels valides reçoivent ce
+maximum. Label, Playlist et Compilation restent directs. Seuls les Artists sont classés : `active`
+avant 180 jours exacts d'inactivité et `inactive` à partir de cette frontière, soit
+15 552 000 000 ms. Il s'agit de l'approximation produit V1 de six mois, et non d'une durée
+calendaire. `inactive` ne signifie jamais `absent`. Activity ne produit encore aucune apparence
+géographique ou visuelle.
+
+La transformation suivante reste séparée et versionnée :
+
+```text
+Activity(T) + GeographicHierarchy
+→ music-geographic-appearance-v1
+→ GeographicAppearanceSnapshot(T)
+```
+
+Pour V1, chaque Artist inactive est résolu par son Knowledge Node canonique et toutes ses
+représentations de rôle District deviennent `ruined`. Un Artist actif, une feature d'un autre rôle
+ou une activité d'un autre kind ne produit aucune entrée. Le snapshot est sparse : absence signifie
+`normal`. Une réactivation reconstruit un nouveau snapshot normal sans muter le précédent.
+
+Cette fondation ne branche ni le générateur World legacy ni le Renderer. En particulier, le
+landmark Artist → City du showcase n'est pas utilisé comme cible : la cible canonique est le
+District de la hiérarchie sémantique. Le runtime calcule néanmoins le snapshot Appearance ; il
+reste vide dans la fixture JSON V1 actuelle, faute de Genre et donc de District.
 
 Le showcase exécute désormais réellement la reconstruction suivante pour chaque jalon temporel
 sélectionné :
@@ -460,10 +498,16 @@ sélectionné :
 ```text
 ListeningHistory
 → Presence(T)
+→ Activity(T)
 → KnowledgeGraph(T)
 → GeographicWorld(T)
 → rendu Canvas
 ```
+
+Pour rendre Activity observable avant le rendu de la hiérarchie, la couche application applique un
+bridge legacy limité : un Artist inactive reçoit un descriptor de label générique `weathered` et
+une annotation éditoriale dans le panneau Music. La silhouette City est inchangée et ce traitement
+ne signifie jamais « District ruined ».
 
 La couche application repart toujours du catalogue complet et de l'historique immutable. Elle
 conserve la Camera courante, remplace les snapshots dérivés et laisse le `CurrentBroadcast` hors de

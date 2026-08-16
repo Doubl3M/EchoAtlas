@@ -52,6 +52,46 @@ describe("TemporalMusicAtlas", () => {
         expect(worldSignature(returnedLatest)).toEqual(worldSignature(firstLatest));
     });
 
+    it("reconstructs Presence and Activity independently at every historical instant", () => {
+        const atlas = temporalAtlas();
+        const artistId = "music:artist:david-bowie";
+
+        const active = atlas.project(demoHistoricalTimes.beginnings);
+        const inactive = atlas.project(demoHistoricalTimes.crossings);
+        const reactivated = atlas.project(demoHistoricalTimes.expansion);
+        const returnedActive = atlas.project(demoHistoricalTimes.beginnings);
+
+        expect(active.selectedHistoricalTime).toBe(demoHistoricalTimes.beginnings);
+        expect(
+            active.presence
+                ?.getCatalog()
+                .getEntities()
+                .some(({ kind, id }) => kind === "artist" && id === "david-bowie")
+        ).toBe(true);
+        expect(active.activity?.getActivity("artist", "david-bowie")?.state).toBe("active");
+        expect(active.labels(artistId)?.presentationTone).toBeUndefined();
+        expect(
+            inactive.presence
+                ?.getCatalog()
+                .getEntities()
+                .some(({ kind, id }) => kind === "artist" && id === "david-bowie")
+        ).toBe(true);
+        expect(inactive.activity?.getActivity("artist", "david-bowie")?.state).toBe("inactive");
+        expect(inactive.labels(artistId)?.presentationTone).toBe("weathered");
+        expect(reactivated.activity?.getActivity("artist", "david-bowie")?.state).toBe("active");
+        expect(reactivated.labels(artistId)?.presentationTone).toBeUndefined();
+        expect(returnedActive.activity?.getActivities()).toEqual(active.activity?.getActivities());
+        expect(returnedActive.labels(artistId)).toEqual(active.labels(artistId));
+    });
+
+    it("keeps canonical Appearance empty when the JSON V1 showcase has no Genre hierarchy", () => {
+        const snapshot = temporalAtlas().project(demoHistoricalTimes.crossings);
+
+        expect(snapshot.activity?.getActivity("artist", "david-bowie")?.state).toBe("inactive");
+        expect(snapshot.hierarchy.getFeatures()).toEqual([]);
+        expect(snapshot.appearance.getAppearances()).toEqual([]);
+    });
+
     it("never mutates the full source catalog", () => {
         const imported = new MusicJsonImporter().parse(demoMusicDocumentJson);
         const atlas = createAtlas(imported.catalog, createDemoListeningHistory());
@@ -117,6 +157,7 @@ function createAtlas(
         seed: 1977,
         worldConfig: worldConfig(),
         rulesVersion: "temporal-music-presence-v1",
+        activityRulesVersion: "music-activity-v1",
     });
 }
 

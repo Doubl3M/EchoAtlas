@@ -562,6 +562,32 @@ button {
     border-bottom: 1px solid rgb(105 62 80 / 18%);
 }
 
+.selection-panel__activity {
+    margin: 0.35rem 1.35rem 0;
+    padding: 0.75rem 0.9rem;
+    border-block: 1px solid color-mix(in srgb, var(--atlas-prune) 35%, transparent);
+    color: #675745;
+    background: color-mix(in srgb, var(--atlas-paper) 72%, transparent);
+}
+
+.selection-panel__activity-state,
+.selection-panel__activity-date {
+    margin: 0;
+}
+
+.selection-panel__activity-state {
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+    font-weight: 700;
+    color: #715849;
+}
+
+.selection-panel__activity-date {
+    margin-top: 0.25rem;
+    font-size: 0.78rem;
+    letter-spacing: 0.025em;
+}
+
 .selection-panel dl {
     display: grid;
     grid-template-columns: auto 1fr;

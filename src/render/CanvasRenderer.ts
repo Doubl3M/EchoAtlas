@@ -17,6 +17,7 @@ export type LabelProvider = (knowledgeNodeId: string) => LabelDescriptor | undef
 
 export interface RenderFrameSummary {
     readonly visibleLabelCount: number;
+    readonly visibleWeatheredLabelCount: number;
     readonly visibleKnowledgeNodeIds: readonly string[];
 }
 
@@ -56,6 +57,9 @@ export class CanvasRenderer {
         this.renderLabels(plan.labels, surface);
         return Object.freeze({
             visibleLabelCount: plan.labels.length,
+            visibleWeatheredLabelCount: plan.labels.filter(
+                ({ descriptor }) => descriptor.presentationTone === "weathered"
+            ).length,
             visibleKnowledgeNodeIds: Object.freeze(
                 plan.labels.map(({ knowledgeNodeId }) => knowledgeNodeId)
             ),
@@ -370,14 +374,18 @@ export class CanvasRenderer {
 
     private renderLabels(labels: readonly PositionedLabel[], surface: RenderSurface): void {
         for (const label of labels) {
+            const style =
+                label.descriptor.presentationTone === "weathered"
+                    ? this.theme.label.weathered
+                    : this.theme.label;
             surface.fillText(
                 label.descriptor.text,
                 label.x,
                 label.y,
-                this.theme.label.color,
-                this.theme.label.font,
-                this.theme.label.haloColor,
-                this.theme.label.haloWidth
+                style.color,
+                style.font,
+                style.haloColor,
+                style.haloWidth
             );
         }
     }

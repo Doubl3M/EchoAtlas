@@ -115,13 +115,46 @@ Le snapshot conserve uniquement les entités présentes et les relations origina
 extrémités sont présentes. Il ne crée ni entité ni relation. Une identité d'écoute absente du
 catalogue est ignorée par cette projection sans effacer le fait historique.
 
-Presence détermine qui existe à `T`. Activity décrira plus tard l'état temporel d'une identité.
-Appearance décrira sa traduction géographique ou visuelle. Ces responsabilités restent séparées.
+Presence détermine qui existe à `T`. `music-activity-v1` mesure séparément le `lastActivityAt` le
+plus récent pour chaque identité résolue. Une écoute Track renouvelle ses Albums, Artists et Genres
+ancêtres via les relations structurelles V1 ; une écoute Album renouvelle ses Artists et Genres ;
+une écoute Artist renouvelle ses Genres. Tous les parents valides sont pris en compte. Label,
+Playlist et Compilation ne propagent pas leur activité.
+
+Seuls les Artists reçoivent une classification V1. Un Artist est `active` avant 180 jours exacts
+d'inactivité et `inactive` à partir de cette frontière, soit 15 552 000 000 millisecondes. Ces
+180 jours sont l'approximation produit V1 de six mois, pas une durée calendaire ; aucun calendrier,
+timezone ou locale n'intervient. Les autres kinds exposent leur mesure sans état inventé. Une
+identité sans activité résolue n'apparaît pas dans le snapshot Activity.
+
+```text
+Presence(T) != Activity(T) != Appearance(T)
+```
+
+Un Artist `inactive` reste présent lorsque Presence(T) le contient. Appearance décrira plus tard la
+traduction géographique ou visuelle de cet état ; aucune ruine ou autre métaphore n'est produite par
+Activity.
+
+## Apparence géographique temporelle V1
+
+`GeographicAppearanceSnapshot` est un snapshot World générique, immutable et sparse. Chaque entrée
+référence une `GeographicFeature` existante et porte une condition non-default. L'absence d'entrée
+signifie `normal`; la seule condition non-default V1 est `ruined`. Le snapshot ne contient ni date,
+ni seuil, ni identité Music, et ne remplace jamais la feature concernée.
+
+La couche application applique `music-geographic-appearance-v1` : un Artist `inactive` rend
+`ruined` chacun des Districts issus de son Knowledge Node canonique. Un Artist actif ne crée aucune
+entrée, y compris après réactivation. Aucun autre kind Music ne possède de règle Appearance V1.
+L'actuel landmark Canvas Artist → City est une compatibilité visuelle legacy du showcase et n'est
+pas une cible canonique de cette politique. Le runtime calcule Appearance, mais le document JSON V1
+de démonstration ne contient aucun Genre et ne peut donc produire aucun District canonique.
 
 Dans le showcase navigateur, la couche application choisit un jalon historique explicite puis
-reconstruit `Presence(T)`, le Knowledge Graph, le World et les libellés Music depuis le catalogue et
-l'historique complets et immutables. Changer de jalon ne modifie ni ces sources, ni la Camera, ni le
-`CurrentBroadcast`, qui reste un état d'expérience distinct.
+reconstruit `Presence(T)` et `Activity(T)`, puis le Knowledge Graph, le World, la hiérarchie,
+Appearance et les libellés Music depuis le catalogue et l'historique complets et immutables. Un
+bridge applicatif temporaire patine uniquement le label d'un Artist inactive ; il ne transforme
+jamais la City legacy en District ruiné. Changer de jalon ne modifie ni les sources, ni la Camera,
+ni le `CurrentBroadcast`, qui reste un état d'expérience distinct.
 
 ## Snapshot temporel du Monde
 

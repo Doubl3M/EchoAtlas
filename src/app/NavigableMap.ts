@@ -16,10 +16,9 @@ import { createDemoCurrentBroadcast } from "./demoCurrentBroadcast";
 import { createDemoListeningHistory } from "./demoListeningHistory";
 import { demoMusicDocumentJson } from "./demoMusicDocument";
 import { createHistoricalTimelineControl } from "./HistoricalTimelineControl";
-import type { MusicAtlasSnapshot } from "./MusicAtlasPipeline";
 import { createMusicSelectionPanel } from "./MusicSelectionPanel";
 import { createMusicSelectionRelationProvider } from "./MusicSelectionRelations";
-import { TemporalMusicAtlas } from "./TemporalMusicAtlas";
+import { TemporalMusicAtlas, type TemporalMusicAtlasState } from "./TemporalMusicAtlas";
 import { uiText } from "./UiText";
 
 const WORLD_WIDTH = 96;
@@ -49,10 +48,11 @@ export function mountNavigableMap(root: HTMLElement): () => void {
         seed,
         worldConfig,
         rulesVersion: "temporal-music-presence-v1",
+        activityRulesVersion: "music-activity-v1",
     });
     const milestones = temporalAtlas.getMilestones();
     let selectedHistoricalTime = temporalAtlas.getInitialHistoricalTime();
-    let snapshot: MusicAtlasSnapshot =
+    let snapshot: TemporalMusicAtlasState =
         selectedHistoricalTime === undefined
             ? temporalAtlas.projectEmpty()
             : temporalAtlas.project(selectedHistoricalTime);
@@ -78,6 +78,7 @@ export function mountNavigableMap(root: HTMLElement): () => void {
         const summary = renderer.render(snapshot.world, camera, surface, focusedKnowledgeNodeId);
         visibleKnowledgeNodeIds = new Set(summary.visibleKnowledgeNodeIds);
         canvas.dataset.visibleLabels = String(summary.visibleLabelCount);
+        canvas.dataset.visibleWeatheredLabels = String(summary.visibleWeatheredLabelCount);
         canvas.dataset.visibleLocations = String(summary.visibleKnowledgeNodeIds.length);
         if (selectedHistoricalTime !== undefined) {
             canvas.dataset.historicalAt = String(selectedHistoricalTime);
@@ -128,7 +129,8 @@ export function mountNavigableMap(root: HTMLElement): () => void {
                 focusedKnowledgeNodeId = undefined;
                 render();
             },
-        }
+        },
+        snapshot.activity
     );
     const broadcastPanel = createCurrentBroadcastPanel(currentBroadcast, () => render());
     openCurrentBroadcast = (): void => {
@@ -191,7 +193,8 @@ export function mountNavigableMap(root: HTMLElement): () => void {
         renderer = new CanvasRenderer(theme, snapshot.labels);
         selectionPanel.updateSource(
             snapshot.catalog,
-            createMusicSelectionRelationProvider(snapshot.catalog, snapshot.graph)
+            createMusicSelectionRelationProvider(snapshot.catalog, snapshot.graph),
+            snapshot.activity
         );
         if (
             selectedKnowledgeNodeId !== undefined &&

@@ -78,6 +78,14 @@ export interface LabelVisualStyle {
     readonly haloColor: string;
     readonly haloWidth: number;
     readonly collisionPadding: number;
+    readonly weathered: LabelToneVisualStyle;
+}
+
+export interface LabelToneVisualStyle {
+    readonly color: string;
+    readonly font: string;
+    readonly haloColor: string;
+    readonly haloWidth: number;
 }
 
 export interface CityLandmarkVisualStyle {

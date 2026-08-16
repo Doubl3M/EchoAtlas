@@ -144,13 +144,36 @@ Track. Ils sont dirigés, sensibles à la casse et ne possèdent aucun alias sil
 
 ## Activity
 
-État temporel futur d'une identité présente, par exemple son ancienneté ou son abandon. Activity
-n'est pas calculée par `temporal-music-presence-v1`.
+Mesure Music temporelle indépendante de Presence et Appearance. `music-activity-v1` expose le
+dernier instant d'activité résolu à `T` et propage le maximum aux ancêtres structurels V1. Seuls les
+Artists sont classés `active` ou `inactive`, avec une frontière de 180 jours exacts d'inactivité,
+soit l'approximation produit V1 de six mois et non une durée calendaire. Une identité sans activité
+résolue n'a aucun résultat Activity, et un Artist inactive n'est pas pour autant absent de
+Presence(T).
+
+## Music Activity Rules Version
+
+Version explicite des règles qui mesurent et classifient Activity(T). La première valeur,
+`music-activity-v1`, est distincte de `temporal-music-presence-v1`, `music-geography-v1`,
+`geographic-layout-v1`, `world-v1-exact` et de toute future version Appearance.
 
 ## Appearance
 
 Traduction géographique ou visuelle future d'une identité et de son Activity. Elle n'appartient ni
-au Listening History ni au snapshot de présence Music.
+au Listening History, ni au snapshot de présence Music, ni au projecteur Activity. Une
+classification `inactive` ne choisit donc pas elle-même une ruine, un marqueur ou un style.
+
+## Geographic Appearance Snapshot
+
+Snapshot World générique et immutable des conditions non-default de features géographiques
+existantes. Il est sparse : une feature absente du snapshot est `normal`. Une condition `ruined`
+change l'apparence, jamais l'identité, le rôle ou le containment de la feature.
+
+## Music Geographic Appearance Version
+
+Version de la politique applicative traduisant Activity Music en Appearance World. La première,
+`music-geographic-appearance-v1`, applique `ruined` à tous les Districts canoniques d'un Artist
+inactive. Elle est distincte des versions Presence, Activity, Geography, Layout et World.
 
 ## World(T)
 

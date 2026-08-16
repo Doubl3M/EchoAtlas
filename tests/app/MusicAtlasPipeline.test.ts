@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { createMusicAtlasSnapshot, createMusicLabelProvider } from "../../src/app";
 import { TerrainConfig } from "../../src/engine/terrain";
-import { MusicCatalog, MusicEntity } from "../../src/music";
+import { MusicActivity, MusicActivitySnapshot, MusicCatalog, MusicEntity } from "../../src/music";
 import { WorldConfig } from "../../src/world";
 import { demoMusicDocumentJson } from "../../src/app/demoMusicDocument";
 
@@ -80,6 +80,40 @@ describe("Music Atlas application pipeline", () => {
         expect(snapshot.arrivalZoom("music:label:motown")).toBe(12);
         expect(snapshot.arrivalZoom("music:playlist:night-drive")).toBe(14);
         expect(snapshot.arrivalZoom("music:artist:missing")).toBeUndefined();
+    });
+
+    it("bridges only inactive Artist activity to a generic weathered label", () => {
+        const catalog = new MusicCatalog([
+            new MusicEntity({ kind: "artist", id: "artist", name: "Artist" }),
+            new MusicEntity({ kind: "album", id: "album", title: "Album" }),
+            new MusicEntity({ kind: "track", id: "track", title: "Track" }),
+        ]);
+        const activity = new MusicActivitySnapshot(20, "music-activity-v1", [
+            new MusicActivity({
+                musicEntityKind: "artist",
+                musicEntityId: "artist",
+                lastActivityAt: 10,
+                state: "inactive",
+            }),
+            new MusicActivity({
+                musicEntityKind: "album",
+                musicEntityId: "album",
+                lastActivityAt: 10,
+            }),
+            new MusicActivity({
+                musicEntityKind: "track",
+                musicEntityId: "track",
+                lastActivityAt: 10,
+            }),
+        ]);
+        const labels = createMusicLabelProvider(catalog, activity);
+
+        expect(labels("music:artist:artist")).toMatchObject({
+            landmarkKind: "city",
+            presentationTone: "weathered",
+        });
+        expect(labels("music:album:album")?.presentationTone).toBeUndefined();
+        expect(labels("music:track:track")?.presentationTone).toBeUndefined();
     });
 
     it("is deterministic in world ordering, values and labels", () => {
