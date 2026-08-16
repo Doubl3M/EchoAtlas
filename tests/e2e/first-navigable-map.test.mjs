@@ -115,6 +115,44 @@ test("First Navigable Map works in local headless Chrome", async () => {
         assert.notEqual(early.signature, initial.signature);
         assert.equal(await page.$eval(".broadcast-landmark", (element) => !element.hidden), true);
 
+        assert.equal(early.visibleWeatheredLabels, 0);
+        assert.equal(
+            await clickFirstCityLandmark(page),
+            true,
+            "An active early Artist must remain selectable."
+        );
+        const historicalArtist = await selectionState(page);
+        assert.equal(historicalArtist.entityKind, "artist");
+        assert.equal(
+            await page.$$(".selection-panel__activity").then((items) => items.length),
+            0,
+            "An active Artist must not receive the inactivity annotation."
+        );
+        await selectTimelineIndex(page, 1);
+        const inactiveArtist = await selectionState(page);
+        assert.equal(inactiveArtist.selectedId, historicalArtist.selectedId);
+        assert.ok((await canvasState(page)).visibleWeatheredLabels > 0);
+        assert.equal(
+            await page.$eval(".selection-panel__activity-state", (element) => element.textContent),
+            "En sommeil dans l’Atlas"
+        );
+        assert.match(
+            await page.$eval(
+                ".selection-panel__activity-date",
+                (element) => element.textContent ?? ""
+            ),
+            /^Dernière écoute: \d{2} [^.]+\.? \d{4}$/
+        );
+        await selectTimelineIndex(page, 2);
+        assert.equal((await selectionState(page)).selectedId, historicalArtist.selectedId);
+        assert.equal(
+            await page.$$(".selection-panel__activity").then((items) => items.length),
+            0,
+            "A descendant listen must immediately restore the active presentation."
+        );
+        await page.click(".selection-panel__close");
+        await selectTimelineIndex(page, 0);
+
         const broadcastLandmark = await page.$eval(".broadcast-landmark", (element) => {
             const bounds = element.getBoundingClientRect();
             return {
@@ -399,6 +437,7 @@ async function canvasState(page) {
             dpr: globalThis.window.devicePixelRatio,
             visibleLabels: Number(canvas.dataset.visibleLabels ?? 0),
             visibleLocations: Number(canvas.dataset.visibleLocations ?? 0),
+            visibleWeatheredLabels: Number(canvas.dataset.visibleWeatheredLabels ?? 0),
             signature,
         };
     });
@@ -417,6 +456,45 @@ async function clickFirstLocation(page, canvas, excludedId = undefined) {
                 return true;
             }
         }
+    }
+    return false;
+}
+
+async function clickFirstCityLandmark(page) {
+    const candidates = await page.$eval("canvas", (canvas) => {
+        const context = canvas.getContext("2d");
+        const pixels = context?.getImageData(0, 0, canvas.width, canvas.height).data;
+        if (pixels === undefined) return [];
+        const dpr = globalThis.window.devicePixelRatio;
+        const found = [];
+        const occupied = new Set();
+        for (let y = 0; y < canvas.height; y += 1) {
+            for (let x = 0; x < canvas.width; x += 1) {
+                const index = (y * canvas.width + x) * 4;
+                const isCityFill =
+                    (pixels[index] === 198 &&
+                        pixels[index + 1] === 111 &&
+                        pixels[index + 2] === 63) ||
+                    (pixels[index] === 215 &&
+                        pixels[index + 1] === 161 &&
+                        pixels[index + 2] === 77);
+                if (!isCityFill) continue;
+                const cell = `${Math.floor(x / (24 * dpr))}:${Math.floor(y / (24 * dpr))}`;
+                if (occupied.has(cell)) continue;
+                occupied.add(cell);
+                found.push({ x: x / dpr, y: y / dpr });
+            }
+        }
+        return found;
+    });
+    const canvas = await page.$eval("canvas", (element) => {
+        const bounds = element.getBoundingClientRect();
+        return { x: bounds.x, y: bounds.y };
+    });
+    for (const candidate of candidates) {
+        await page.mouse.click(canvas.x + candidate.x, canvas.y + candidate.y);
+        const selected = await selectionState(page);
+        if (selected.visible && selected.entityKind === "artist") return true;
     }
     return false;
 }

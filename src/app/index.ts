@@ -22,4 +22,4 @@ export type { MusicGeographicAppearanceInterpretationOptions } from "./MusicGeog
 export type { MusicGeographicAppearanceVersion } from "./MusicGeographicAppearanceVersion";
 export { mountNavigableMap } from "./NavigableMap";
 export { TemporalMusicAtlas } from "./TemporalMusicAtlas";
-export type { TemporalMusicAtlasOptions } from "./TemporalMusicAtlas";
+export type { TemporalMusicAtlasOptions, TemporalMusicAtlasState } from "./TemporalMusicAtlas";

@@ -2,6 +2,7 @@ import type { KnowledgeGraph } from "../knowledge";
 import {
     MusicInterpreter,
     musicKnowledgeNodeId,
+    type MusicActivitySnapshot,
     type MusicCatalog,
     type MusicEntityKind,
 } from "../music";
@@ -39,11 +40,12 @@ export function createMusicAtlasSnapshot(
 export function createMusicAtlasSnapshotFromCatalog(
     catalog: MusicCatalog,
     seed: number,
-    worldConfig: WorldConfig
+    worldConfig: WorldConfig,
+    activity?: MusicActivitySnapshot
 ): MusicAtlasSnapshot {
     const graph = new MusicInterpreter().interpret(catalog);
     const world = new WorldGenerator().generate(seed, worldConfig, graph);
-    const labels = createMusicLabelProvider(catalog);
+    const labels = createMusicLabelProvider(catalog, activity);
     const arrivalZoom = createMusicArrivalZoomProvider(catalog);
     return Object.freeze({ catalog, graph, world, labels, arrivalZoom, seed });
 }
@@ -61,7 +63,10 @@ export function createMusicArrivalZoomProvider(catalog: MusicCatalog): ArrivalZo
         zoomByKnowledgeNodeId.get(knowledgeNodeId);
 }
 
-export function createMusicLabelProvider(catalog: MusicCatalog): LabelProvider {
+export function createMusicLabelProvider(
+    catalog: MusicCatalog,
+    activity?: MusicActivitySnapshot
+): LabelProvider {
     const labels = new Map<string, LabelDescriptor>();
     for (const entity of catalog.getEntities()) {
         const label =
@@ -79,6 +84,10 @@ export function createMusicLabelProvider(catalog: MusicCatalog): LabelProvider {
                         text: label,
                         ...detail,
                         ...(entity.kind === "artist" ? { landmarkKind: "city" as const } : {}),
+                        ...(entity.kind === "artist" &&
+                        activity?.getActivity(entity.kind, entity.id)?.state === "inactive"
+                            ? { presentationTone: "weathered" as const }
+                            : {}),
                     })
                 );
             }

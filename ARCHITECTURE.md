@@ -581,17 +581,23 @@ The application policy `music-geographic-appearance-v1` maps an inactive Artist 
 canonical Knowledge Node ID to every represented District and marks those Districts `ruined`.
 Active Artists and every other Music kind produce no non-default appearance. The current Artist →
 City Canvas landmark remains showcase compatibility only and is deliberately not an Appearance
-target; rendering does not consume the new snapshot yet.
+target. The runtime calculates the canonical Appearance snapshot, but the JSON V1 showcase has no
+Genre and therefore no District representation to mark as ruined.
 
 The browser showcase now exercises this boundary through the application layer:
 
 ```text
 ListeningHistory
 → Presence(T)
+→ Activity(T)
 → KnowledgeGraph(T)
 → GeographicWorld(T)
 → CanvasRenderer
 ```
+
+Until the hierarchical geography is rendered, the application uses an explicit legacy bridge:
+inactive Artists receive only a generic `weathered` label treatment and a Music-panel annotation.
+It does not alter City geometry and does not mean that the legacy City is a ruined District.
 
 Changing the explicit historical milestone rebuilds every derived snapshot from the immutable full
 catalog and history. It does not mutate the source catalog, reuse the previous World as input, or

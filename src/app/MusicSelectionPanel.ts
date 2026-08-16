@@ -1,5 +1,6 @@
-import type { MusicCatalog, MusicEntity } from "../music";
+import type { MusicActivitySnapshot, MusicCatalog, MusicEntity } from "../music";
 
+import { formatHistoricalDate } from "./HistoricalTimelineControl";
 import { uiText } from "./UiText";
 import type {
     MusicSelectionRelation,
@@ -13,7 +14,11 @@ export interface MusicSelectionPanel {
     show(knowledgeNodeId: string): void;
     hide(): void;
     close(): void;
-    updateSource(catalog: MusicCatalog, relationProvider: MusicSelectionRelationProvider): void;
+    updateSource(
+        catalog: MusicCatalog,
+        relationProvider: MusicSelectionRelationProvider,
+        activity?: MusicActivitySnapshot
+    ): void;
     getSelectedKnowledgeNodeId(): string | undefined;
 }
 
@@ -26,10 +31,12 @@ export interface MusicSelectionPanelActions {
 export function createMusicSelectionPanel(
     catalog: MusicCatalog,
     relationProvider: MusicSelectionRelationProvider,
-    actions: MusicSelectionPanelActions
+    actions: MusicSelectionPanelActions,
+    activity?: MusicActivitySnapshot
 ): MusicSelectionPanel {
     let entities = indexEntities(catalog);
     let currentRelationProvider = relationProvider;
+    let currentActivity = activity;
     const element = document.createElement("aside");
     element.className = "selection-panel";
     element.hidden = true;
@@ -61,6 +68,7 @@ export function createMusicSelectionPanel(
             closeButton,
             createHeader(entity),
             ...(entity.kind === "artist" ? [createCityMotif()] : []),
+            ...createActivityAnnotation(entity, currentActivity),
             createAttributes(entity),
             createConnections(currentRelationProvider(knowledgeNodeId), selectRelation)
         );
@@ -68,10 +76,12 @@ export function createMusicSelectionPanel(
     };
     const updateSource = (
         updatedCatalog: MusicCatalog,
-        updatedRelationProvider: MusicSelectionRelationProvider
+        updatedRelationProvider: MusicSelectionRelationProvider,
+        updatedActivity?: MusicActivitySnapshot
     ): void => {
         entities = indexEntities(updatedCatalog);
         currentRelationProvider = updatedRelationProvider;
+        currentActivity = updatedActivity;
     };
     const getSelectedKnowledgeNodeId = (): string | undefined => element.dataset.selectedId;
     return Object.freeze({
@@ -82,6 +92,31 @@ export function createMusicSelectionPanel(
         updateSource,
         getSelectedKnowledgeNodeId,
     });
+}
+
+function createActivityAnnotation(
+    entity: MusicEntity,
+    activity: MusicActivitySnapshot | undefined
+): readonly HTMLElement[] {
+    if (entity.kind !== "artist") {
+        return [];
+    }
+    const artistActivity = activity?.getActivity(entity.kind, entity.id);
+    if (artistActivity?.state !== "inactive") {
+        return [];
+    }
+    const section = document.createElement("section");
+    section.className = "selection-panel__activity selection-panel__activity--weathered";
+    const state = document.createElement("p");
+    state.className = "selection-panel__activity-state";
+    state.textContent = uiText.artistSleeping;
+    const lastActivity = document.createElement("p");
+    lastActivity.className = "selection-panel__activity-date";
+    lastActivity.textContent = `${uiText.lastListening}: ${formatHistoricalDate(
+        artistActivity.lastActivityAt
+    )}`;
+    section.append(state, lastActivity);
+    return [section];
 }
 
 function indexEntities(catalog: MusicCatalog): Map<string, MusicEntity> {

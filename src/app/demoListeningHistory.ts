@@ -25,6 +25,8 @@ export function createDemoListeningHistory(): ListeningHistory {
             ["track", "mr-follow-follow"],
         ]),
         ...eventsAt(demoHistoricalTimes.expansion, [
+            ["track", "sound-and-vision"],
+            ["track", "st-elmos-fire"],
             ["track", "sir-duke"],
             ["track", "as"],
             ["track", "europe-endless"],

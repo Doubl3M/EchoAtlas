@@ -6,9 +6,12 @@ export interface LabelDescriptor {
     readonly priority: number;
     readonly minZoom: number;
     readonly landmarkKind?: LandmarkKind;
+    /** Generic editorial treatment; its domain meaning remains owned by the caller. */
+    readonly presentationTone?: LabelPresentationTone;
 }
 
 export type LandmarkKind = "city";
+export type LabelPresentationTone = "normal" | "weathered";
 
 export interface LabelCandidate {
     readonly knowledgeNodeId: string;
@@ -52,7 +55,11 @@ export function layoutLabels(
         return lexicalCompare(left.knowledgeNodeId, right.knowledgeNodeId);
     });
     for (const candidate of ordered) {
-        const metrics = surface.measureText(candidate.descriptor.text, style.font);
+        const font =
+            candidate.descriptor.presentationTone === "weathered"
+                ? style.weathered.font
+                : style.font;
+        const metrics = surface.measureText(candidate.descriptor.text, font);
         for (const rectangle of placements(candidate, metrics, style)) {
             if (
                 isInside(rectangle, bounds) &&

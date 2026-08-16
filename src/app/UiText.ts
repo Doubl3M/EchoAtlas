@@ -20,6 +20,8 @@ export const uiText = Object.freeze({
     connections: "Connexions dans l’atlas",
     noConnections: "Aucune connexion directe",
     moreConnections: "autres connexions",
+    artistSleeping: "En sommeil dans l’Atlas",
+    lastListening: "Dernière écoute",
     pirateRadio: "Radio Pirate",
     pirateRadioLandmark: "Open Radio Pirate current broadcast",
     currentBroadcastKind: "Diffusion en cours",

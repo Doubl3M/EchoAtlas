@@ -488,8 +488,9 @@ ou une activité d'un autre kind ne produit aucune entrée. Le snapshot est spar
 `normal`. Une réactivation reconstruit un nouveau snapshot normal sans muter le précédent.
 
 Cette fondation ne branche ni le générateur World legacy ni le Renderer. En particulier, le
-landmark Artist → City du showcase n'est pas utilisé : la cible canonique est le District de la
-hiérarchie sémantique.
+landmark Artist → City du showcase n'est pas utilisé comme cible : la cible canonique est le
+District de la hiérarchie sémantique. Le runtime calcule néanmoins le snapshot Appearance ; il
+reste vide dans la fixture JSON V1 actuelle, faute de Genre et donc de District.
 
 Le showcase exécute désormais réellement la reconstruction suivante pour chaque jalon temporel
 sélectionné :
@@ -497,10 +498,16 @@ sélectionné :
 ```text
 ListeningHistory
 → Presence(T)
+→ Activity(T)
 → KnowledgeGraph(T)
 → GeographicWorld(T)
 → rendu Canvas
 ```
+
+Pour rendre Activity observable avant le rendu de la hiérarchie, la couche application applique un
+bridge legacy limité : un Artist inactive reçoit un descriptor de label générique `weathered` et
+une annotation éditoriale dans le panneau Music. La silhouette City est inchangée et ce traitement
+ne signifie jamais « District ruined ».
 
 La couche application repart toujours du catalogue complet et de l'historique immutable. Elle
 conserve la Camera courante, remplace les snapshots dérivés et laisse le `CurrentBroadcast` hors de
