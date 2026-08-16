@@ -77,6 +77,7 @@ test("First Navigable Map works in local headless Chrome", async () => {
         assert.equal(await page.$eval(".atlas-journey dd", (element) => element.textContent), "47");
 
         const initial = await canvasState(page);
+        const initialJourney = await journeyState(page);
         assert.ok(initial.cssWidth > 0 && initial.cssHeight > 0);
         assert.ok(initial.width > 0 && initial.height > 0);
         assert.ok(initial.visibleLabels > 0, "The initial atlas view must render semantic labels.");
@@ -85,6 +86,34 @@ test("First Navigable Map works in local headless Chrome", async () => {
             initial.visibleLabels,
             "Every initial marker must have an accepted label."
         );
+        assert.deepEqual(initialJourney, { locations: 47, relations: 50 });
+        assert.equal(
+            await page.$eval(".historical-timeline", (element) => element.dataset.milestoneCount),
+            "4"
+        );
+        const latestHistoricalAt = await page.$eval(
+            ".historical-timeline",
+            (element) => element.dataset.selectedAt
+        );
+        const latestDate = await page.$eval(
+            ".historical-timeline__date",
+            (element) => element.textContent
+        );
+        await selectTimelineIndex(page, 0);
+        const early = await canvasState(page);
+        const earlyJourney = await journeyState(page);
+        assert.notEqual(
+            await page.$eval(".historical-timeline", (element) => element.dataset.selectedAt),
+            latestHistoricalAt
+        );
+        assert.notEqual(
+            await page.$eval(".historical-timeline__date", (element) => element.textContent),
+            latestDate
+        );
+        assert.ok(earlyJourney.locations < initialJourney.locations);
+        assert.ok(earlyJourney.relations < initialJourney.relations);
+        assert.notEqual(early.signature, initial.signature);
+        assert.equal(await page.$eval(".broadcast-landmark", (element) => !element.hidden), true);
 
         const broadcastLandmark = await page.$eval(".broadcast-landmark", (element) => {
             const bounds = element.getBoundingClientRect();
@@ -124,11 +153,51 @@ test("First Navigable Map works in local headless Chrome", async () => {
                 .then((items) => items.length),
             1
         );
+        const broadcastBeforeHistoricalChange = await broadcastState(page);
+        await selectTimelineIndex(page, 1);
+        assert.deepEqual(await broadcastState(page), broadcastBeforeHistoricalChange);
+        assert.equal(
+            await page.$eval(".selection-panel--broadcast", (element) => element.hidden),
+            false,
+            "Historical navigation must keep the current broadcast panel open."
+        );
         await page.click(".selection-panel--broadcast .selection-panel__close");
         await page.waitForFunction(() => {
             const panel = globalThis.document.querySelector(".selection-panel--broadcast");
             return panel !== null && panel.hidden;
         });
+        await page.waitForFunction(
+            (initialWidth) =>
+                globalThis.document.querySelector("canvas")?.getBoundingClientRect().width ===
+                initialWidth,
+            {},
+            initial.cssWidth
+        );
+        await renderedFrameCount(page, 12);
+        await selectTimelineIndex(page, 3);
+        await page.waitForFunction(
+            (expected) =>
+                globalThis.document.querySelector(".historical-timeline")?.dataset.selectedAt ===
+                expected,
+            {},
+            latestHistoricalAt
+        );
+        await renderedFrames(page);
+        const returnedLatest = await canvasState(page);
+        assert.deepEqual(await journeyState(page), initialJourney);
+        assert.notEqual(
+            returnedLatest.signature,
+            early.signature,
+            "Returning to latest T must replace the historical rendering."
+        );
+        assert.equal(returnedLatest.visibleLocations, returnedLatest.visibleLabels);
+        await selectTimelineIndex(page, 0);
+        await selectTimelineIndex(page, 3);
+        assert.equal(
+            (await canvasState(page)).signature,
+            returnedLatest.signature,
+            "Repeating the same historical round trip with an equivalent Camera must reproduce the Canvas."
+        );
 
         assert.equal(
             await clickFirstLocation(page, initial),
@@ -186,8 +255,8 @@ test("First Navigable Map works in local headless Chrome", async () => {
         assert.notEqual(secondSelection.title, firstSelection.title);
         const afterFirstJourney = await waitForCanvasToSettle(page);
         assert.notEqual(
-            afterFirstJourney.dataUrl,
-            selectedCanvas.dataUrl,
+            afterFirstJourney.signature,
+            selectedCanvas.signature,
             "Relational selection must animate the Camera to its WorldLocation."
         );
         assert.equal(
@@ -196,7 +265,7 @@ test("First Navigable Map works in local headless Chrome", async () => {
             "Safe arrival framing must preserve the selected destination without assuming pixel-center placement."
         );
 
-        const interruptedStart = afterFirstJourney.dataUrl;
+        const interruptedStart = afterFirstJourney.signature;
         await page.click(".selection-panel__connection");
         await page.mouse.move(
             afterFirstJourney.x + afterFirstJourney.cssWidth / 2,
@@ -205,11 +274,11 @@ test("First Navigable Map works in local headless Chrome", async () => {
         await page.mouse.wheel({ deltaY: -120 });
         await renderedFrames(page);
         const afterInterruption = await canvasState(page);
-        assert.notEqual(afterInterruption.dataUrl, interruptedStart);
+        assert.notEqual(afterInterruption.signature, interruptedStart);
         await renderedFrameCount(page, 12);
         assert.equal(
-            (await canvasState(page)).dataUrl,
-            afterInterruption.dataUrl,
+            (await canvasState(page)).signature,
+            afterInterruption.signature,
             "Wheel input must cancel the active Camera journey immediately."
         );
 
@@ -235,8 +304,8 @@ test("First Navigable Map works in local headless Chrome", async () => {
         await renderedFrames(page);
         const afterZoom = await canvasState(page);
         assert.notEqual(
-            afterZoom.dataUrl,
-            initial.dataUrl,
+            afterZoom.signature,
+            initial.signature,
             "A browser wheel event must redraw the map."
         );
         assert.equal(afterZoom.visibleLocations, afterZoom.visibleLabels);
@@ -254,7 +323,11 @@ test("First Navigable Map works in local headless Chrome", async () => {
         await page.mouse.up();
         await renderedFrames(page);
         const afterPan = await canvasState(page);
-        assert.notEqual(afterPan.dataUrl, afterZoom.dataUrl, "A browser drag must redraw the map.");
+        assert.notEqual(
+            afterPan.signature,
+            afterZoom.signature,
+            "A browser drag must redraw the map."
+        );
 
         await page.setViewport({ width: 900, height: 640 });
         await page.waitForFunction(() => {
@@ -272,7 +345,11 @@ test("First Navigable Map works in local headless Chrome", async () => {
         assert.ok(afterResize.cssHeight > 0 && afterResize.cssHeight < 640);
         assert.equal(afterResize.width, Math.round(afterResize.cssWidth * afterResize.dpr));
         assert.equal(afterResize.height, Math.round(afterResize.cssHeight * afterResize.dpr));
-        assert.notEqual(afterResize.dataUrl, afterPan.dataUrl, "Resize must produce a new frame.");
+        assert.notEqual(
+            afterResize.signature,
+            afterPan.signature,
+            "Resize must produce a new frame."
+        );
 
         assert.deepEqual(pageErrors, []);
         assert.deepEqual(consoleErrors, []);
@@ -296,6 +373,22 @@ test("First Navigable Map works in local headless Chrome", async () => {
 async function canvasState(page) {
     return page.$eval("canvas", (canvas) => {
         const bounds = canvas.getBoundingClientRect();
+        const sample = globalThis.document.createElement("canvas");
+        sample.width = 64;
+        sample.height = 64;
+        const context = sample.getContext("2d");
+        context?.drawImage(canvas, 0, 0, sample.width, sample.height);
+        const pixels = context?.getImageData(0, 0, sample.width, sample.height).data;
+        let signature = 2166136261;
+        if (pixels !== undefined) {
+            for (let index = 0; index < pixels.length; index += 4) {
+                const color =
+                    ((pixels[index] >> 4) << 8) |
+                    ((pixels[index + 1] >> 4) << 4) |
+                    (pixels[index + 2] >> 4);
+                signature = Math.imul(signature ^ color, 16777619) >>> 0;
+            }
+        }
         return {
             cssWidth: bounds.width,
             cssHeight: bounds.height,
@@ -306,7 +399,7 @@ async function canvasState(page) {
             dpr: globalThis.window.devicePixelRatio,
             visibleLabels: Number(canvas.dataset.visibleLabels ?? 0),
             visibleLocations: Number(canvas.dataset.visibleLocations ?? 0),
-            dataUrl: canvas.toDataURL(),
+            signature,
         };
     });
 }
@@ -336,6 +429,39 @@ async function selectionState(page) {
         kind: element.querySelector(".selection-panel__kind")?.textContent ?? "",
         title: element.querySelector("h2")?.textContent ?? "",
     }));
+}
+
+async function journeyState(page) {
+    return page.evaluate(() => ({
+        locations: Number(
+            globalThis.document.querySelector(".atlas-journey__locations")?.textContent ?? 0
+        ),
+        relations: Number(
+            globalThis.document.querySelector(".atlas-journey__relations")?.textContent ?? 0
+        ),
+    }));
+}
+
+async function broadcastState(page) {
+    return page.$$eval(".broadcast-panel__playlist li", (items) =>
+        items.map((item) => ({
+            id: item.dataset.broadcastEntryId,
+            text: item.textContent,
+            current: item.getAttribute("aria-current"),
+        }))
+    );
+}
+
+async function selectTimelineIndex(page, index) {
+    await page.$eval(
+        ".historical-timeline input",
+        (input, selectedIndex) => {
+            input.value = String(selectedIndex);
+            input.dispatchEvent(new globalThis.Event("input", { bubbles: true }));
+        },
+        index
+    );
+    await renderedFrames(page);
 }
 
 function assertSelectionMatchesIdentity(selection) {

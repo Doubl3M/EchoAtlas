@@ -32,11 +32,20 @@ export function createMusicAtlasSnapshot(
         throw new Error("The navigable map document must provide metadata.seed.");
     }
 
-    const graph = new MusicInterpreter().interpret(imported.catalog);
+    return createMusicAtlasSnapshotFromCatalog(imported.catalog, seed, worldConfig);
+}
+
+/** Builds one deterministic Atlas snapshot from an already resolved Music catalog. */
+export function createMusicAtlasSnapshotFromCatalog(
+    catalog: MusicCatalog,
+    seed: number,
+    worldConfig: WorldConfig
+): MusicAtlasSnapshot {
+    const graph = new MusicInterpreter().interpret(catalog);
     const world = new WorldGenerator().generate(seed, worldConfig, graph);
-    const labels = createMusicLabelProvider(imported.catalog);
-    const arrivalZoom = createMusicArrivalZoomProvider(imported.catalog);
-    return Object.freeze({ catalog: imported.catalog, graph, world, labels, arrivalZoom, seed });
+    const labels = createMusicLabelProvider(catalog);
+    const arrivalZoom = createMusicArrivalZoomProvider(catalog);
+    return Object.freeze({ catalog, graph, world, labels, arrivalZoom, seed });
 }
 
 /** Showcase presentation policy; values are deliberately independent from Music domain data. */

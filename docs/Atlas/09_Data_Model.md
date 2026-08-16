@@ -69,8 +69,59 @@ ImportedMusicDocument
 Les métadonnées du document ne deviennent ni des entités musicales, ni des nœuds du Knowledge
 Graph.
 
-Les événements d'écoute appartiendront au modèle de Listening History distinct requis pour la
+Les événements d'écoute appartiennent au modèle `ListeningHistory` distinct requis pour la
 navigation temporelle V1. Les paramètres applicatifs n'appartiennent pas au catalogue musical.
+
+## Listening History
+
+`ListeningHistory` est une suite canonique immutable de faits d'écoute explicites. Chaque
+`ListeningEvent` possède un ID stable, un instant `occurredAt` exprimé en millisecondes Unix sous
+forme d'entier sûr, et une identité Music canonique `(kind, ID)`. Il ne contient ni géographie, ni
+durée écoutée, ni provenance implicite.
+
+L'ordre d'entrée n'a aucun sens. L'ordre historique est `occurredAt` croissant, puis ID d'événement
+selon une comparaison lexicale JavaScript explicite. Deux événements au même instant restent deux
+faits distincts lorsque leurs IDs diffèrent.
+
+```text
+History(T) = ListeningEvents dont occurredAt <= T
+```
+
+`T` est inclusif et toujours fourni explicitement. L'historique n'utilise aucune horloge système et
+sa consultation ne dépend d'aucun snapshot précédent. Il peut référencer une identité Music absente
+du catalogue courant afin de conserver un fait issu d'un catalogue incomplet, d'un import différé
+ou d'une source externe. La résolution de cette identité appartiendra au futur projecteur temporel.
+
+## Présence musicale temporelle V1
+
+Les relations structurelles Music V1 sont exactement :
+
+```text
+Genre  --includes-->  Artist
+Artist --performed--> Album
+Album  --contains-->  Track
+```
+
+Les kinds sont exacts, sensibles à la casse et ne possèdent aucun alias implicite. Une relation
+structurelle est reconnue par le triplet complet `(source kind, relation kind, target kind)`.
+
+`temporal-music-presence-v1` définit `Presence(T)` comme les identités directement écoutées au plus
+tard à `T`, résolues dans le catalogue fourni, auxquelles s'ajoute la fermeture ascendante de leurs
+ancêtres structurels canoniques. Une écoute Track peut ainsi révéler tous ses Albums parents, leurs
+Artists puis leurs Genres. Label, Playlist et Compilation peuvent être présents par écoute directe,
+mais aucune propagation structurelle ne leur est attribuée en V1.
+
+Le snapshot conserve uniquement les entités présentes et les relations originales dont les deux
+extrémités sont présentes. Il ne crée ni entité ni relation. Une identité d'écoute absente du
+catalogue est ignorée par cette projection sans effacer le fait historique.
+
+Presence détermine qui existe à `T`. Activity décrira plus tard l'état temporel d'une identité.
+Appearance décrira sa traduction géographique ou visuelle. Ces responsabilités restent séparées.
+
+Dans le showcase navigateur, la couche application choisit un jalon historique explicite puis
+reconstruit `Presence(T)`, le Knowledge Graph, le World et les libellés Music depuis le catalogue et
+l'historique complets et immutables. Changer de jalon ne modifie ni ces sources, ni la Camera, ni le
+`CurrentBroadcast`, qui reste un état d'expérience distinct.
 
 ## Snapshot temporel du Monde
 
@@ -109,8 +160,8 @@ Chaque entrée possède une identité locale au broadcast, un titre de morceau, 
 une provenance explicite. Une identité Music existante peut être référencée facultativement, mais
 une entrée reste valide sans `MusicEntity`, `KnowledgeNode`, `GeographicFeature` ou
 `WorldLocation`. L'ordre fourni est significatif et n'est pas trié. Représenter ou sélectionner une
-entrée ne l'adopte pas : cela ne modifie ni le catalogue ni le Monde et ne crée aucun Listening
-Event. Une future écoute acceptée dans le Listening History passera par une action explicite
+entrée ne l'adopte pas : cela ne modifie ni le catalogue ni le Monde et ne crée aucun
+`ListeningEvent`. Une future écoute acceptée dans `ListeningHistory` passera par une action explicite
 séparée.
 
 La fidélité historique ne consiste pas à masquer les éléments apparus après `T`. L'état complet est

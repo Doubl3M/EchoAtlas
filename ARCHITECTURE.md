@@ -201,11 +201,12 @@ explicit World interpretation policy. The current `world-v1-exact` flat generato
 during this migration.
 
 Music Atlas currently owns `music-geography-v1` in the application layer. This interpretation
-uses directed relations only: Genre → Artist creates a District in a Genre Continent,
-Artist → Album creates a Building in every represented Artist District, and Album → Track creates
-Building Content in every represented Album Building. Inverse and unrelated relations have no
-implicit geographic meaning. This interpretation version is independent from both the JSON format
-version and `WorldGenerationVersion`.
+uses the exact canonical structural Music relations V1: Genre `includes` Artist creates a District
+in a Genre Continent, Artist `performed` Album creates a Building in every represented Artist
+District, and Album `contains` Track creates Building Content in every represented Album Building.
+Endpoint kinds alone are insufficient. Inverse, aliased and unrelated relations have no implicit
+geographic meaning. This interpretation version is independent from both the JSON format version
+and `WorldGenerationVersion`.
 
 World provides a generic focus resolution step over this hierarchy. A Knowledge identity resolves
 to zero or more direct features or content containers; no one-to-one representation is assumed.
@@ -535,6 +536,41 @@ Changing FPS must never change the world.
 Changing operating system must never change the world.
 
 ## Temporal snapshots
+
+`ListeningHistory` belongs to Music and is an immutable canonical sequence of explicit listening
+facts. Each `ListeningEvent` carries its own stable ID, an explicit safe Unix epoch millisecond and
+a canonical Music identity `(kind, ID)`. Input order has no meaning: events are ordered by
+`occurredAt`, then by an explicit lexical comparison of event IDs. Equal timestamps represent
+distinct facts when their IDs differ.
+
+`History(T)` contains exactly events where `occurredAt <= T`. It is reconstructed directly from
+the immutable history and never from a previous temporal snapshot. Neither the catalog nor the
+system clock is required to construct the history; an event may therefore reference a Music
+identity absent from the current catalog, for later resolution by temporal projection.
+
+`temporal-music-presence-v1` projects `Presence(T)` from direct listening identities resolved in
+the supplied catalog, then closes upward over exactly the same canonical structural relations:
+Genre `includes` Artist, Artist `performed` Album and Album `contains` Track. Label, Playlist and
+Compilation can be directly present but have no inherited structural presence in V1. The temporal
+catalog retains every original relation whose two endpoints are present and invents none.
+
+Presence answers which identities exist at `T`. Activity will later describe states such as
+recency or abandonment. Appearance remains a separate geographic/rendering concern. These three
+contracts are not interchangeable.
+
+The browser showcase now exercises this boundary through the application layer:
+
+```text
+ListeningHistory
+→ Presence(T)
+→ KnowledgeGraph(T)
+→ GeographicWorld(T)
+→ CanvasRenderer
+```
+
+Changing the explicit historical milestone rebuilds every derived snapshot from the immutable full
+catalog and history. It does not mutate the source catalog, reuse the previous World as input, or
+alter Camera state. `CurrentBroadcast` remains separate application state and is not rewound.
 
 A temporal world is defined conceptually by:
 

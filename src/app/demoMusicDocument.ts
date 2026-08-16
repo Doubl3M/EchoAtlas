@@ -68,7 +68,7 @@ export const demoMusicDocumentJson = JSON.stringify(
         relations: [
             relation(
                 "stevie-songs",
-                "created",
+                "performed",
                 "artist",
                 "stevie-wonder",
                 "album",
@@ -77,7 +77,7 @@ export const demoMusicDocumentJson = JSON.stringify(
             ),
             relation(
                 "fleetwood-rumours",
-                "created",
+                "performed",
                 "artist",
                 "fleetwood-mac",
                 "album",
@@ -86,7 +86,7 @@ export const demoMusicDocumentJson = JSON.stringify(
             ),
             relation(
                 "kraftwerk-trans",
-                "created",
+                "performed",
                 "artist",
                 "kraftwerk",
                 "album",
@@ -95,28 +95,28 @@ export const demoMusicDocumentJson = JSON.stringify(
             ),
             relation(
                 "kraftwerk-machine",
-                "created",
+                "performed",
                 "artist",
                 "kraftwerk",
                 "album",
                 "man-machine",
                 2
             ),
-            relation("bowie-low", "created", "artist", "david-bowie", "album", "low", 2),
-            relation("joni-hejira", "created", "artist", "joni-mitchell", "album", "hejira", 2),
+            relation("bowie-low", "performed", "artist", "david-bowie", "album", "low", 2),
+            relation("joni-hejira", "performed", "artist", "joni-mitchell", "album", "hejira", 2),
             relation(
                 "joni-hissing",
-                "created",
+                "performed",
                 "artist",
                 "joni-mitchell",
                 "album",
                 "hissing-of-summer-lawns",
                 2
             ),
-            relation("fela-zombie", "created", "artist", "fela-kuti", "album", "zombie", 2),
+            relation("fela-zombie", "performed", "artist", "fela-kuti", "album", "zombie", 2),
             relation(
                 "eno-green-world",
-                "created",
+                "performed",
                 "artist",
                 "brian-eno",
                 "album",
@@ -125,7 +125,7 @@ export const demoMusicDocumentJson = JSON.stringify(
             ),
             relation(
                 "gil-pieces",
-                "created",
+                "performed",
                 "artist",
                 "gil-scott-heron",
                 "album",

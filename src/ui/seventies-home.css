@@ -418,6 +418,49 @@ button {
     font-weight: 700;
 }
 
+.historical-timeline {
+    display: grid;
+    grid-template-columns: auto minmax(10rem, 18rem) auto;
+    align-items: center;
+    gap: 0.35rem 0.8rem;
+    margin-left: auto;
+    padding-left: 1rem;
+    border-left: 1px solid rgb(242 203 118 / 38%);
+}
+
+.historical-timeline > div {
+    display: grid;
+    min-width: 7.5rem;
+}
+
+.historical-timeline strong {
+    color: #f2cb76;
+    font-size: 0.92rem;
+    font-style: italic;
+}
+
+.historical-timeline span,
+.historical-timeline__date {
+    color: #dbcda6;
+    font-family: var(--atlas-sans);
+    font-size: 0.55rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.historical-timeline input {
+    width: 100%;
+    accent-color: var(--atlas-ochre);
+    cursor: pointer;
+}
+
+.historical-timeline__date {
+    min-width: 10.5rem;
+    color: var(--atlas-paper-light);
+    font-weight: 700;
+    text-align: right;
+}
+
 .selection-panel {
     position: relative;
     min-width: 0;
@@ -859,6 +902,20 @@ button {
 
     .atlas-journey dl {
         gap: 0.25rem 0.5rem;
+    }
+
+    .historical-timeline {
+        grid-template-columns: minmax(7rem, 1fr) auto;
+        margin-left: 0.5rem;
+    }
+
+    .historical-timeline > div {
+        display: none;
+    }
+
+    .historical-timeline__date {
+        min-width: 7rem;
+        font-size: 0.48rem;
     }
 
     .atlas-journey dt {

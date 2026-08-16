@@ -5,6 +5,7 @@ import {
     type MusicGeographyInterpretationVersion,
 } from "../../src/app";
 import {
+    getStructuralMusicRelationKindV1,
     MusicCatalog,
     MusicEntity,
     MusicInterpreter,
@@ -84,6 +85,38 @@ describe("MusicGeographicInterpreter", () => {
         expect(hierarchy.getFeatures().map(({ role }) => role)).toEqual(["continent"]);
         expect(hierarchy.getContents()).toEqual([]);
     });
+
+    it.each([
+        ["genre", "random-link", "artist"],
+        ["artist", "created", "album"],
+        ["playlist", "contains", "track"],
+    ] as const)(
+        "ignores non-canonical %s --%s--> %s relations",
+        (sourceKind, relationKind, targetKind) => {
+            const catalog = new MusicCatalog(standardEntities(), [
+                relationWithKind(
+                    "non-canonical",
+                    sourceKind,
+                    sourceKind === "genre"
+                        ? "trip-hop"
+                        : sourceKind === "artist"
+                          ? "tricky"
+                          : "mix",
+                    targetKind,
+                    targetKind === "artist"
+                        ? "tricky"
+                        : targetKind === "album"
+                          ? "maxinquaye"
+                          : "overcome",
+                    relationKind
+                ),
+            ]);
+
+            const hierarchy = interpret(catalog);
+            expect(hierarchy.getFeatures().map(({ role }) => role)).toEqual(["continent"]);
+            expect(hierarchy.getContents()).toEqual([]);
+        }
+    );
 
     it("deduplicates repeated logical containment relations", () => {
         const hierarchy = interpret(
@@ -229,13 +262,25 @@ function relation(
     targetKind: MusicEntityKind,
     targetId: string
 ): MusicRelation {
+    const kind = getStructuralMusicRelationKindV1(sourceKind, targetKind) ?? "fixture-link";
+    return relationWithKind(id, sourceKind, sourceId, targetKind, targetId, kind);
+}
+
+function relationWithKind(
+    id: string,
+    sourceKind: MusicEntityKind,
+    sourceId: string,
+    targetKind: MusicEntityKind,
+    targetId: string,
+    kind: string
+): MusicRelation {
     return new MusicRelation({
         id,
         sourceKind,
         sourceId,
         targetKind,
         targetId,
-        kind: "fixture-link",
+        kind,
     });
 }
 

@@ -99,22 +99,58 @@ ni un Listening Event implicite.
 
 ## Listening History
 
-Historique temporel distinct de `MusicCatalog`, composé conceptuellement de Listening Events. Il
-décrit l'histoire musicale de l'utilisateur et alimente la Temporal Navigation. Sa reconstruction
-reste déterministe à partir d'entrées explicites, sans notion implicite de « maintenant ».
+Suite canonique immutable de `ListeningEvent`, distincte de `MusicCatalog`. Elle est ordonnée par
+instant croissant puis ID lexical, indépendamment de l'ordre d'entrée. `History(T)` contient tous
+les événements dont `occurredAt <= T`; cette coupe inclusive est reconstruite directement, sans
+notion implicite de « maintenant » ni dépendance à une consultation antérieure.
 
 ## Listening Event
 
-Événement explicite appartenant au Listening History et représentant un fait d'écoute dans le
-temps. Il ne devient ni une propriété structurelle de `MusicCatalog`, ni un événement analytics de
-navigation.
+Fait d'écoute explicite et immutable possédant un ID stable, un `occurredAt` en millisecondes Unix
+sous forme d'entier sûr et une identité Music canonique `(kind, ID)`. Il peut référencer une identité
+absente du catalogue courant. Il ne devient ni une propriété structurelle de `MusicCatalog`, ni un
+événement analytics de navigation.
 
 ## Temporal Navigation
 
 Exploration de l'évolution de l'atlas musical à partir du Listening History. Elle est critique
 pour Version 1.0 et reste distincte du temps d'exécution, du framerate et du parcours de
 l'utilisateur dans l'interface. Elle reconstruit un `World(T)` historiquement fidèle plutôt que de
-masquer simplement les éléments apparus après `T`.
+masquer simplement les éléments apparus après `T`. Le showcase navigateur propose des jalons
+explicites et reconstruit à chacun d'eux `Presence(T)`, le Knowledge Graph et le Geographic World,
+sans déplacer la Camera ni rembobiner le `CurrentBroadcast`.
+
+## Temporal Music Rules Version
+
+Version explicite des règles Music qui déterminent la présence à un instant. La première valeur,
+`temporal-music-presence-v1`, reste distincte des versions JSON, géographiques, de layout et de
+physique World.
+
+## Temporal Music Snapshot
+
+Snapshot Music immutable à un instant explicite `T`. Son catalogue contient uniquement les
+identités présentes et les relations originales dont les deux endpoints sont présents.
+
+## Presence(T)
+
+Ensemble des identités Music directement écoutées à ou avant `T`, résolues dans le catalogue, puis
+complété par leurs ancêtres structurels V1. Presence répond à « qui existe ? », sans calculer
+Activity ni Appearance.
+
+## Canonical Structural Music Relations V1
+
+Les trois triplets exacts Genre `includes` Artist, Artist `performed` Album et Album `contains`
+Track. Ils sont dirigés, sensibles à la casse et ne possèdent aucun alias silencieux.
+
+## Activity
+
+État temporel futur d'une identité présente, par exemple son ancienneté ou son abandon. Activity
+n'est pas calculée par `temporal-music-presence-v1`.
+
+## Appearance
+
+Traduction géographique ou visuelle future d'une identité et de son Activity. Elle n'appartient ni
+au Listening History ni au snapshot de présence Music.
 
 ## World(T)
 
