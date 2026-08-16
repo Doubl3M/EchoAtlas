@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 
 import cameraJourneySource from "../../src/app/CameraJourney.ts?raw";
 import currentBroadcastSource from "../../src/app/CurrentBroadcast.ts?raw";
+import appearanceInterpreterSource from "../../src/app/MusicGeographicAppearanceInterpreter.ts?raw";
 import interactionSource from "../../src/engine/interaction/CameraInteractionController.ts?raw";
 import navigableMapSource from "../../src/app/NavigableMap.ts?raw";
 import mainSource from "../../src/main.ts?raw";
@@ -73,5 +74,23 @@ describe("First Navigable Map architecture", () => {
         expect(shellSource).not.toMatch(/Cartographie musicale|Votre voyage|Zoom avant/);
         expect(interactionSource).not.toMatch(/Drag to explore|Scroll to zoom/);
         expect(rendererSource).not.toMatch(/Drag to explore|Scroll to zoom/);
+    });
+});
+
+describe("Music geographic appearance architecture", () => {
+    it("bridges Music and World without rendering or legacy City landmarks", () => {
+        const imports = [...appearanceInterpreterSource.matchAll(/from\s+["']([^"']+)["']/g)].map(
+            ([, path]) => path
+        );
+
+        expect(imports).toEqual(
+            expect.arrayContaining([
+                expect.stringContaining("music"),
+                expect.stringContaining("world"),
+            ])
+        );
+        expect(appearanceInterpreterSource).not.toMatch(
+            /(?:render|Canvas|VisualTheme|landmarkKind|city)/i
+        );
     });
 });

@@ -474,6 +474,23 @@ avant 180 jours exacts d'inactivité et `inactive` à partir de cette frontière
 calendaire. `inactive` ne signifie jamais `absent`. Activity ne produit encore aucune apparence
 géographique ou visuelle.
 
+La transformation suivante reste séparée et versionnée :
+
+```text
+Activity(T) + GeographicHierarchy
+→ music-geographic-appearance-v1
+→ GeographicAppearanceSnapshot(T)
+```
+
+Pour V1, chaque Artist inactive est résolu par son Knowledge Node canonique et toutes ses
+représentations de rôle District deviennent `ruined`. Un Artist actif, une feature d'un autre rôle
+ou une activité d'un autre kind ne produit aucune entrée. Le snapshot est sparse : absence signifie
+`normal`. Une réactivation reconstruit un nouveau snapshot normal sans muter le précédent.
+
+Cette fondation ne branche ni le générateur World legacy ni le Renderer. En particulier, le
+landmark Artist → City du showcase n'est pas utilisé : la cible canonique est le District de la
+hiérarchie sémantique.
+
 Le showcase exécute désormais réellement la reconstruction suivante pour chaque jalon temporel
 sélectionné :
 

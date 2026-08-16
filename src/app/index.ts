@@ -17,6 +17,9 @@ export type { ArrivalZoomProvider, MusicAtlasSnapshot } from "./MusicAtlasPipeli
 export { MusicGeographicInterpreter } from "./MusicGeographicInterpreter";
 export type { MusicGeographicInterpretationOptions } from "./MusicGeographicInterpreter";
 export type { MusicGeographyInterpretationVersion } from "./MusicGeographyInterpretationVersion";
+export { MusicGeographicAppearanceInterpreter } from "./MusicGeographicAppearanceInterpreter";
+export type { MusicGeographicAppearanceInterpretationOptions } from "./MusicGeographicAppearanceInterpreter";
+export type { MusicGeographicAppearanceVersion } from "./MusicGeographicAppearanceVersion";
 export { mountNavigableMap } from "./NavigableMap";
 export { TemporalMusicAtlas } from "./TemporalMusicAtlas";
 export type { TemporalMusicAtlasOptions } from "./TemporalMusicAtlas";

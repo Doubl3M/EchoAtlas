@@ -572,6 +572,17 @@ Presence(T) + Activity(T) → future Appearance(T)
 Activity reconstruction has no system clock, previous-snapshot input, CurrentBroadcast input,
 World dependency or rendering effect.
 
+World owns a generic immutable `GeographicAppearanceSnapshot`. It is sparse: absence means the
+default `normal` condition, while V1 stores only non-default `ruined` appearances for verified
+features in a supplied `GeographicHierarchy`. Appearance contains no time calculation or Music
+semantics and never replaces a feature identity.
+
+The application policy `music-geographic-appearance-v1` maps an inactive Artist through its
+canonical Knowledge Node ID to every represented District and marks those Districts `ruined`.
+Active Artists and every other Music kind produce no non-default appearance. The current Artist →
+City Canvas landmark remains showcase compatibility only and is deliberately not an Appearance
+target; rendering does not consume the new snapshot yet.
+
 The browser showcase now exercises this boundary through the application layer:
 
 ```text

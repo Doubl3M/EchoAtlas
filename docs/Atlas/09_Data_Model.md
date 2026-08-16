@@ -135,6 +135,19 @@ Un Artist `inactive` reste présent lorsque Presence(T) le contient. Appearance 
 traduction géographique ou visuelle de cet état ; aucune ruine ou autre métaphore n'est produite par
 Activity.
 
+## Apparence géographique temporelle V1
+
+`GeographicAppearanceSnapshot` est un snapshot World générique, immutable et sparse. Chaque entrée
+référence une `GeographicFeature` existante et porte une condition non-default. L'absence d'entrée
+signifie `normal`; la seule condition non-default V1 est `ruined`. Le snapshot ne contient ni date,
+ni seuil, ni identité Music, et ne remplace jamais la feature concernée.
+
+La couche application applique `music-geographic-appearance-v1` : un Artist `inactive` rend
+`ruined` chacun des Districts issus de son Knowledge Node canonique. Un Artist actif ne crée aucune
+entrée, y compris après réactivation. Aucun autre kind Music ne possède de règle Appearance V1.
+L'actuel landmark Canvas Artist → City est une compatibilité visuelle legacy du showcase et n'est
+pas une cible canonique de cette politique. Le Renderer ne consomme pas encore Appearance.
+
 Dans le showcase navigateur, la couche application choisit un jalon historique explicite puis
 reconstruit `Presence(T)`, le Knowledge Graph, le World et les libellés Music depuis le catalogue et
 l'historique complets et immutables. Changer de jalon ne modifie ni ces sources, ni la Camera, ni le

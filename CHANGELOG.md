@@ -12,6 +12,8 @@ The project follows Semantic Versioning.
 
 ## Added
 
+- Generic sparse geographic appearance snapshots and a versioned Music policy mapping inactive
+  Artists to every canonical District representation as `ruined`, without renderer integration.
 - Versioned deterministic Music activity snapshots with direct and structural-ancestor recency,
   plus the explicit 180-day Artist active/inactive boundary.
 - Interactive historical showcase reconstruction from an explicit `ListeningHistory` milestone,

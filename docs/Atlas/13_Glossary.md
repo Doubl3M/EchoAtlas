@@ -163,6 +163,18 @@ Traduction géographique ou visuelle future d'une identité et de son Activity. 
 au Listening History, ni au snapshot de présence Music, ni au projecteur Activity. Une
 classification `inactive` ne choisit donc pas elle-même une ruine, un marqueur ou un style.
 
+## Geographic Appearance Snapshot
+
+Snapshot World générique et immutable des conditions non-default de features géographiques
+existantes. Il est sparse : une feature absente du snapshot est `normal`. Une condition `ruined`
+change l'apparence, jamais l'identité, le rôle ou le containment de la feature.
+
+## Music Geographic Appearance Version
+
+Version de la politique applicative traduisant Activity Music en Appearance World. La première,
+`music-geographic-appearance-v1`, applique `ruined` à tous les Districts canoniques d'un Artist
+inactive. Elle est distincte des versions Presence, Activity, Geography, Layout et World.
+
 ## World(T)
 
 Snapshot géographique à l'instant explicite `T`, déterminé par `MusicCatalog`, le Listening History

@@ -2,8 +2,11 @@ import { describe, expect, it } from "vitest";
 
 import type {
     GeographicContentId,
+    GeographicAppearanceCondition,
+    GeographicAppearanceSnapshotOptions,
     GeographicContentOptions,
     GeographicFeatureId,
+    GeographicFeatureAppearanceOptions,
     GeographicFeatureOptions,
     GeographicHierarchyOptions,
     GeographicFocusRepresentationKind,
@@ -28,8 +31,10 @@ describe("world public API", () => {
         const publicApi = await import("../../src/world");
 
         expect(Object.keys(publicApi).sort()).toEqual([
+            "GeographicAppearanceSnapshot",
             "GeographicContent",
             "GeographicFeature",
+            "GeographicFeatureAppearance",
             "GeographicFocusResolver",
             "GeographicHierarchy",
             "GeographicLayout",
@@ -63,6 +68,12 @@ describe("world public API", () => {
             keyof GeographicContentOptions,
             keyof GeographicHierarchyOptions,
         ] = ["role", "containerFeatureId", "features"];
+        const appearanceCondition: GeographicAppearanceCondition = "ruined";
+        const appearanceOptions: GeographicFeatureAppearanceOptions = {
+            featureId,
+            condition: appearanceCondition,
+        };
+        const appearanceSnapshotKey: keyof GeographicAppearanceSnapshotOptions = "appearances";
         const focusKind: GeographicFocusRepresentationKind = "content-container";
         const focusTarget: GeographicFocusTarget = {
             knowledgeNodeId: "node",
@@ -86,6 +97,8 @@ describe("world public API", () => {
             generationVersion,
             ...contracts,
             ...hierarchyContracts,
+            appearanceOptions.condition,
+            appearanceSnapshotKey,
             focusTarget.representationKind,
             placement.kind,
             layoutKey,
@@ -106,6 +119,8 @@ describe("world public API", () => {
             "role",
             "containerFeatureId",
             "features",
+            "ruined",
+            "appearances",
             "content-container",
             "site",
             "hierarchy",

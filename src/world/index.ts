@@ -1,5 +1,12 @@
 export { GeographicWorld } from "./GeographicWorld";
 export type { GeographicWorldOptions } from "./GeographicWorld";
+export { GeographicAppearanceSnapshot } from "./GeographicAppearanceSnapshot";
+export type { GeographicAppearanceSnapshotOptions } from "./GeographicAppearanceSnapshot";
+export { GeographicFeatureAppearance } from "./GeographicFeatureAppearance";
+export type {
+    GeographicAppearanceCondition,
+    GeographicFeatureAppearanceOptions,
+} from "./GeographicFeatureAppearance";
 export { GeographicContent } from "./GeographicContent";
 export type { GeographicContentId, GeographicContentOptions } from "./GeographicContent";
 export { GeographicFeature } from "./GeographicFeature";
