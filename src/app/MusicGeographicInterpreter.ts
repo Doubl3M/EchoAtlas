@@ -1,7 +1,9 @@
 import type { KnowledgeGraph, KnowledgeRelation } from "../knowledge";
 import {
+    getStructuralMusicRelationKindV1,
     musicKnowledgeNodeId,
     musicKnowledgeNodeKind,
+    musicKnowledgeRelationKind,
     type MusicCatalog,
     type MusicEntity,
     type MusicEntityKind,
@@ -103,7 +105,7 @@ export class MusicGeographicInterpreter {
         featureIdsByKnowledgeNodeId: Map<string, GeographicFeatureId[]>
     ): void {
         for (const relation of relations) {
-            if (!hasEndpointKinds(relation, entities, "genre", "artist")) {
+            if (!isCanonicalStructuralRelation(relation, entities, "genre", "artist")) {
                 continue;
             }
             for (const continentId of featureIdsByKnowledgeNodeId.get(relation.sourceId) ?? []) {
@@ -134,7 +136,7 @@ export class MusicGeographicInterpreter {
         featureIdsByKnowledgeNodeId: Map<string, GeographicFeatureId[]>
     ): void {
         for (const relation of relations) {
-            if (!hasEndpointKinds(relation, entities, "artist", "album")) {
+            if (!isCanonicalStructuralRelation(relation, entities, "artist", "album")) {
                 continue;
             }
             for (const districtId of featureIdsByKnowledgeNodeId.get(relation.sourceId) ?? []) {
@@ -160,7 +162,7 @@ export class MusicGeographicInterpreter {
         contents: Map<string, GeographicContent>
     ): void {
         for (const relation of relations) {
-            if (!hasEndpointKinds(relation, entities, "album", "track")) {
+            if (!isCanonicalStructuralRelation(relation, entities, "album", "track")) {
                 continue;
             }
             for (const buildingId of featureIdsByKnowledgeNodeId.get(relation.sourceId) ?? []) {
@@ -195,15 +197,18 @@ export class MusicGeographicInterpreter {
     }
 }
 
-function hasEndpointKinds(
+function isCanonicalStructuralRelation(
     relation: KnowledgeRelation,
     entities: ReadonlyMap<string, MusicEntity>,
     sourceKind: MusicEntityKind,
     targetKind: MusicEntityKind
 ): boolean {
+    const relationKind = getStructuralMusicRelationKindV1(sourceKind, targetKind);
     return (
+        relationKind !== undefined &&
         entities.get(relation.sourceId)?.kind === sourceKind &&
-        entities.get(relation.targetId)?.kind === targetKind
+        entities.get(relation.targetId)?.kind === targetKind &&
+        relation.kind === musicKnowledgeRelationKind(relationKind)
     );
 }
 

@@ -92,6 +92,32 @@ sa consultation ne dépend d'aucun snapshot précédent. Il peut référencer un
 du catalogue courant afin de conserver un fait issu d'un catalogue incomplet, d'un import différé
 ou d'une source externe. La résolution de cette identité appartiendra au futur projecteur temporel.
 
+## Présence musicale temporelle V1
+
+Les relations structurelles Music V1 sont exactement :
+
+```text
+Genre  --includes-->  Artist
+Artist --performed--> Album
+Album  --contains-->  Track
+```
+
+Les kinds sont exacts, sensibles à la casse et ne possèdent aucun alias implicite. Une relation
+structurelle est reconnue par le triplet complet `(source kind, relation kind, target kind)`.
+
+`temporal-music-presence-v1` définit `Presence(T)` comme les identités directement écoutées au plus
+tard à `T`, résolues dans le catalogue fourni, auxquelles s'ajoute la fermeture ascendante de leurs
+ancêtres structurels canoniques. Une écoute Track peut ainsi révéler tous ses Albums parents, leurs
+Artists puis leurs Genres. Label, Playlist et Compilation peuvent être présents par écoute directe,
+mais aucune propagation structurelle ne leur est attribuée en V1.
+
+Le snapshot conserve uniquement les entités présentes et les relations originales dont les deux
+extrémités sont présentes. Il ne crée ni entité ni relation. Une identité d'écoute absente du
+catalogue est ignorée par cette projection sans effacer le fait historique.
+
+Presence détermine qui existe à `T`. Activity décrira plus tard l'état temporel d'une identité.
+Appearance décrira sa traduction géographique ou visuelle. Ces responsabilités restent séparées.
+
 ## Snapshot temporel du Monde
 
 Le Monde temporel est une reconstruction déterministe :

@@ -72,6 +72,19 @@ describe("ListeningHistory", () => {
         expect(history.getEvents()).toEqual([]);
         expect(history.getEventsUpTo(0)).toEqual([]);
         expect(history.getEventById("missing")).toBeUndefined();
+        expect(history.getEarliestOccurredAt()).toBeUndefined();
+        expect(history.getLatestOccurredAt()).toBeUndefined();
+    });
+
+    it("exposes explicit historical bounds without a current-time fallback", () => {
+        const history = new ListeningHistory([
+            event("latest", 30),
+            event("earliest", -10),
+            event("middle", 20),
+        ]);
+
+        expect(history.getEarliestOccurredAt()).toBe(-10);
+        expect(history.getLatestOccurredAt()).toBe(30);
     });
 
     it("returns one event by its ID", () => {

@@ -118,6 +118,38 @@ pour Version 1.0 et reste distincte du temps d'exécution, du framerate et du pa
 l'utilisateur dans l'interface. Elle reconstruit un `World(T)` historiquement fidèle plutôt que de
 masquer simplement les éléments apparus après `T`.
 
+## Temporal Music Rules Version
+
+Version explicite des règles Music qui déterminent la présence à un instant. La première valeur,
+`temporal-music-presence-v1`, reste distincte des versions JSON, géographiques, de layout et de
+physique World.
+
+## Temporal Music Snapshot
+
+Snapshot Music immutable à un instant explicite `T`. Son catalogue contient uniquement les
+identités présentes et les relations originales dont les deux endpoints sont présents.
+
+## Presence(T)
+
+Ensemble des identités Music directement écoutées à ou avant `T`, résolues dans le catalogue, puis
+complété par leurs ancêtres structurels V1. Presence répond à « qui existe ? », sans calculer
+Activity ni Appearance.
+
+## Canonical Structural Music Relations V1
+
+Les trois triplets exacts Genre `includes` Artist, Artist `performed` Album et Album `contains`
+Track. Ils sont dirigés, sensibles à la casse et ne possèdent aucun alias silencieux.
+
+## Activity
+
+État temporel futur d'une identité présente, par exemple son ancienneté ou son abandon. Activity
+n'est pas calculée par `temporal-music-presence-v1`.
+
+## Appearance
+
+Traduction géographique ou visuelle future d'une identité et de son Activity. Elle n'appartient ni
+au Listening History ni au snapshot de présence Music.
+
 ## World(T)
 
 Snapshot géographique à l'instant explicite `T`, déterminé par `MusicCatalog`, le Listening History

@@ -52,6 +52,14 @@ export class ListeningHistory {
         return this.eventsById.get(id);
     }
 
+    public getEarliestOccurredAt(): number | undefined {
+        return this.events[0]?.occurredAt;
+    }
+
+    public getLatestOccurredAt(): number | undefined {
+        return this.events[this.events.length - 1]?.occurredAt;
+    }
+
     public getEventsUpTo(occurredAtInclusive: number): readonly ListeningEvent[] {
         validateOccurredAt(occurredAtInclusive, "Listening history upper bound");
         return copyPrefix(this.events, upperBound(this.events, occurredAtInclusive));

@@ -201,11 +201,12 @@ explicit World interpretation policy. The current `world-v1-exact` flat generato
 during this migration.
 
 Music Atlas currently owns `music-geography-v1` in the application layer. This interpretation
-uses directed relations only: Genre → Artist creates a District in a Genre Continent,
-Artist → Album creates a Building in every represented Artist District, and Album → Track creates
-Building Content in every represented Album Building. Inverse and unrelated relations have no
-implicit geographic meaning. This interpretation version is independent from both the JSON format
-version and `WorldGenerationVersion`.
+uses the exact canonical structural Music relations V1: Genre `includes` Artist creates a District
+in a Genre Continent, Artist `performed` Album creates a Building in every represented Artist
+District, and Album `contains` Track creates Building Content in every represented Album Building.
+Endpoint kinds alone are insufficient. Inverse, aliased and unrelated relations have no implicit
+geographic meaning. This interpretation version is independent from both the JSON format version
+and `WorldGenerationVersion`.
 
 World provides a generic focus resolution step over this hierarchy. A Knowledge identity resolves
 to zero or more direct features or content containers; no one-to-one representation is assumed.
@@ -546,6 +547,16 @@ distinct facts when their IDs differ.
 the immutable history and never from a previous temporal snapshot. Neither the catalog nor the
 system clock is required to construct the history; an event may therefore reference a Music
 identity absent from the current catalog, for later resolution by temporal projection.
+
+`temporal-music-presence-v1` projects `Presence(T)` from direct listening identities resolved in
+the supplied catalog, then closes upward over exactly the same canonical structural relations:
+Genre `includes` Artist, Artist `performed` Album and Album `contains` Track. Label, Playlist and
+Compilation can be directly present but have no inherited structural presence in V1. The temporal
+catalog retains every original relation whose two endpoints are present and invents none.
+
+Presence answers which identities exist at `T`. Activity will later describe states such as
+recency or abandonment. Appearance remains a separate geographic/rendering concern. These three
+contracts are not interchangeable.
 
 A temporal world is defined conceptually by:
 

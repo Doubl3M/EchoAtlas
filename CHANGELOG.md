@@ -12,6 +12,10 @@ The project follows Semantic Versioning.
 
 ## Added
 
+- Versioned temporal Music presence projection from direct listening facts and exact canonical
+  structural ancestors, producing immutable filtered catalogs for explicit historical instants.
+- Shared V1 structural Music semantics for Genre `includes` Artist, Artist `performed` Album and
+  Album `contains` Track.
 - Immutable canonical listening events and indexed listening histories with explicit inclusive
   temporal queries, independent from the current catalog, system time and Radio Pirate.
 - Application-owned current broadcast snapshots and a clickable seventies Radio Pirate landmark,
@@ -43,6 +47,8 @@ The project follows Semantic Versioning.
 
 ## Changed
 
+- Music geography now requires exact V1 structural relation triplets, and the showcase uses the
+  canonical Artist `performed` Album relation kind without changing its graph structure.
 - Relational atlas navigation now performs a safely framed, kind-scaled, cancellable and
   reduced-motion-aware Camera journey to the selected World location while preserving generic
   Renderer and domain boundaries.

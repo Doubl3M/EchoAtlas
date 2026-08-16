@@ -212,9 +212,10 @@ relations musicales restent dans Knowledge; la politique Music Atlas qui les int
 à l'application, tandis que le containment générique résultant appartient au World.
 
 Pour Music Atlas, la couche application applique explicitement `music-geography-v1`. Les relations
-sont dirigées : Genre → Artist crée le District, Artist → Album propage le Building dans chaque
-District représenté, puis Album → Track propage le Building Content. Les relations inverses ou
-d'autres couples de kinds sont ignorés et aucun parent géographique de repli n'est inventé.
+sont dirigées et leur kind exact participe au contrat : Genre `includes` Artist crée le District,
+Artist `performed` Album propage le Building dans chaque District représenté, puis Album `contains`
+Track propage le Building Content. Les relations inverses, les aliases, les autres relation kinds
+ou d'autres couples de kinds sont ignorés et aucun parent géographique de repli n'est inventé.
 Cette version d'interprétation est distincte de `metadata.version`, de la version des règles
 temporelles et de `WorldConfig.generationVersion`.
 
@@ -434,6 +435,24 @@ History(T) = events where occurredAt <= T
 Une coupe est toujours calculée depuis l'historique complet et jamais depuis la coupe précédente.
 Une identité absente du catalogue reste un fait valide; sa résolution ou son exclusion du futur
 snapshot musical appartient à l'étape de projection temporelle, pas à l'historique.
+
+La première projection d'existence est versionnée `temporal-music-presence-v1` :
+
+```text
+Presence(T)
+= identités directement écoutées à ou avant T et résolues dans MusicCatalog
++ leurs ancêtres via Genre --includes--> Artist
+                     Artist --performed--> Album
+                     Album --contains--> Track
+```
+
+La fermeture remonte ces relations jusqu'au point fixe et accepte tous les parents valides. Label,
+Playlist et Compilation restent limités à une présence directe. Le catalogue temporel résultant
+conserve toutes les relations originales dont les deux endpoints sont présents, structurelles ou
+non, sans en synthétiser.
+
+Cette étape répond uniquement à l'existence. Les futurs états d'activité et leur apparence
+géographique ou visuelle sont des transformations distinctes.
 
 La navigation temporelle reconstruit un snapshot historique complet :
 

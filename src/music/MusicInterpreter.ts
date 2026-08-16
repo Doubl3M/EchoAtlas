@@ -2,7 +2,11 @@ import { KnowledgeGraph, KnowledgeNode, KnowledgeRelation } from "../knowledge";
 import type { MusicEntity } from "./MusicEntity";
 import type { MusicCatalog } from "./MusicCatalog";
 import type { MusicRelation } from "./MusicRelation";
-import { musicKnowledgeNodeId, musicKnowledgeNodeKind } from "./MusicKnowledgeIdentity";
+import {
+    musicKnowledgeNodeId,
+    musicKnowledgeNodeKind,
+    musicKnowledgeRelationKind,
+} from "./MusicKnowledgeIdentity";
 
 /** Deterministically translates musical semantics into the generic Knowledge Graph. */
 export class MusicInterpreter {
@@ -53,7 +57,7 @@ export class MusicInterpreter {
             id: `music:relation:${relation.id}`,
             sourceId,
             targetId,
-            kind: `music:${relation.kind}`,
+            kind: musicKnowledgeRelationKind(relation.kind),
             weight: relation.weight,
         });
     }

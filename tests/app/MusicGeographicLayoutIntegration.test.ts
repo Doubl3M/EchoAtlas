@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { MusicGeographicInterpreter } from "../../src/app";
 import {
+    getStructuralMusicRelationKindV1,
     MusicCatalog,
     MusicEntity,
     MusicInterpreter,
@@ -86,12 +87,14 @@ function relation(
     targetKind: "artist" | "album" | "track",
     targetId: string
 ): MusicRelation {
+    const kind = getStructuralMusicRelationKindV1(sourceKind, targetKind);
+    if (kind === undefined) throw new Error("Expected a canonical structural relation kind.");
     return new MusicRelation({
         id,
         sourceKind,
         sourceId,
         targetKind,
         targetId,
-        kind: "fixture-link",
+        kind,
     });
 }
