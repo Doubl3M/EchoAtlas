@@ -12,6 +12,9 @@ The project follows Semantic Versioning.
 
 ## Added
 
+- Interactive historical showcase reconstruction from an explicit `ListeningHistory` milestone,
+  with deterministic `Presence(T)`, Knowledge Graph, World and Music labels while the current
+  Radio Pirate broadcast remains independent.
 - Versioned temporal Music presence projection from direct listening facts and exact canonical
   structural ancestors, producing immutable filtered catalogs for explicit historical instants.
 - Shared V1 structural Music semantics for Genre `includes` Artist, Artist `performed` Album and

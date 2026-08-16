@@ -18,3 +18,5 @@ export { MusicGeographicInterpreter } from "./MusicGeographicInterpreter";
 export type { MusicGeographicInterpretationOptions } from "./MusicGeographicInterpreter";
 export type { MusicGeographyInterpretationVersion } from "./MusicGeographyInterpretationVersion";
 export { mountNavigableMap } from "./NavigableMap";
+export { TemporalMusicAtlas } from "./TemporalMusicAtlas";
+export type { TemporalMusicAtlasOptions } from "./TemporalMusicAtlas";

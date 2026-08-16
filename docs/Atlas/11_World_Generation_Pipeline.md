@@ -454,6 +454,21 @@ non, sans en synthétiser.
 Cette étape répond uniquement à l'existence. Les futurs états d'activité et leur apparence
 géographique ou visuelle sont des transformations distinctes.
 
+Le showcase exécute désormais réellement la reconstruction suivante pour chaque jalon temporel
+sélectionné :
+
+```text
+ListeningHistory
+→ Presence(T)
+→ KnowledgeGraph(T)
+→ GeographicWorld(T)
+→ rendu Canvas
+```
+
+La couche application repart toujours du catalogue complet et de l'historique immutable. Elle
+conserve la Camera courante, remplace les snapshots dérivés et laisse le `CurrentBroadcast` hors de
+ce pipeline.
+
 La navigation temporelle reconstruit un snapshot historique complet :
 
 ```

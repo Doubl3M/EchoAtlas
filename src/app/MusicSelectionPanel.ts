@@ -13,6 +13,8 @@ export interface MusicSelectionPanel {
     show(knowledgeNodeId: string): void;
     hide(): void;
     close(): void;
+    updateSource(catalog: MusicCatalog, relationProvider: MusicSelectionRelationProvider): void;
+    getSelectedKnowledgeNodeId(): string | undefined;
 }
 
 export interface MusicSelectionPanelActions {
@@ -26,11 +28,8 @@ export function createMusicSelectionPanel(
     relationProvider: MusicSelectionRelationProvider,
     actions: MusicSelectionPanelActions
 ): MusicSelectionPanel {
-    const entities = new Map<string, MusicEntity>(
-        catalog
-            .getEntities()
-            .map((entity) => [`music:${entity.kind}:${entity.id}`, entity] as const)
-    );
+    let entities = indexEntities(catalog);
+    let currentRelationProvider = relationProvider;
     const element = document.createElement("aside");
     element.className = "selection-panel";
     element.hidden = true;
@@ -63,11 +62,34 @@ export function createMusicSelectionPanel(
             createHeader(entity),
             ...(entity.kind === "artist" ? [createCityMotif()] : []),
             createAttributes(entity),
-            createConnections(relationProvider(knowledgeNodeId), selectRelation)
+            createConnections(currentRelationProvider(knowledgeNodeId), selectRelation)
         );
         element.hidden = false;
     };
-    return Object.freeze({ element, show, hide, close });
+    const updateSource = (
+        updatedCatalog: MusicCatalog,
+        updatedRelationProvider: MusicSelectionRelationProvider
+    ): void => {
+        entities = indexEntities(updatedCatalog);
+        currentRelationProvider = updatedRelationProvider;
+    };
+    const getSelectedKnowledgeNodeId = (): string | undefined => element.dataset.selectedId;
+    return Object.freeze({
+        element,
+        show,
+        hide,
+        close,
+        updateSource,
+        getSelectedKnowledgeNodeId,
+    });
+}
+
+function indexEntities(catalog: MusicCatalog): Map<string, MusicEntity> {
+    return new Map<string, MusicEntity>(
+        catalog
+            .getEntities()
+            .map((entity) => [`music:${entity.kind}:${entity.id}`, entity] as const)
+    );
 }
 
 function createCloseButton(close: () => void): HTMLButtonElement {

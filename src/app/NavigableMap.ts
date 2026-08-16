@@ -1,6 +1,7 @@
 import { Camera2D, CameraConfig } from "../engine/camera";
 import { CameraInteractionController } from "../engine/interaction";
 import { TerrainConfig } from "../engine/terrain";
+import { MusicJsonImporter } from "../music/import";
 import { CanvasRenderer, CanvasRenderSurface, SeventiesTheme } from "../render";
 import { createSeventiesHomeShell } from "../ui/SeventiesHomeShell";
 import { WorldConfig, type GeographicWorld, type WorldLocation } from "../world";
@@ -12,10 +13,13 @@ import {
 } from "./CurrentBroadcastLandmark";
 import { createCurrentBroadcastPanel } from "./CurrentBroadcastPanel";
 import { createDemoCurrentBroadcast } from "./demoCurrentBroadcast";
+import { createDemoListeningHistory } from "./demoListeningHistory";
 import { demoMusicDocumentJson } from "./demoMusicDocument";
-import { createMusicAtlasSnapshot } from "./MusicAtlasPipeline";
+import { createHistoricalTimelineControl } from "./HistoricalTimelineControl";
+import type { MusicAtlasSnapshot } from "./MusicAtlasPipeline";
 import { createMusicSelectionPanel } from "./MusicSelectionPanel";
 import { createMusicSelectionRelationProvider } from "./MusicSelectionRelations";
+import { TemporalMusicAtlas } from "./TemporalMusicAtlas";
 import { uiText } from "./UiText";
 
 const WORLD_WIDTH = 96;
@@ -33,14 +37,32 @@ const CAMERA_MAX_ZOOM = 128;
 /** Browser adapter that binds DOM events to the generic interaction controller. */
 export function mountNavigableMap(root: HTMLElement): () => void {
     const worldConfig = createWorldConfig();
-    const snapshot = createMusicAtlasSnapshot(demoMusicDocumentJson, worldConfig);
+    const imported = new MusicJsonImporter().parse(demoMusicDocumentJson);
+    const seed = imported.metadata.seed;
+    if (seed === undefined) {
+        throw new Error("The navigable map document must provide metadata.seed.");
+    }
+    const listeningHistory = createDemoListeningHistory();
+    const temporalAtlas = new TemporalMusicAtlas({
+        catalog: imported.catalog,
+        listeningHistory,
+        seed,
+        worldConfig,
+        rulesVersion: "temporal-music-presence-v1",
+    });
+    const milestones = temporalAtlas.getMilestones();
+    let selectedHistoricalTime = temporalAtlas.getInitialHistoricalTime();
+    let snapshot: MusicAtlasSnapshot =
+        selectedHistoricalTime === undefined
+            ? temporalAtlas.projectEmpty()
+            : temporalAtlas.project(selectedHistoricalTime);
     const camera = createCamera(1, 1);
     const interaction = new CameraInteractionController(camera);
     const canvas = document.createElement("canvas");
     canvas.setAttribute("aria-label", uiText.canvasLabel);
     const surface = new CanvasRenderSurface(canvas);
     const theme = new SeventiesTheme();
-    const renderer = new CanvasRenderer(theme, snapshot.labels);
+    let renderer = new CanvasRenderer(theme, snapshot.labels);
     const currentBroadcast = createDemoCurrentBroadcast();
     let openCurrentBroadcast = (): void => undefined;
     const broadcastLandmark = createCurrentBroadcastLandmark({
@@ -57,6 +79,9 @@ export function mountNavigableMap(root: HTMLElement): () => void {
         visibleKnowledgeNodeIds = new Set(summary.visibleKnowledgeNodeIds);
         canvas.dataset.visibleLabels = String(summary.visibleLabelCount);
         canvas.dataset.visibleLocations = String(summary.visibleKnowledgeNodeIds.length);
+        if (selectedHistoricalTime !== undefined) {
+            canvas.dataset.historicalAt = String(selectedHistoricalTime);
+        }
         shell.setVisibleLocationCount(summary.visibleKnowledgeNodeIds.length);
         broadcastLandmark.update(camera);
     };
@@ -113,6 +138,12 @@ export function mountNavigableMap(root: HTMLElement): () => void {
         broadcastPanel.show();
         render();
     };
+    let selectHistoricalTime: (at: number) => void = (): void => undefined;
+    const timeline = createHistoricalTimelineControl({
+        milestones,
+        selectedAt: selectedHistoricalTime,
+        onSelect: (at) => selectHistoricalTime(at),
+    });
     const resize = (): void => {
         const bounds = shell.mapViewport.getBoundingClientRect();
         const width = Math.max(1, bounds.width);
@@ -146,10 +177,39 @@ export function mountNavigableMap(root: HTMLElement): () => void {
         text: uiText,
         locationCount: snapshot.world.getLocations().length,
         relationCount: snapshot.world.getConnections().length,
+        journeyControl: timeline.element,
         onZoomIn: () => zoomFromCenter(CONTROL_ZOOM_FACTOR),
         onZoomOut: () => zoomFromCenter(1 / CONTROL_ZOOM_FACTOR),
         onRecenter: recenter,
     });
+    selectHistoricalTime = (at: number): void => {
+        journey.cancel();
+        const selectedKnowledgeNodeId = selectionPanel.getSelectedKnowledgeNodeId();
+        const wasSelectionVisible = !selectionPanel.element.hidden;
+        snapshot = temporalAtlas.project(at);
+        selectedHistoricalTime = at;
+        renderer = new CanvasRenderer(theme, snapshot.labels);
+        selectionPanel.updateSource(
+            snapshot.catalog,
+            createMusicSelectionRelationProvider(snapshot.catalog, snapshot.graph)
+        );
+        if (
+            selectedKnowledgeNodeId !== undefined &&
+            snapshot.graph.hasNode(selectedKnowledgeNodeId)
+        ) {
+            focusedKnowledgeNodeId = selectedKnowledgeNodeId;
+            if (wasSelectionVisible) {
+                selectionPanel.show(selectedKnowledgeNodeId);
+            }
+        } else {
+            focusedKnowledgeNodeId = undefined;
+            selectionPanel.hide();
+        }
+        timeline.setSelectedAt(at);
+        shell.setLocationCount(snapshot.world.getLocations().length);
+        shell.setRelationCount(snapshot.world.getConnections().length);
+        render();
+    };
     root.replaceChildren(shell.element);
     const selectLocation = (screenX: number, screenY: number): void => {
         const location = findLocationAtScreen(

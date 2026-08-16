@@ -116,7 +116,9 @@ absente du catalogue courant. Il ne devient ni une propriété structurelle de `
 Exploration de l'évolution de l'atlas musical à partir du Listening History. Elle est critique
 pour Version 1.0 et reste distincte du temps d'exécution, du framerate et du parcours de
 l'utilisateur dans l'interface. Elle reconstruit un `World(T)` historiquement fidèle plutôt que de
-masquer simplement les éléments apparus après `T`.
+masquer simplement les éléments apparus après `T`. Le showcase navigateur propose des jalons
+explicites et reconstruit à chacun d'eux `Presence(T)`, le Knowledge Graph et le Geographic World,
+sans déplacer la Camera ni rembobiner le `CurrentBroadcast`.
 
 ## Temporal Music Rules Version
 

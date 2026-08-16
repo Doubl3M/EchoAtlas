@@ -558,6 +558,20 @@ Presence answers which identities exist at `T`. Activity will later describe sta
 recency or abandonment. Appearance remains a separate geographic/rendering concern. These three
 contracts are not interchangeable.
 
+The browser showcase now exercises this boundary through the application layer:
+
+```text
+ListeningHistory
+→ Presence(T)
+→ KnowledgeGraph(T)
+→ GeographicWorld(T)
+→ CanvasRenderer
+```
+
+Changing the explicit historical milestone rebuilds every derived snapshot from the immutable full
+catalog and history. It does not mutate the source catalog, reuse the previous World as input, or
+alter Camera state. `CurrentBroadcast` remains separate application state and is not rewound.
+
 A temporal world is defined conceptually by:
 
 ```text

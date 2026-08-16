@@ -20,6 +20,7 @@ export interface SeventiesHomeShellOptions {
     readonly text: SeventiesHomeShellText;
     readonly locationCount: number;
     readonly relationCount: number;
+    readonly journeyControl?: HTMLElement;
     readonly onZoomIn: () => void;
     readonly onZoomOut: () => void;
     readonly onRecenter: () => void;
@@ -29,6 +30,8 @@ export interface SeventiesHomeShell {
     readonly element: HTMLElement;
     readonly mapViewport: HTMLElement;
     setVisibleLocationCount(count: number): void;
+    setLocationCount(count: number): void;
+    setRelationCount(count: number): void;
 }
 
 /** Theme-specific browser shell. It receives generic map facts and actions only. */
@@ -49,6 +52,12 @@ export function createSeventiesHomeShell(options: SeventiesHomeShellOptions): Se
         mapViewport: map.viewport,
         setVisibleLocationCount(count: number): void {
             journey.visible.textContent = String(count);
+        },
+        setLocationCount(count: number): void {
+            journey.locations.textContent = String(count);
+        },
+        setRelationCount(count: number): void {
+            journey.relations.textContent = String(count);
         },
     });
 }
@@ -127,6 +136,8 @@ function createControl(
 function createJourney(options: SeventiesHomeShellOptions): {
     readonly element: HTMLElement;
     readonly visible: HTMLElement;
+    readonly locations: HTMLElement;
+    readonly relations: HTMLElement;
 } {
     const element = document.createElement("footer");
     element.className = "atlas-journey";
@@ -134,12 +145,23 @@ function createJourney(options: SeventiesHomeShellOptions): {
     title.className = "atlas-journey__title";
     title.textContent = options.text.journey;
     const facts = document.createElement("dl");
+    const locations = document.createElement("dd");
+    const relations = document.createElement("dd");
     const visible = document.createElement("dd");
-    appendFact(facts, options.text.places, String(options.locationCount));
-    appendFact(facts, options.text.relations, String(options.relationCount));
+    locations.className = "atlas-journey__locations";
+    relations.className = "atlas-journey__relations";
+    visible.className = "atlas-journey__visible";
+    locations.textContent = String(options.locationCount);
+    relations.textContent = String(options.relationCount);
+    appendFact(facts, options.text.places, locations);
+    appendFact(facts, options.text.relations, relations);
     appendFact(facts, options.text.visible, visible);
-    element.append(title, facts);
-    return { element, visible };
+    element.append(
+        title,
+        facts,
+        ...(options.journeyControl === undefined ? [] : [options.journeyControl])
+    );
+    return { element, visible, locations, relations };
 }
 
 function appendFact(list: HTMLElement, label: string, value: string | HTMLElement): void {

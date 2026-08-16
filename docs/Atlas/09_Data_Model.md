@@ -118,6 +118,11 @@ catalogue est ignorée par cette projection sans effacer le fait historique.
 Presence détermine qui existe à `T`. Activity décrira plus tard l'état temporel d'une identité.
 Appearance décrira sa traduction géographique ou visuelle. Ces responsabilités restent séparées.
 
+Dans le showcase navigateur, la couche application choisit un jalon historique explicite puis
+reconstruit `Presence(T)`, le Knowledge Graph, le World et les libellés Music depuis le catalogue et
+l'historique complets et immutables. Changer de jalon ne modifie ni ces sources, ni la Camera, ni le
+`CurrentBroadcast`, qui reste un état d'expérience distinct.
+
 ## Snapshot temporel du Monde
 
 Le Monde temporel est une reconstruction déterministe :
